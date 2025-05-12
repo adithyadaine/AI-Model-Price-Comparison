@@ -6,6 +6,7 @@
     <title>AI Model Pricing Comparator</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/png" href="img/favicon/ai_cluster.png" />
+
     <!-- Add Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
@@ -13,32 +14,34 @@
     <header>
       <!-- **** ADD HAMBURGER BUTTON **** -->
       <button id="hamburgerBtn" class="hamburger-btn" aria-label="Open model selection menu" aria-expanded="false">
-        &#9776; <!-- Hamburger icon -->
+        &#9776;
       </button>
-      <!-- **** END HAMBURGER BUTTON **** -->
+
       <h1>AI Model Pricing Comparator</h1>
+
     </header>
 
     <!-- **** MOVE SELECTION PANEL HERE **** -->
     <aside class="selection-panel" id="selectionPanel" aria-hidden="true">
+
       <!-- **** ADD CLOSE BUTTON **** -->
       <button id="closePanelBtn" class="close-panel-btn" aria-label="Close model selection menu">&times;</button>
-      <!-- **** END CLOSE BUTTON **** -->
+
       <h2>Select Models</h2>
       <div id="model-selection-list">
+
         <!-- Provider groups with dropdowns will be populated here by JS -->
         <p>Loading models...</p>
       </div>
     </aside>
-    <!-- **** END SELECTION PANEL MOVE **** -->
 
     <!-- **** ADD OVERLAY **** -->
     <div id="overlay" class="overlay"></div>
-    <!-- **** END OVERLAY **** -->
 
     <!-- Main content area remains -->
     <div class="container">
       <main class="comparison-area">
+
         <!-- View Toggles -->
         <div class="view-toggles">
           <button id="tableViewBtn" class="toggle-btn active">Table</button>
@@ -77,8 +80,10 @@
 
         <!-- Bar Chart Container -->
         <div id="bar-chart-view" class="view-container">
+
           <!-- Outer wrapper for scrolling -->
           <div class="chart-scroll-wrapper">
+
             <!-- Inner wrapper for sizing the canvas container -->
             <div class="chart-canvas-container">
               <canvas id="priceChart"></canvas>
@@ -92,7 +97,6 @@
         </p>
       </main>
     </div>
-    <!-- End .container -->
 
     <footer>
       <h3>Maintained with ❤️ by Adithya D M</h3>
