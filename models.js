@@ -8,8 +8,10 @@ const openAIModels = [
   { id: "o1", name: "o1", provider: "OpenAI", inputPrice: 15.0, outputPrice: 60.0, contextWindow: "200k", logo: "openai.png" },
   { id: "o1-mini", name: "o1 Mini", provider: "OpenAI", inputPrice: 1.1, outputPrice: 4.4, contextWindow: "128k", logo: "openai.png" },
   { id: "o3-mini", name: "o3 Mini", provider: "OpenAI", inputPrice: 1.1, outputPrice: 4.4, contextWindow: "200k", logo: "openai.png" },
-  { id: "o3-mini-high", name: "o3 Mini High", provider: "OpenAI", inputPrice: 1.1, outputPrice: 4.4, contextWindow: "200k", logo: "openai.png" },
+  { id: "o3-mini-high", name: "o3-Mini-High", provider: "OpenAI", inputPrice: 1.1, outputPrice: 4.4, contextWindow: "200k", logo: "openai.png" },
   { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo", provider: "OpenAI", inputPrice: 0.5, outputPrice: 1.5, contextWindow: "16k", logo: "openai.png" },
+  { id: "o4-mini-high", name: "o4-Mini-High", provider: "OpenAI", inputPrice: 1.1, outputPrice: 4.4, contextWindow: "200k", logo: "openai.png" },
+  
 ];
 
 // ================== Anthropic Models ==================
@@ -76,6 +78,23 @@ const amazonModels = [
   { id: "nova-pro", name: "Nova Pro", provider: "Amazon", inputPrice: 0.8, outputPrice: 3.2, contextWindow: "300k", logo: "amazon.png" },
 ];
 
+// ================== Alibaba Models ==================
+const alibabaModels = [
+{ id: "qwen-max", name: "Qwen-Max", provider: "Alibaba", inputPrice: 1.6, outputPrice: 6.4, contextWindow: "128k", logo: "alibaba.png"},
+{ id: "qwen-plus", name: "Qwen-Plus", provider: "Alibaba", inputPrice: 0.4, outputPrice: 1.2, contextWindow: "128k", logo: "alibaba.png"},
+{ id: "qwen-plus-latest-thinking", name: "Qwen-Plus-Latest (Thinking)", provider: "Alibaba", inputPrice: 0.4, outputPrice: 8.0, contextWindow: "128k", logo: "alibaba.png"},
+{ id: "qwen-plus-latest", name: "Qwen-Plus-Latest", provider: "Alibaba", inputPrice: 0.4, outputPrice: 1.2, contextWindow: "128k", logo: "alibaba.png"},
+{ id: "qwen-turbo", name: "Qwen-Turbo", provider: "Alibaba", inputPrice: 0.05, outputPrice: 0.2, contextWindow: "32k", logo: "alibaba.png"},
+{ id: "qwen-vl-max", name: "Qwen-VL-Max", provider: "Alibaba", inputPrice: 0.41, outputPrice: 0.41, contextWindow: "128k", logo: "alibaba.png"},
+];
+
+// ================== NVIDIA Models ==================
+const NVIDIAModels = [
+  {id: "llama-3.1-nemotron-70b-instruct", name: "Llama 3.1 Nemotron 70B Instruct", provider: "NVIDIA", inputPrice: 0.12, outputPrice: 0.30, contextWindow: "131k", logo: "nvidia.png"},
+  {id: "llama-3.1-nemotron-8b-instruct-bf16", name: "Llama 3.1 Nemotron 8B Instruct (BF16)", provider: "NVIDIA", inputPrice: 0.025, outputPrice: 0.04, contextWindow: "131k", logo: "nvidia.png"},
+  {id: "llama-3.1-405b-instruct-fp8", name: "Llama 3.1 405B Instruct (FP8)", provider: "NVIDIA", inputPrice: 0.80, outputPrice: 0.80, contextWindow: "131k", logo: "nvidia.png"},
+  {id: "llama-3.2-3b-instruct-bf16", name: "Llama 3.2 3B Instruct (BF16)", provider: "NVIDIA", inputPrice: 0.015, outputPrice: 0.025, contextWindow: "131k", logo: "nvidia.png"},
+];
 
 // ================== Combine all models ==================
 // This is the final array used by script.js
@@ -89,6 +108,8 @@ const modelsData = [
   ...metaModels,
   ...xAIModels,
   ...amazonModels,
+  ...alibabaModels,
+  ...NVIDIAModels
 ];
 
 // EDIT THIS VALUE WHEN DATA CHANGES
