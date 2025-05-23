@@ -15,15 +15,18 @@ Anthropic,Claude 3.5 Sonnet,200000,3,15,Active
 Anthropic,Claude 3.7 Sonnet,200000,3,15,Active
 Anthropic,Claude 3.7 Sonnet Thinking,200000,3,15,Active
 Anthropic,Claude 3 Opus,200000,15,75,Active
-Google,Gemini 2.5 Pro Exp.,1000000,1.25,10,Active
+Anthropic,Claude 4 Opus,200000,15,75,Active
+Anthropic,Claude Sonnet 4,200000,3,15,Active
+Google,Gemini 2.5 Pro (Preview),1048576,1.25,10,Active
 Google,Gemini 2.0 Pro Exp.,2000000,1.25,10,Active
-Google,Gemini 2.0 Flash,1000000,0.1,0.4,Active
-Google,Gemini 2.0 Flash-Lite,1000000,0.075,0.3,Active
-Google,Gemini 1.5 Pro,2000000,1.25,5,Active
-Google,Gemini 1.5 Flash,1000000,0.15,0.6,Active
+Google,Gemini 2.5 Flash (Preview),1048576,0.15,0.6,Active
+Google,Gemini 2.0 Flash,1048576,0.15,0.6,Active
+Google,Gemini 2.0 Flash-Lite,1048576,0.15,0.6,Active
+Google,Gemini 1.5 Pro,2097152,1.25,10,Legacy
+Google,Gemini 1.5 Flash,1048576,0.15,0.6,Legacy
 Google,Gemini 1.5 Flash-8B,1000000,0.075,0.3,Active
 DeepSeek,DeepSeek R1,128000,0.55,2.19,Active
-DeepSeek,DeepSeek V3 (Mar â€™25),128000,0.14,0.28,Active
+DeepSeek,DeepSeek V3 (Mar â2025),128000,0.14,0.28,Active
 DeepSeek,DeepSeek V2.5,128000,0.14,0.28,Active
 DeepSeek,DeepSeek R1 Distill Qwen,128000,0.27,1.1,Active
 Mistral,Mistral Small,32000,0.1,0.3,Active
