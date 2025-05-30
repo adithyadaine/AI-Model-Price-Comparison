@@ -26,6 +26,9 @@ const expandAllBtn = document.getElementById("expandAllBtn");
 const clearPanelBtn = document.getElementById("clearPanelBtn"); // Clear button in panel
 const dynamicTimestampSpan = document.getElementById("dynamicTimestamp");
 
+// --- Global Image Cache ---
+const imageCache = {};
+
 // --- Helper Functions ---
 function formatNumber(numStr) {
   if (numStr === null || numStr === undefined || numStr.trim() === "")
@@ -47,6 +50,47 @@ function getLogoFilename(vendorName) {
       .replace(/\(.*\)/g, "")
       .replace(/[^a-z0-9]/gi, "") + ".png"
   );
+}
+
+// --- Image Preloading Functions ---
+async function preloadLogosForChart(models) {
+  const promises = models.map((model) => {
+    if (
+      model.logo &&
+      (imageCache[model.logo] === undefined ||
+        (imageCache[model.logo] instanceof HTMLImageElement === false &&
+          imageCache[model.logo] !== null))
+    ) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = `img/logos/${model.logo}`;
+        imageCache[model.logo] = img; // Store img object to prevent re-attempts
+        img.onload = () => {
+          resolve();
+        };
+        img.onerror = () => {
+          console.warn(`Failed to load chart logo: ${model.logo}`);
+          imageCache[model.logo] = null; // Mark as failed
+          resolve();
+        };
+      });
+    }
+    return Promise.resolve();
+  });
+  await Promise.all(promises);
+}
+
+function getPreloadedImage(logoFilename) {
+  if (!logoFilename) return null;
+  const img = imageCache[logoFilename];
+  if (
+    img instanceof HTMLImageElement &&
+    img.complete &&
+    img.naturalHeight !== 0
+  ) {
+    return img;
+  }
+  return null;
 }
 
 // --- CSV Processing Functions ---
@@ -251,11 +295,10 @@ function populateModelSelection() {
       checkbox.type = "checkbox";
       checkbox.id = `model-checkbox-${model.id}`;
       checkbox.value = model.id;
-      checkbox.addEventListener("change", updateDisplay);
+      checkbox.addEventListener("change", () => updateDisplay()); // updateDisplay is async
       const label = document.createElement("label");
       label.htmlFor = `model-checkbox-${model.id}`;
 
-      // This is the logo for individual models in the selection panel
       if (model.logo) {
         const modelItemLogoImg = document.createElement("img");
         modelItemLogoImg.src = `img/logos/${model.logo}`;
@@ -291,7 +334,7 @@ function selectAllModels() {
   checkboxes.forEach((checkbox) => {
     checkbox.checked = true;
   });
-  updateDisplay();
+  updateDisplay(); // This is async
   console.log("All models selected.");
 }
 
@@ -301,27 +344,13 @@ function expandAllProviders() {
     return;
   }
   const providerGroups = modelSelectionList.querySelectorAll(".model-group");
-  console.log(`Found ${providerGroups.length} provider groups to expand.`);
-
-  providerGroups.forEach((groupDiv, index) => {
+  providerGroups.forEach((groupDiv) => {
     if (!groupDiv.classList.contains("expanded")) {
       groupDiv.classList.add("expanded");
       const providerTitle = groupDiv.querySelector(".provider-title");
       if (providerTitle) {
         providerTitle.setAttribute("aria-expanded", "true");
-        console.log(
-          `Expanded group ${index + 1}:`,
-          providerTitle.textContent
-        );
-      } else {
-        console.warn(`Provider title not found for group ${index + 1}.`);
       }
-    } else {
-      console.log(
-        `Group ${index + 1} (${
-          groupDiv.querySelector(".provider-title")?.textContent
-        }) already expanded.`
-      );
     }
   });
   console.log("Attempted to expand all providers.");
@@ -334,31 +363,24 @@ function clearAndCollapseSelections() {
     );
     return;
   }
-
   const checkboxes = modelSelectionList.querySelectorAll(
     'input[type="checkbox"]'
   );
   checkboxes.forEach((checkbox) => {
     checkbox.checked = false;
   });
-  console.log("All model selections cleared.");
-
   const providerGroups = modelSelectionList.querySelectorAll(".model-group");
-  providerGroups.forEach((groupDiv, index) => {
+  providerGroups.forEach((groupDiv) => {
     if (groupDiv.classList.contains("expanded")) {
       groupDiv.classList.remove("expanded");
       const providerTitle = groupDiv.querySelector(".provider-title");
       if (providerTitle) {
         providerTitle.setAttribute("aria-expanded", "false");
-        console.log(
-          `Collapsed group ${index + 1}:`,
-          providerTitle.textContent
-        );
       }
     }
   });
-  console.log("All providers collapsed.");
-  updateDisplay();
+  updateDisplay(); // This is async
+  console.log("All selections cleared and providers collapsed.");
 }
 
 function updateTableView(selectedModelsData) {
@@ -375,29 +397,25 @@ function updateTableView(selectedModelsData) {
         ? `$${price.toFixed(2)}`
         : "N/A";
 
-    // Create cell for Model Name with Logo
     const modelNameCell = document.createElement("td");
-    modelNameCell.className = "model-name-cell"; // Add a class for potential styling
+    modelNameCell.className = "model-name-cell";
 
     if (model.logo) {
       const logoImg = document.createElement("img");
       logoImg.src = `img/logos/${model.logo}`;
       logoImg.alt = `${model.provider || "Provider"} logo`;
-      logoImg.className = "table-model-logo"; // New class for styling table logos
+      logoImg.className = "table-model-logo";
       logoImg.loading = "lazy";
       logoImg.onerror = function () {
-        this.style.display = "none"; // Hide if logo fails to load
+        this.style.display = "none";
       };
       modelNameCell.appendChild(logoImg);
     }
-
     const modelNameSpan = document.createElement("span");
     modelNameSpan.textContent = model.name || "N/A";
     modelNameCell.appendChild(modelNameSpan);
+    row.appendChild(modelNameCell);
 
-    row.appendChild(modelNameCell); // Add the model name cell first
-
-    // Add other cells
     row.innerHTML += `
             <td>${model.provider || "N/A"}</td>
             <td>${formatPrice(model.inputPrice)}</td>
@@ -408,7 +426,48 @@ function updateTableView(selectedModelsData) {
   });
 }
 
-function renderBarChart(selectedModelsData) {
+// --- Chart.js Plugin Registration ---
+Chart.register({
+  id: "customXAxisRenderer",
+  afterDraw(chart, args, options) {
+    const pluginOpts = chart.config.options.plugins.customXAxisRenderer;
+    if (!pluginOpts || !pluginOpts.selectedModels) {
+      return;
+    }
+    const { ctx } = chart;
+    const xAxis = chart.scales.x;
+    const logoSize = pluginOpts.logoSize || 16;
+    const textPadding = pluginOpts.textPadding || 4;
+    const font = pluginOpts.font || "10px Arial, sans-serif";
+    const textColor = pluginOpts.textColor || "#444";
+
+    ctx.save();
+    ctx.font = font;
+    ctx.fillStyle = textColor;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+
+    pluginOpts.selectedModels.forEach((model, index) => {
+      if (index >= xAxis.ticks.length) return;
+      const xPos = xAxis.getPixelForTick(index);
+      const logo = getPreloadedImage(model.logo);
+      let currentY = xAxis.bottom + textPadding;
+
+      if (logo) {
+        const logoX = xPos - logoSize / 2;
+        ctx.drawImage(logo, logoX, currentY, logoSize, logoSize);
+        currentY += logoSize + textPadding;
+      } else {
+        currentY += logoSize + textPadding; // Reserve space even if no logo
+      }
+      const modelName = model.name || "N/A";
+      ctx.fillText(modelName, xPos, currentY);
+    });
+    ctx.restore();
+  },
+});
+
+async function renderBarChart(selectedModelsData) {
   if (!priceChartCanvas || !barChartCanvasContainer || !barChartMessage) return;
   if (priceChartInstance) priceChartInstance.destroy();
   barChartMessage.textContent = "";
@@ -420,16 +479,16 @@ function renderBarChart(selectedModelsData) {
     priceChartCanvas.style.display = "none";
     return;
   }
-  const minBarWidthPerModel = 80,
-    chartPadding = 100;
-  const calculatedMinWidth =
-    selectedModelsData.length * minBarWidthPerModel + chartPadding;
+
+  await preloadLogosForChart(selectedModelsData);
+
+  const minBarWidthPerModel = 80, chartPadding = 100;
+  const calculatedMinWidth = selectedModelsData.length * minBarWidthPerModel + chartPadding;
   barChartCanvasContainer.style.minWidth = `${calculatedMinWidth}px`;
+
   const labels = selectedModelsData.map((model) => model.name);
   const inputPrices = selectedModelsData.map((model) => model.inputPrice ?? 0);
-  const outputPrices = selectedModelsData.map(
-    (model) => model.outputPrice ?? 0
-  );
+  const outputPrices = selectedModelsData.map((model) => model.outputPrice ?? 0);
   const data = { labels, datasets: [] };
   data.datasets = [
     {
@@ -447,56 +506,70 @@ function renderBarChart(selectedModelsData) {
       borderWidth: 1,
     },
   ];
-  const config = { type: "bar", data, options: {} };
-  config.options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    indexAxis: "x",
-    plugins: {
-      title: {
-        display: true,
-        text: "Model Pricing Comparison ($/1M Tokens)",
-        padding: { top: 10, bottom: 20 },
-        font: { size: 14 },
+
+  const logoSize = 16;
+  const textPadding = 4;
+  const xAxisItemHeight = logoSize + textPadding + 12 + 5; // logo + padding + text height + extra buffer
+
+  const config = {
+    type: "bar",
+    data,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: "x",
+      layout: {
+        padding: {
+          bottom: xAxisItemHeight,
+        },
       },
-      tooltip: {
-        callbacks: {
-          label: function (context) {
-            let label = context.dataset.label || "";
-            if (label) label += ": ";
-            const modelIndex = context.dataIndex;
-            if (
-              !selectedModelsData ||
-              modelIndex >= selectedModelsData.length
-            )
-              return label + "Error";
-            const model = selectedModelsData[modelIndex];
-            if (!model) return label + "Error";
-            const originalValue = context.dataset.label
-              .toLowerCase()
-              .startsWith("input")
-              ? model.inputPrice
-              : model.outputPrice;
-            if (
-              originalValue !== null &&
-              originalValue !== undefined &&
-              !isNaN(originalValue)
-            )
-              label += `$${context.parsed.y.toFixed(2)}`;
-            else label += "N/A";
-            return label;
+      plugins: {
+        title: {
+          display: true,
+          text: "Model Pricing Comparison ($/1M Tokens)",
+          padding: { top: 10, bottom: 20 },
+          font: { size: 14 },
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              let label = context.dataset.label || "";
+              if (label) label += ": ";
+              const modelIndex = context.dataIndex;
+              if (!selectedModelsData || modelIndex >= selectedModelsData.length) return label + "Error";
+              const model = selectedModelsData[modelIndex];
+              if (!model) return label + "Error";
+              const originalValue = context.dataset.label.toLowerCase().startsWith("input") ? model.inputPrice : model.outputPrice;
+              if (originalValue !== null && originalValue !== undefined && !isNaN(originalValue)) label += `$${context.parsed.y.toFixed(2)}`;
+              else label += "N/A";
+              return label;
+            },
+          },
+        },
+        legend: { position: "top" },
+        customXAxisRenderer: {
+          selectedModels: selectedModelsData,
+          logoSize: logoSize,
+          textPadding: textPadding,
+          font: "10px Arial, sans-serif",
+          textColor: "#444",
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: "Price ($/1M tokens)" },
+          ticks: { callback: (value) => "$" + value.toFixed(2) },
+        },
+        x: {
+          title: { display: true, text: "Model" },
+          ticks: {
+            callback: function (value, index, ticks) {
+              return ""; // Hide default labels
+            },
           },
         },
       },
-      legend: { position: "top" },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: { display: true, text: "Price ($/1M tokens)" },
-        ticks: { callback: (value) => "$" + value.toFixed(2) },
-      },
-      x: { title: { display: true, text: "Model" } },
     },
   };
   const ctx = priceChartCanvas.getContext("2d");
@@ -515,33 +588,26 @@ function renderBarChart(selectedModelsData) {
   }
 }
 
-function switchView(view) {
+async function switchView(view) {
   if (tableViewBtn) tableViewBtn.classList.toggle("active", view === "table");
-  if (barChartViewBtn)
-    barChartViewBtn.classList.toggle("active", view === "bar");
+  if (barChartViewBtn) barChartViewBtn.classList.toggle("active", view === "bar");
   if (tableView) tableView.classList.toggle("active", view === "table");
   if (barChartView) barChartView.classList.toggle("active", view === "bar");
   if (viewTitle) {
     switch (view) {
-      case "bar":
-        viewTitle.textContent = "Bar Chart";
-        break;
-      case "table":
-      default:
-        viewTitle.textContent = "Table";
-        break;
+      case "bar": viewTitle.textContent = "Bar Chart"; break;
+      case "table": default: viewTitle.textContent = "Table"; break;
     }
   }
   currentView = view;
-  updateDisplay();
+  await updateDisplay();
 }
 
-function updateDisplay() {
+async function updateDisplay() {
   console.log("updateDisplay called. Current view:", currentView);
   if (!modelsData || modelsData.length === 0) {
     console.warn("updateDisplay: modelsData is empty or not loaded.");
-    if (comparisonTableBody)
-      comparisonTableBody.innerHTML = `<tr><td colspan="5">No model data loaded.</td></tr>`;
+    if (comparisonTableBody) comparisonTableBody.innerHTML = `<tr><td colspan="5">No model data loaded.</td></tr>`;
     if (barChartMessage) barChartMessage.textContent = "No model data loaded.";
     if (priceChartInstance) priceChartInstance.destroy();
     if (priceChartCanvas) priceChartCanvas.style.display = "none";
@@ -552,30 +618,18 @@ function updateDisplay() {
     return;
   }
 
-  const selectedCheckboxes = modelSelectionList.querySelectorAll(
-    'input[type="checkbox"]:checked'
-  );
-  const selectedModelIds = Array.from(selectedCheckboxes).map(
-    (checkbox) => checkbox.value
-  );
-  console.log("Selected Model IDs from checkboxes:", selectedModelIds);
+  const selectedCheckboxes = modelSelectionList.querySelectorAll('input[type="checkbox"]:checked');
+  const selectedModelIds = Array.from(selectedCheckboxes).map((checkbox) => checkbox.value);
 
   let filteredModelsData = modelsData.filter((model) => {
     return model.id && selectedModelIds.includes(model.id);
   });
-  console.log(
-    "Filtered Models Data for display (count):",
-    filteredModelsData.length
-  );
-  if (filteredModelsData.length > 0) {
-    console.log("First filtered model:", filteredModelsData[0]);
-  }
 
   filteredModelsData.sort((a, b) => a.name.localeCompare(b.name));
 
   switch (currentView) {
     case "bar":
-      renderBarChart(filteredModelsData);
+      await renderBarChart(filteredModelsData);
       break;
     case "table":
     default:
@@ -590,13 +644,8 @@ function setDynamicTimestamp() {
     return;
   }
   const now = new Date();
-  const optionsDate = { year: "numeric", month: "long" };
-  const optionsTime = {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  };
+  const optionsDate = { year: 'numeric', month: 'long' };
+  const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
   const dateString = now.toLocaleDateString(undefined, optionsDate);
   const timeString = now.toLocaleTimeString(undefined, optionsTime);
   dynamicTimestampSpan.textContent = `${dateString}, ${timeString}`;
@@ -606,63 +655,43 @@ function setDynamicTimestamp() {
 // --- Initialization ---
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("DOM fully loaded and parsed.");
-  if (
-    !modelSelectionList ||
-    !comparisonTableBody ||
-    !priceChartCanvas ||
-    !dynamicTimestampSpan
-  ) {
+  if (!modelSelectionList || !comparisonTableBody || !priceChartCanvas || !dynamicTimestampSpan) {
     console.error("Initialization failed: Essential DOM elements are missing.");
-    if (document.body)
-      document.body.innerHTML =
-        "<h1>Error: Application structure incomplete.</h1>";
+    if (document.body) document.body.innerHTML = "<h1>Error: Application structure incomplete.</h1>";
     return;
   }
 
   modelsData = await loadModelsData();
-  console.log("Global modelsData count after load:", modelsData.length);
-  if (modelsData.length > 0) {
-    console.log("First model in global modelsData:", modelsData[0]);
-  }
 
   if (modelsData && modelsData.length > 0) {
     populateModelSelection();
     setDynamicTimestamp();
 
-    if (tableViewBtn)
-      tableViewBtn.addEventListener("click", () => switchView("table"));
-    if (barChartViewBtn)
-      barChartViewBtn.addEventListener("click", () => switchView("bar"));
-    if (refreshPageBtn)
-      refreshPageBtn.addEventListener("click", () => location.reload());
+    if (tableViewBtn) tableViewBtn.addEventListener("click", () => switchView("table"));
+    if (barChartViewBtn) barChartViewBtn.addEventListener("click", () => switchView("bar"));
+    if (refreshPageBtn) refreshPageBtn.addEventListener("click", () => location.reload());
 
     if (hamburgerBtn) hamburgerBtn.addEventListener("click", openPanel);
     if (closePanelBtn) closePanelBtn.addEventListener("click", closePanel);
     if (overlay) overlay.addEventListener("click", closePanel);
 
     if (selectAllBtn) {
-      selectAllBtn.addEventListener("click", selectAllModels);
-    } else {
-      console.warn("Select All button not found in the DOM.");
+      selectAllBtn.addEventListener("click", () => { // selectAllModels calls async updateDisplay
+        selectAllModels();
+      });
     }
     if (expandAllBtn) {
       expandAllBtn.addEventListener("click", expandAllProviders);
-    } else {
-      console.warn("Expand All button not found in the DOM.");
     }
     if (clearPanelBtn) {
-      clearPanelBtn.addEventListener("click", clearAndCollapseSelections);
-    } else {
-      console.warn("Panel Clear button not found in the DOM.");
+      clearPanelBtn.addEventListener("click", () => { // clearAndCollapseSelections calls async updateDisplay
+        clearAndCollapseSelections();
+      });
     }
-
-    switchView(currentView);
+    await switchView(currentView); // Initial view rendering
   } else {
     console.warn("No model data loaded. Check models.csv and console.");
-    if (modelSelectionList)
-      modelSelectionList.innerHTML =
-        "<p>Failed to load model data. Check console.</p>";
-    if (dynamicTimestampSpan)
-      dynamicTimestampSpan.textContent = "Data loading failed";
+    if (modelSelectionList) modelSelectionList.innerHTML = "<p>Failed to load model data. Check console.</p>";
+    if (dynamicTimestampSpan) dynamicTimestampSpan.textContent = "Data loading failed";
   }
 });

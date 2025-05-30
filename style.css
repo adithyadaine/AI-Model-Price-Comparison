@@ -254,8 +254,8 @@ body.panel-open .overlay {
   transition: background-color 0.15s ease;
   border-radius: var(--border-radius);
   user-select: none;
-  display: flex; /* ADDED: to align logo and text */
-  align-items: center; /* ADDED: to vertically align logo and text */
+  display: flex;
+  align-items: center;
 }
 .provider-title:hover {
   background-color: #f1f3f5;
@@ -286,7 +286,7 @@ body.panel-open .overlay {
 
 .model-list {
   display: none;
-  padding-left: 1rem;
+  padding-left: 1rem; /* Indent model items under provider */
   margin-top: 0.25rem;
   max-height: 0;
   overflow: hidden;
@@ -295,24 +295,24 @@ body.panel-open .overlay {
 }
 .model-group.expanded .model-list {
   display: block;
-  max-height: 1000px;
+  max-height: 1000px; /* Ensure this is large enough for content */
   padding-top: 0.5rem;
   margin-top: 0;
   transition: max-height 0.4s ease-in, padding-top 0.4s ease-in,
     margin-top 0.4s ease-in;
 }
 
-/* Model Item (Checkbox, Logo, Name) */
+/* Model Item (Checkbox, Logo, Name) in Selection Panel */
 .model-item {
   display: flex;
   align-items: center;
   margin-bottom: 0.25rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.75rem; /* Padding around each model item */
   border-radius: var(--border-radius);
   transition: background-color 0.15s ease;
 }
 .model-item:hover {
-  background-color: #e9ecef;
+  background-color: #e9ecef; /* Light hover for model items */
 }
 
 .model-item input[type="checkbox"] {
@@ -332,13 +332,13 @@ body.panel-open .overlay {
   color: var(--text-color);
 }
 
-.model-logo {
+.model-logo { /* Logo for individual models in the selection panel list */
   width: 18px;
   height: 18px;
   margin-right: 0.6em;
   flex-shrink: 0;
   object-fit: contain;
-  margin-top: 0.1em;
+  /* margin-top: 0.1em; /* Minor adjustment if needed */
 }
 
 .model-name-text {
@@ -383,7 +383,7 @@ body.panel-open .overlay {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  border-bottom: none;
+  border-bottom: none; /* Or 1px solid var(--border-color) if preferred */
 }
 
 .toggle-btn {
@@ -400,7 +400,7 @@ body.panel-open .overlay {
 }
 .toggle-btn:hover {
   border-color: var(--primary-hover-color);
-  background-color: #f8f9fa;
+  background-color: #f8f9fa; /* Lighter hover */
   box-shadow: var(--box-shadow);
 }
 .toggle-btn.active {
@@ -417,7 +417,7 @@ body.panel-open .overlay {
 .toggle-btn.refresh-btn {
   color: var(--danger-color);
   border-color: var(--danger-color);
-  margin-left: auto;
+  margin-left: auto; /* Pushes refresh button to the right */
 }
 .toggle-btn.refresh-btn:hover {
   background-color: var(--danger-color);
@@ -449,29 +449,29 @@ td {
   padding: 0.75rem 1rem;
   text-align: left;
   white-space: nowrap;
-  vertical-align: middle; /* ADDED: Better vertical alignment for cells */
+  vertical-align: middle; /* Vertically align content in cells */
 }
 th {
-  background-color: #e9ecef;
+  background-color: #e9ecef; /* Light gray for table headers */
   font-weight: 500;
   color: var(--text-color);
 }
 tbody tr:nth-child(even) {
-  background-color: var(--light-gray-bg);
+  background-color: var(--light-gray-bg); /* Zebra striping for rows */
 }
 tbody tr:hover {
-  background-color: #dde6ef;
+  background-color: #dde6ef; /* Hover effect for table rows */
 }
 
-/* NEW: Styles for model name cell and logo in table */
+/* Styles for model name cell and logo in table */
 .model-name-cell {
   display: flex; /* Use flex to align logo and text */
   align-items: center; /* Vertically align items in the cell */
 }
 
 .table-model-logo {
-  width: 20px; /* Adjust size as needed */
-  height: 20px; /* Adjust size as needed */
+  width: 20px;
+  height: 20px;
   margin-right: 0.75em; /* Space between logo and model name */
   object-fit: contain;
   flex-shrink: 0; /* Prevent logo from shrinking */
@@ -480,9 +480,9 @@ tbody tr:hover {
 /* Bar Chart View */
 .chart-scroll-wrapper {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: auto; /* Allow horizontal scrolling for many bars */
   overflow-y: hidden;
-  max-height: 480px;
+  max-height: 480px; /* Max height for the chart area */
   border: 1px solid var(--border-color);
   margin-bottom: 0.5rem;
   background-color: var(--white-color);
@@ -490,7 +490,8 @@ tbody tr:hover {
 }
 .chart-canvas-container {
   position: relative;
-  height: 450px;
+  height: 450px; /* Fixed height for the canvas container */
+  /* min-width will be set by JS */
 }
 #priceChart {
   display: block;
@@ -516,15 +517,15 @@ tbody tr:hover {
 /* --- Responsiveness --- */
 @media (max-width: 768px) {
   body {
-    padding-top: 56px;
-    margin-bottom: 60px;
+    padding-top: 56px; /* Adjust if header height changes on mobile */
+    margin-bottom: 60px; /* Adjust if footer height changes on mobile */
   }
   header {
-    height: 56px;
+    height: 56px; /* Example fixed height for mobile header */
     padding: 0 1rem;
   }
   header h1 {
-    font-size: 1.2rem;
+    font-size: 1.2rem; /* Smaller title on mobile */
   }
   .hamburger-btn {
     padding: 0 0.75rem 0 0;
@@ -541,36 +542,39 @@ tbody tr:hover {
   .comparison-area h2 {
     font-size: 1.3rem;
   }
-  .toggle-btn.refresh-btn {
-    margin-left: 0;
-    margin-top: 0.5rem;
-    width: 100%;
-  }
+
   .view-toggles {
-    flex-direction: column;
+    flex-direction: column; /* Stack toggle buttons on mobile */
     align-items: stretch;
   }
   .toggle-btn {
-    width: 100%;
+    width: 100%; /* Make toggle buttons full width */
     margin-right: 0;
   }
   .toggle-btn + .toggle-btn {
+    margin-top: 0.5rem; /* Add space between stacked buttons */
+  }
+  .toggle-btn.refresh-btn {
+    margin-left: 0; /* Reset margin for refresh button */
     margin-top: 0.5rem;
+    width: 100%;
   }
+
   .panel-actions-container {
-    align-items: stretch;
+    align-items: stretch; /* Make panel action buttons full width */
   }
-  footer {
-    padding: 0.8rem 1rem;
-    font-size: 0.8rem;
-  }
-  /* Adjust table cell padding for smaller screens if needed */
-  th, td {
+
+  th, td { /* Slightly reduce padding in table cells for mobile */
     padding: 0.6rem 0.75rem;
   }
-  .table-model-logo {
+  .table-model-logo { /* Slightly smaller logo in table for mobile */
     width: 18px;
     height: 18px;
     margin-right: 0.5em;
+  }
+
+  footer {
+    padding: 0.8rem 1rem;
+    font-size: 0.8rem;
   }
 }
