@@ -234,6 +234,33 @@ function expandAllProviders() {
     console.log("Attempted to expand all providers.");
 }
 
+function clearAndCollapseSelections() {
+    if (!modelSelectionList) {
+        console.error("clearAndCollapseSelections: modelSelectionList not found.");
+        return;
+    }
+
+    const checkboxes = modelSelectionList.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    console.log("All model selections cleared.");
+
+    const providerGroups = modelSelectionList.querySelectorAll('.model-group');
+    providerGroups.forEach((groupDiv, index) => {
+        if (groupDiv.classList.contains('expanded')) {
+            groupDiv.classList.remove('expanded');
+            const providerTitle = groupDiv.querySelector('.provider-title');
+            if (providerTitle) {
+                providerTitle.setAttribute('aria-expanded', 'false');
+                console.log(`Collapsed group ${index + 1}:`, providerTitle.textContent);
+            }
+        }
+    });
+    console.log("All providers collapsed.");
+    updateDisplay();
+}
+
 function updateTableView(selectedModelsData) {
     if (!comparisonTableBody) return;
     comparisonTableBody.innerHTML = "";
@@ -408,6 +435,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (tableViewBtn) tableViewBtn.addEventListener("click", () => switchView("table"));
         if (barChartViewBtn) barChartViewBtn.addEventListener("click", () => switchView("bar"));
         if (refreshPageBtn) refreshPageBtn.addEventListener("click", () => location.reload());
+        
         if (hamburgerBtn) hamburgerBtn.addEventListener("click", openPanel);
         if (closePanelBtn) closePanelBtn.addEventListener("click", closePanel);
         if (overlay) overlay.addEventListener("click", closePanel);
@@ -422,10 +450,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         } else {
             console.warn("Expand All button not found in the DOM.");
         }
-        if (clearPanelBtn) { // Event listener for the new clear button in panel
-            clearPanelBtn.addEventListener("click", () => {
-                location.reload();
-            });
+        if (clearPanelBtn) {
+            clearPanelBtn.addEventListener("click", clearAndCollapseSelections); // Updated action
         } else {
             console.warn("Panel Clear button not found in the DOM.");
         }
@@ -437,19 +463,3 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (dynamicTimestampSpan) dynamicTimestampSpan.textContent = "Data loading failed";
     }
 });
-// --- Window Resize Handling ---
-window.addEventListener("resize", () => {
-    if (currentView === "bar" && priceChartInstance) {
-        priceChartInstance.resize();
-        console.log("Bar chart resized on window resize.");
-    }
-});
-// --- Initial View Setup ---
-if (tableViewBtn) tableViewBtn.classList.add("active");
-if (barChartView) barChartView.classList.remove("active");
-if (viewTitle) viewTitle.textContent = "Table";
-if (dynamicTimestampSpan) setDynamicTimestamp(); // Set initial timestamp
-if (priceChartCanvas) {
-    priceChartCanvas.style.display = "none"; // Hide chart initially
-    priceChartCanvas.style.minWidth = "0px"; // Reset min-width
-}

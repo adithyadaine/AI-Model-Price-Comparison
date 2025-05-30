@@ -23,6 +23,8 @@
   --border-radius: 0.3rem;
   --box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   --box-shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+
+  --header-height: 65px; /* Approximate height of the header, adjust as needed */
 }
 
 body {
@@ -37,6 +39,7 @@ body {
   position: relative;
   min-height: 100vh;
   font-size: 16px;
+  padding-top: var(--header-height); /* Space for fixed header */
 }
 
 body.panel-open {
@@ -47,12 +50,18 @@ body.panel-open {
 header {
   background-color: var(--header-footer-background);
   color: var(--header-footer-text);
-  padding: 0.9rem 1.5rem;
+  padding: 0 1.5rem; /* Adjusted padding for explicit height */
   text-align: center;
   display: flex;
   align-items: center;
-  position: relative;
+  position: fixed; /* Make header fixed */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 900; /* Below panel/overlay, above content */
+  box-sizing: border-box;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  height: var(--header-height); /* Explicit height */
 }
 
 header h1 {
@@ -75,7 +84,7 @@ footer {
   left: 0;
   right: 0;
   box-sizing: border-box;
-  z-index: 100;
+  z-index: 100; /* Ensure footer is above content, but can be below panel if panel is full height */
   /* border-top: 1px solid var(--header-footer-border); */ /* Optional */
 }
 footer p { margin: 0; }
@@ -87,10 +96,13 @@ footer p { margin: 0; }
   color: var(--header-footer-text);
   font-size: 1.8rem;
   cursor: pointer;
-  padding: 0 1rem 0 0;
+  padding: 0 1rem 0 0; /* Padding on the right of the icon */
   line-height: 1;
-  order: -1;
+  order: -1; /* Place before title */
   transition: opacity 0.2s ease;
+  height: 100%; /* Make it take full header height for easier click */
+  display: flex; /* For vertical centering of icon if needed */
+  align-items: center;
 }
 .hamburger-btn:hover {
   opacity: 0.8;
@@ -99,18 +111,18 @@ footer p { margin: 0; }
 /* --- Off-Canvas Selection Panel --- */
 .selection-panel {
   position: fixed;
-  top: 0;
+  top: 0; /* Align with top of viewport */
   left: 0;
   bottom: 0;
   width: 300px;
   max-width: 90%;
   background-color: var(--panel-bg);
   padding: 1.5rem;
-  padding-top: 4.5rem;
+  padding-top: 4.5rem; /* Space for close button & title */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: translateX(-100%);
   transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
-  z-index: 1000;
+  z-index: 1000; /* Highest z-index */
   overflow-y: auto;
   box-sizing: border-box;
 }
@@ -152,7 +164,7 @@ body.panel-open .selection-panel {
   top: 0; left: 0; right: 0; bottom: 0;
   background-color: rgba(0, 0, 0, 0.6);
   display: none;
-  z-index: 999;
+  z-index: 999; /* Below panel, above fixed header and content */
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -323,13 +335,14 @@ body.panel-open .overlay {
   flex-wrap: wrap;
   padding: 1.5rem;
   gap: 1.5rem;
+  /* No padding-top here, it's on the body */
 }
 
 .comparison-area {
   flex-grow: 1;
   width: 100%;
   min-width: 400px;
-  background-color: var(--content-bg); /* White background for content card */
+  background-color: var(--content-bg);
   padding: 1.5rem;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
@@ -418,7 +431,7 @@ th {
   font-weight: 500;
   color: var(--text-color);
 }
-tbody tr:nth-child(even) { background-color: var(--light-gray-bg); } /* Use body bg for even rows */
+tbody tr:nth-child(even) { background-color: var(--light-gray-bg); }
 tbody tr:hover { background-color: #dde6ef; }
 
 /* Bar Chart View */
@@ -446,7 +459,17 @@ tbody tr:hover { background-color: #dde6ef; }
 
 /* --- Responsiveness --- */
 @media (max-width: 768px) {
-  header h1 { font-size: 1.3rem; text-align: center; }
+  body {
+    padding-top: 56px; /* Adjust if header height changes on mobile */
+    margin-bottom: 60px; /* Adjust if footer height changes on mobile */
+  }
+  header {
+    height: 56px; /* Example fixed height for mobile header */
+    padding: 0 1rem;
+  }
+  header h1 { font-size: 1.2rem; /* Smaller title on mobile */ }
+  .hamburger-btn { padding: 0 0.75rem 0 0; font-size: 1.6rem; }
+
   .container { padding: 1rem; gap: 1rem; }
   .comparison-area { padding: 1rem; }
   .comparison-area h2 { font-size: 1.3rem; }
@@ -455,4 +478,20 @@ tbody tr:hover { background-color: #dde6ef; }
   .toggle-btn { width: 100%; margin-right: 0; }
   .toggle-btn + .toggle-btn { margin-top: 0.5rem; }
   .panel-actions-container { align-items: stretch; }
+  footer { padding: 0.8rem 1rem; font-size: 0.8rem; }
+}
+@media (max-width: 576px) {
+  .selection-panel {
+    width: 100%;
+    max-width: none;
+    padding: 1rem;
+  }
+  .selection-panel h2 { font-size: 1.2rem; }
+  .close-panel-btn { top: 0.5rem; right: 0.5rem; }
+  
+  .model-item input[type="checkbox"] { width: 1.2em; height: 1.2em; }
+  
+  .model-logo { width: 16px; height: 16px; }
+  
+  .provider-title { padding-left: 2em; }
 }
