@@ -4,7 +4,7 @@
   --primary-hover-color: #0056b3;
   --secondary-color: #6c757d;
   --light-gray-bg: #f8f9fa; /* Body background */
-  --content-bg: #ffffff;    /* Background for main content cards */
+  --content-bg: #ffffff; /* Background for main content cards */
   --border-color: #dee2e6;
   --text-color: #212529;
   --text-muted-color: #6c757d;
@@ -17,8 +17,8 @@
 
   /* Consistent Dark Header/Footer Variables */
   --header-footer-background: #343a40; /* Dark Charcoal / Very Dark Gray */
-  --header-footer-text: #f8f9fa;       /* Light Gray / Off-White for text */
-  --header-footer-border: #495057;     /* Slightly lighter dark gray for subtle borders */
+  --header-footer-text: #f8f9fa; /* Light Gray / Off-White for text */
+  --header-footer-border: #495057; /* Slightly lighter dark gray for subtle borders */
 
   --border-radius: 0.3rem;
   --box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
@@ -60,7 +60,7 @@ header {
   right: 0;
   z-index: 900; /* Below panel/overlay, above content */
   box-sizing: border-box;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   height: var(--header-height); /* Explicit height */
 }
 
@@ -84,10 +84,12 @@ footer {
   left: 0;
   right: 0;
   box-sizing: border-box;
-  z-index: 100; /* Ensure footer is above content, but can be below panel if panel is full height */
+  z-index: 100;
   /* border-top: 1px solid var(--header-footer-border); */ /* Optional */
 }
-footer p { margin: 0; }
+footer p {
+  margin: 0;
+}
 
 /* Hamburger Button - UPDATED FOR DARK HEADER */
 .hamburger-btn {
@@ -161,7 +163,10 @@ body.panel-open .selection-panel {
 
 .overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: rgba(0, 0, 0, 0.6);
   display: none;
   z-index: 999; /* Below panel, above fixed header and content */
@@ -192,7 +197,8 @@ body.panel-open .overlay {
   font-weight: 500;
   text-align: center;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    color 0.2s ease, transform 0.1s ease;
   border: 1px solid transparent;
 }
 .panel-action-btn:active {
@@ -239,7 +245,7 @@ body.panel-open .overlay {
 .provider-title {
   cursor: pointer;
   padding: 0.75rem 1rem;
-  padding-left: 2.5em;
+  padding-left: 2.5em; /* Space for the ::before arrow */
   position: relative;
   margin: 0;
   font-size: 1rem;
@@ -248,20 +254,20 @@ body.panel-open .overlay {
   transition: background-color 0.15s ease;
   border-radius: var(--border-radius);
   user-select: none;
-  display: flex;
-  align-items: center;
+  display: flex; /* ADDED: to align logo and text */
+  align-items: center; /* ADDED: to vertically align logo and text */
 }
 .provider-title:hover {
   background-color: #f1f3f5;
 }
 .provider-title::before {
-  content: '';
+  content: "";
   border: solid var(--secondary-color);
   border-width: 0 2px 2px 0;
   display: inline-block;
   padding: 3px;
   position: absolute;
-  left: 1em;
+  left: 1em; /* Position of the arrow */
   top: 50%;
   transform: translateY(-60%) rotate(45deg);
   transition: transform 0.25s ease-in-out;
@@ -270,20 +276,30 @@ body.panel-open .overlay {
   transform: translateY(-40%) rotate(-135deg);
 }
 
+.provider-logo-title {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.6em;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 .model-list {
   display: none;
   padding-left: 1rem;
   margin-top: 0.25rem;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease-out, padding-top 0.3s ease-out, margin-top 0.3s ease-out;
+  transition: max-height 0.3s ease-out, padding-top 0.3s ease-out,
+    margin-top 0.3s ease-out;
 }
 .model-group.expanded .model-list {
   display: block;
   max-height: 1000px;
   padding-top: 0.5rem;
   margin-top: 0;
-  transition: max-height 0.4s ease-in, padding-top 0.4s ease-in, margin-top 0.4s ease-in;
+  transition: max-height 0.4s ease-in, padding-top 0.4s ease-in,
+    margin-top 0.4s ease-in;
 }
 
 /* Model Item (Checkbox, Logo, Name) */
@@ -335,7 +351,6 @@ body.panel-open .overlay {
   flex-wrap: wrap;
   padding: 1.5rem;
   gap: 1.5rem;
-  /* No padding-top here, it's on the body */
 }
 
 .comparison-area {
@@ -380,7 +395,8 @@ body.panel-open .overlay {
   border-radius: var(--border-radius);
   font-size: 0.9rem;
   font-weight: 500;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .toggle-btn:hover {
   border-color: var(--primary-hover-color);
@@ -410,29 +426,56 @@ body.panel-open .overlay {
 }
 
 /* View Containers (Table, Chart) */
-.view-container { display: none; margin-top: 1rem; }
-.view-container.active { display: block; }
+.view-container {
+  display: none;
+  margin-top: 1rem;
+}
+.view-container.active {
+  display: block;
+}
 
 /* Table Styles */
-.table-container { overflow-x: auto; }
+.table-container {
+  overflow-x: auto;
+}
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
 }
-th, td {
+th,
+td {
   border: 1px solid var(--border-color);
   padding: 0.75rem 1rem;
   text-align: left;
   white-space: nowrap;
+  vertical-align: middle; /* ADDED: Better vertical alignment for cells */
 }
 th {
   background-color: #e9ecef;
   font-weight: 500;
   color: var(--text-color);
 }
-tbody tr:nth-child(even) { background-color: var(--light-gray-bg); }
-tbody tr:hover { background-color: #dde6ef; }
+tbody tr:nth-child(even) {
+  background-color: var(--light-gray-bg);
+}
+tbody tr:hover {
+  background-color: #dde6ef;
+}
+
+/* NEW: Styles for model name cell and logo in table */
+.model-name-cell {
+  display: flex; /* Use flex to align logo and text */
+  align-items: center; /* Vertically align items in the cell */
+}
+
+.table-model-logo {
+  width: 20px; /* Adjust size as needed */
+  height: 20px; /* Adjust size as needed */
+  margin-right: 0.75em; /* Space between logo and model name */
+  object-fit: contain;
+  flex-shrink: 0; /* Prevent logo from shrinking */
+}
 
 /* Bar Chart View */
 .chart-scroll-wrapper {
@@ -445,9 +488,22 @@ tbody tr:hover { background-color: #dde6ef; }
   background-color: var(--white-color);
   border-radius: var(--border-radius);
 }
-.chart-canvas-container { position: relative; height: 450px; }
-#priceChart { display: block; box-sizing: border-box; height: 100%; width: 100%; }
-.chart-message { text-align: center; color: var(--text-muted-color); margin-top: 1rem; font-size: 0.9rem; }
+.chart-canvas-container {
+  position: relative;
+  height: 450px;
+}
+#priceChart {
+  display: block;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+}
+.chart-message {
+  text-align: center;
+  color: var(--text-muted-color);
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
 
 /* Last Updated Info */
 .last-updated {
@@ -460,38 +516,61 @@ tbody tr:hover { background-color: #dde6ef; }
 /* --- Responsiveness --- */
 @media (max-width: 768px) {
   body {
-    padding-top: 56px; /* Adjust if header height changes on mobile */
-    margin-bottom: 60px; /* Adjust if footer height changes on mobile */
+    padding-top: 56px;
+    margin-bottom: 60px;
   }
   header {
-    height: 56px; /* Example fixed height for mobile header */
+    height: 56px;
     padding: 0 1rem;
   }
-  header h1 { font-size: 1.2rem; /* Smaller title on mobile */ }
-  .hamburger-btn { padding: 0 0.75rem 0 0; font-size: 1.6rem; }
+  header h1 {
+    font-size: 1.2rem;
+  }
+  .hamburger-btn {
+    padding: 0 0.75rem 0 0;
+    font-size: 1.6rem;
+  }
 
-  .container { padding: 1rem; gap: 1rem; }
-  .comparison-area { padding: 1rem; }
-  .comparison-area h2 { font-size: 1.3rem; }
-  .toggle-btn.refresh-btn { margin-left: 0; margin-top: 0.5rem; width: 100%; }
-  .view-toggles { flex-direction: column; align-items: stretch; }
-  .toggle-btn { width: 100%; margin-right: 0; }
-  .toggle-btn + .toggle-btn { margin-top: 0.5rem; }
-  .panel-actions-container { align-items: stretch; }
-  footer { padding: 0.8rem 1rem; font-size: 0.8rem; }
-}
-@media (max-width: 576px) {
-  .selection-panel {
-    width: 100%;
-    max-width: none;
+  .container {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  .comparison-area {
     padding: 1rem;
   }
-  .selection-panel h2 { font-size: 1.2rem; }
-  .close-panel-btn { top: 0.5rem; right: 0.5rem; }
-  
-  .model-item input[type="checkbox"] { width: 1.2em; height: 1.2em; }
-  
-  .model-logo { width: 16px; height: 16px; }
-  
-  .provider-title { padding-left: 2em; }
+  .comparison-area h2 {
+    font-size: 1.3rem;
+  }
+  .toggle-btn.refresh-btn {
+    margin-left: 0;
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+  .view-toggles {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .toggle-btn {
+    width: 100%;
+    margin-right: 0;
+  }
+  .toggle-btn + .toggle-btn {
+    margin-top: 0.5rem;
+  }
+  .panel-actions-container {
+    align-items: stretch;
+  }
+  footer {
+    padding: 0.8rem 1rem;
+    font-size: 0.8rem;
+  }
+  /* Adjust table cell padding for smaller screens if needed */
+  th, td {
+    padding: 0.6rem 0.75rem;
+  }
+  .table-model-logo {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.5em;
+  }
 }
