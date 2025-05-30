@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI Model Pricing Comparator</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="icon" type="image/png" href="img/favicon/ai_cluster.png" />
+    <link rel="icon" type="image/png" href="img/favicon.png" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
@@ -19,9 +19,13 @@
     <aside class="selection-panel" id="selectionPanel" aria-hidden="true">
       <button id="closePanelBtn" class="close-panel-btn" aria-label="Close model selection menu">&times;</button>
       <h2>Select Models</h2>
-      <!-- **** ADD SELECT ALL BUTTON HERE **** -->
-      <button id="selectAllBtn" class="panel-action-btn select-all-btn">Select All Models</button>
-      <!-- **** END SELECT ALL BUTTON **** -->
+      <div class="panel-actions-container">
+        <button id="selectAllBtn" class="panel-action-btn select-all-btn">Select All Models</button>
+        <button id="expandAllBtn" class="panel-action-btn expand-all-btn">Expand All Providers</button>
+        <!-- **** ADD NEW CLEAR BUTTON HERE **** -->
+        <button id="clearPanelBtn" class="panel-action-btn clear-panel-btn">Clear Selections & Reset</button>
+        <!-- **** END NEW CLEAR BUTTON **** -->
+      </div>
       <div id="model-selection-list">
         <p>Loading models...</p>
       </div>
@@ -72,13 +76,13 @@
         </div>
 
         <p class="last-updated">
-          Last Updated: May 2025
+          Last updated: <span id="dynamicTimestamp"></span>
         </p>
       </main>
     </div>
 
     <footer>
-      <p>Maintained with ❤️ by Adithya D M</p>
+      <h2>Maintained with ❤️ by Adithya D M</h2>
     </footer>
 
     <script src="script.js"></script>
