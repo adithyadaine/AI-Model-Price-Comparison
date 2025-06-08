@@ -284,7 +284,6 @@ body.panel-open .overlay {
   flex-shrink: 0;
 }
 
-/* --- START: Added for Provider Clear Button --- */
 .clear-provider-btn {
   background: none;
   border: none;
@@ -300,17 +299,14 @@ body.panel-open .overlay {
   border-radius: var(--border-radius);
 }
 
-/* Show the button when the user hovers over the provider title container */
 .provider-title:hover .clear-provider-btn {
   opacity: 1;
 }
 
-/* Make the button slightly more prominent on its own hover */
 .clear-provider-btn:hover {
   color: var(--danger-color);
   background-color: #f1f3f5; /* Use same hover as parent for consistency */
 }
-/* --- END: Added for Provider Clear Button --- */
 
 .model-list {
   display: none;
@@ -367,11 +363,38 @@ body.panel-open .overlay {
   margin-right: 0.6em;
   flex-shrink: 0;
   object-fit: contain;
-  /* margin-top: 0.1em; /* Minor adjustment if needed */
 }
 
 .model-name-text {
   line-height: 1.4;
+}
+
+/* --- Price Category Tags --- */
+.price-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15em 0.5em;
+  margin-left: 0.6em;
+  border-radius: 10px; /* Pill shape */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  vertical-align: middle; /* Align with text */
+}
+
+.price-tag.low {
+  background-color: #d4edda; /* Light Green */
+  color: #155724; /* Dark Green */
+}
+
+.price-tag.medium {
+  background-color: #fff3cd; /* Light Yellow */
+  color: #856404; /* Dark Yellow */
+}
+
+.price-tag.high {
+  background-color: #f8d7da; /* Light Red */
+  color: #721c24; /* Dark Red */
 }
 
 /* --- Main Content Area --- */
@@ -506,6 +529,11 @@ tbody tr:hover {
   flex-shrink: 0; /* Prevent logo from shrinking */
 }
 
+.model-name-cell .price-tag {
+  position: relative;
+  top: -1px; /* Minor vertical adjustment */
+}
+
 /* Bar Chart View */
 .chart-scroll-wrapper {
   width: 100%;
@@ -544,7 +572,6 @@ tbody tr:hover {
 }
 
 /* --- Responsiveness --- */
-/* --- Responsiveness --- */
 @media (max-width: 768px) {
   body {
     padding-top: 56px; /* Adjust if header height changes on mobile */
@@ -562,7 +589,6 @@ tbody tr:hover {
     font-size: 1.6rem;
   }
 
-  /* --- OPTIONAL TWEAK: Make panel width more fluid on small screens --- */
   .selection-panel {
     width: 85vw; /* Use viewport width for smaller devices */
     max-width: 300px; /* But never exceed 300px */
@@ -606,7 +632,6 @@ tbody tr:hover {
     padding: 0.6rem 0.75rem;
   }
 
-  /* --- OPTIONAL TWEAK: Slightly smaller font in table body for readability --- */
   tbody td {
     font-size: 0.85rem;
   }

@@ -30,6 +30,23 @@ const dynamicTimestampSpan = document.getElementById("dynamicTimestamp");
 const imageCache = {};
 
 // --- Helper Functions ---
+function getPriceCategory(model) {
+  const price = model.inputPrice;
+  if (price === null || price === undefined) {
+    return { name: "N/A", className: "na" };
+  }
+  if (price < 1.0) {
+    return { name: "Low", className: "low" };
+  }
+  if (price >= 1.0 && price < 5.0) {
+    return { name: "Medium", className: "medium" };
+  }
+  if (price >= 5.0) {
+    return { name: "High", className: "high" };
+  }
+  return { name: "N/A", className: "na" };
+}
+
 function formatNumber(numStr) {
   if (numStr === null || numStr === undefined || numStr.trim() === "")
     return "N/A";
@@ -276,14 +293,12 @@ function populateModelSelection() {
     providerTitle.appendChild(logoImg);
     providerTitle.appendChild(providerNameSpan);
 
-    // **** START: ADDED CLEAR BUTTON FOR EACH PROVIDER ****
     const clearProviderBtn = document.createElement("button");
     clearProviderBtn.className = "clear-provider-btn";
     clearProviderBtn.innerHTML = "&times;"; // The 'X' symbol
     clearProviderBtn.setAttribute("aria-label", `Clear ${provider} selections`);
     clearProviderBtn.title = `Clear ${provider} selections`; // Tooltip for mouse users
     providerTitle.appendChild(clearProviderBtn);
-    // **** END: ADDED CLEAR BUTTON ****
 
     providerTitle.setAttribute("aria-expanded", "false");
     const modelListDiv = document.createElement("div");
@@ -291,23 +306,16 @@ function populateModelSelection() {
     modelListDiv.id = `provider-list-${provider.replace(/\s+/g, "-")}`;
     providerTitle.setAttribute("aria-controls", modelListDiv.id);
 
-    // **** START: ADDED EVENT LISTENER FOR THE NEW BUTTON ****
     clearProviderBtn.addEventListener("click", (event) => {
-      // Stop the click from triggering the expand/collapse on the h3
       event.stopPropagation();
-
-      // Find all checkboxes within this specific provider's list
       const checkboxesInGroup = modelListDiv.querySelectorAll(
         'input[type="checkbox"]'
       );
       checkboxesInGroup.forEach((checkbox) => {
         checkbox.checked = false;
       });
-
-      // Update the main table/chart view
       updateDisplay();
     });
-    // **** END: ADDED EVENT LISTENER ****
 
     providerTitle.addEventListener("click", () => {
       const isCurrentlyExpanded = groupDiv.classList.contains("expanded");
@@ -345,6 +353,14 @@ function populateModelSelection() {
       nameSpan.className = "model-name-text";
       nameSpan.textContent = model.name || "Unnamed Model";
       label.appendChild(nameSpan);
+
+      const category = getPriceCategory(model);
+      if (category.name !== "N/A") {
+        const categoryTag = document.createElement("span");
+        categoryTag.className = `price-tag ${category.className}`;
+        categoryTag.textContent = category.name;
+        label.appendChild(categoryTag);
+      }
 
       div.appendChild(checkbox);
       div.appendChild(label);
@@ -448,6 +464,15 @@ function updateTableView(selectedModelsData) {
     const modelNameSpan = document.createElement("span");
     modelNameSpan.textContent = model.name || "N/A";
     modelNameCell.appendChild(modelNameSpan);
+
+    const category = getPriceCategory(model);
+    if (category.name !== "N/A") {
+      const categoryTag = document.createElement("span");
+      categoryTag.className = `price-tag ${category.className}`;
+      categoryTag.textContent = category.name;
+      modelNameCell.appendChild(categoryTag);
+    }
+
     row.appendChild(modelNameCell);
 
     row.innerHTML += `
@@ -706,18 +731,16 @@ function setDynamicTimestamp() {
     return;
   }
   const now = new Date();
-  // UPDATED OPTIONS to include the day of the week
   const options = {
-    weekday: "long", // "Saturday"
-    year: "numeric", // "2025"
-    month: "long", // "June"
-    day: "numeric", // "7"
-    hour: "numeric", // "11"
-    minute: "numeric", // "59"
-    second: "numeric", // "01"
-    hour12: true, // Use 12-hour clock with AM/PM
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: true,
   };
-  // UPDATED FORMATTING to be simpler and more robust
   const formattedTimestamp = new Intl.DateTimeFormat("en-US", options)
     .format(now)
     .replace(" at", ",");
@@ -763,7 +786,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         selectAllModels();
       });
     }
-    // **** ADDED MISSING EVENT LISTENERS ****
     if (expandAllBtn) {
       expandAllBtn.addEventListener("click", expandAllProviders);
     }
@@ -772,7 +794,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         clearAndCollapseSelections();
       });
     }
-    // **** END ADDED LISTENERS ****
 
     await switchView(currentView); // Initial view rendering
   } else {
