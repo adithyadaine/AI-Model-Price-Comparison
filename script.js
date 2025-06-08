@@ -95,7 +95,9 @@ function getPreloadedImage(logoFilename) {
 
 // --- CSV Processing Functions ---
 function parseCSV(csvText) {
-  console.log("Starting CSV Parse (Direct Header Match, Robust Price Handling)...");
+  console.log(
+    "Starting CSV Parse (Direct Header Match, Robust Price Handling)..."
+  );
   const lines = csvText.trim().split(/\r\n|\n/);
   if (lines.length < 2) {
     console.warn("CSV has too few lines (header + data expected).");
@@ -113,9 +115,14 @@ function parseCSV(csvText) {
   const statusIdx = headers.indexOf("Status");
 
   if (
-    [vendorIdx, modelIdx, contextIdx, inputPriceIdx, outputPriceIdx, statusIdx].some(
-      (idx) => idx === -1
-    )
+    [
+      vendorIdx,
+      modelIdx,
+      contextIdx,
+      inputPriceIdx,
+      outputPriceIdx,
+      statusIdx,
+    ].some((idx) => idx === -1)
   ) {
     console.error(
       "One or more required CSV headers are missing. Check your models.csv file headers."
@@ -540,7 +547,10 @@ async function renderBarChart(selectedModelsData) {
               let label = context.dataset.label || "";
               if (label) label += ": ";
               const modelIndex = context.dataIndex;
-              if (!selectedModelsData || modelIndex >= selectedModelsData.length)
+              if (
+                !selectedModelsData ||
+                modelIndex >= selectedModelsData.length
+              )
                 return label + "Error";
               const model = selectedModelsData[modelIndex];
               if (!model) return label + "Error";
