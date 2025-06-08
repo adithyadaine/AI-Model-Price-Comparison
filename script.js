@@ -276,11 +276,38 @@ function populateModelSelection() {
     providerTitle.appendChild(logoImg);
     providerTitle.appendChild(providerNameSpan);
 
+    // **** START: ADDED CLEAR BUTTON FOR EACH PROVIDER ****
+    const clearProviderBtn = document.createElement("button");
+    clearProviderBtn.className = "clear-provider-btn";
+    clearProviderBtn.innerHTML = "&times;"; // The 'X' symbol
+    clearProviderBtn.setAttribute("aria-label", `Clear ${provider} selections`);
+    clearProviderBtn.title = `Clear ${provider} selections`; // Tooltip for mouse users
+    providerTitle.appendChild(clearProviderBtn);
+    // **** END: ADDED CLEAR BUTTON ****
+
     providerTitle.setAttribute("aria-expanded", "false");
     const modelListDiv = document.createElement("div");
     modelListDiv.className = "model-list";
     modelListDiv.id = `provider-list-${provider.replace(/\s+/g, "-")}`;
     providerTitle.setAttribute("aria-controls", modelListDiv.id);
+
+    // **** START: ADDED EVENT LISTENER FOR THE NEW BUTTON ****
+    clearProviderBtn.addEventListener("click", (event) => {
+      // Stop the click from triggering the expand/collapse on the h3
+      event.stopPropagation();
+
+      // Find all checkboxes within this specific provider's list
+      const checkboxesInGroup = modelListDiv.querySelectorAll(
+        'input[type="checkbox"]'
+      );
+      checkboxesInGroup.forEach((checkbox) => {
+        checkbox.checked = false;
+      });
+
+      // Update the main table/chart view
+      updateDisplay();
+    });
+    // **** END: ADDED EVENT LISTENER ****
 
     providerTitle.addEventListener("click", () => {
       const isCurrentlyExpanded = groupDiv.classList.contains("expanded");

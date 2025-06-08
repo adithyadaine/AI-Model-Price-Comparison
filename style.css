@@ -284,6 +284,34 @@ body.panel-open .overlay {
   flex-shrink: 0;
 }
 
+/* --- START: Added for Provider Clear Button --- */
+.clear-provider-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted-color);
+  cursor: pointer;
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 1;
+  padding: 0 8px;
+  margin-left: auto; /* This pushes the button to the far right */
+  opacity: 0; /* Hide the button by default */
+  transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
+  border-radius: var(--border-radius);
+}
+
+/* Show the button when the user hovers over the provider title container */
+.provider-title:hover .clear-provider-btn {
+  opacity: 1;
+}
+
+/* Make the button slightly more prominent on its own hover */
+.clear-provider-btn:hover {
+  color: var(--danger-color);
+  background-color: #f1f3f5; /* Use same hover as parent for consistency */
+}
+/* --- END: Added for Provider Clear Button --- */
+
 .model-list {
   display: none;
   padding-left: 1rem; /* Indent model items under provider */
@@ -332,7 +360,8 @@ body.panel-open .overlay {
   color: var(--text-color);
 }
 
-.model-logo { /* Logo for individual models in the selection panel list */
+.model-logo {
+  /* Logo for individual models in the selection panel list */
   width: 18px;
   height: 18px;
   margin-right: 0.6em;
@@ -564,10 +593,13 @@ tbody tr:hover {
     align-items: stretch; /* Make panel action buttons full width */
   }
 
-  th, td { /* Slightly reduce padding in table cells for mobile */
+  th,
+  td {
+    /* Slightly reduce padding in table cells for mobile */
     padding: 0.6rem 0.75rem;
   }
-  .table-model-logo { /* Slightly smaller logo in table for mobile */
+  .table-model-logo {
+    /* Slightly smaller logo in table for mobile */
     width: 18px;
     height: 18px;
     margin-right: 0.5em;
