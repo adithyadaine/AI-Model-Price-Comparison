@@ -374,12 +374,13 @@ body.panel-open .overlay {
   font-size: 0.7rem;
   font-weight: 600;
   padding: 0.15em 0.5em;
-  margin-left: 0.6em;
+  margin-left: auto; /* This is the key change to push the tag right */
   border-radius: 10px; /* Pill shape */
   text-transform: uppercase;
   letter-spacing: 0.5px;
   line-height: 1;
   vertical-align: middle; /* Align with text */
+  flex-shrink: 0; /* Prevent the tag from shrinking */
 }
 
 .price-tag.low {
