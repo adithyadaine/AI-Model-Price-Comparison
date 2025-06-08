@@ -235,6 +235,51 @@ body.panel-open .overlay {
   color: var(--white-color);
 }
 
+/* Filter Buttons */
+.filter-btn-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1.25rem;
+}
+
+.filter-btn {
+  flex-grow: 1;
+  padding: 0.6rem 0.5rem;
+  font-size: 0.85rem;
+}
+
+.filter-btn.low {
+  background-color: #d4edda;
+  color: #155724;
+  border-color: #c3e6cb;
+}
+.filter-btn.low:hover {
+  background-color: #c3e6cb;
+  color: #155724;
+}
+
+.filter-btn.medium {
+  background-color: #fff3cd;
+  color: #856404;
+  border-color: #ffeeba;
+}
+.filter-btn.medium:hover {
+  background-color: #ffeeba;
+  color: #856404;
+}
+
+.filter-btn.high {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-color: #f5c6cb;
+}
+.filter-btn.high:hover {
+  background-color: #f5c6cb;
+  color: #721c24;
+}
+
 /* Provider Dropdowns */
 .model-group {
   margin-bottom: 0.25rem;

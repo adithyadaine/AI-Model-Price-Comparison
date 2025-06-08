@@ -23,8 +23,11 @@ const closePanelBtn = document.getElementById("closePanelBtn");
 const overlay = document.getElementById("overlay");
 const selectAllBtn = document.getElementById("selectAllBtn");
 const expandAllBtn = document.getElementById("expandAllBtn");
-const clearPanelBtn = document.getElementById("clearPanelBtn"); // Clear button in panel
+const clearPanelBtn = document.getElementById("clearPanelBtn");
 const dynamicTimestampSpan = document.getElementById("dynamicTimestamp");
+const filterLowBtn = document.getElementById("filterLowBtn");
+const filterMediumBtn = document.getElementById("filterMediumBtn");
+const filterHighBtn = document.getElementById("filterHighBtn");
 
 // --- Global Image Cache ---
 const imageCache = {};
@@ -433,6 +436,28 @@ function clearAndCollapseSelections() {
   console.log("All selections cleared and providers collapsed.");
 }
 
+function filterModelsByCategory(categoryName) {
+  if (!modelSelectionList || !modelsData) return;
+
+  const allCheckboxes = modelSelectionList.querySelectorAll(
+    'input[type="checkbox"]'
+  );
+
+  const matchingModelIds = modelsData
+    .filter((model) => {
+      const category = getPriceCategory(model);
+      return category.name.toLowerCase() === categoryName.toLowerCase();
+    })
+    .map((model) => model.id);
+
+  allCheckboxes.forEach((checkbox) => {
+    checkbox.checked = matchingModelIds.includes(checkbox.value);
+  });
+
+  updateDisplay();
+  console.log(`Filtered to show only "${categoryName}" cost models.`);
+}
+
 function updateTableView(selectedModelsData) {
   if (!comparisonTableBody) return;
   comparisonTableBody.innerHTML = "";
@@ -793,6 +818,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       clearPanelBtn.addEventListener("click", () => {
         clearAndCollapseSelections();
       });
+    }
+    if (filterLowBtn) {
+      filterLowBtn.addEventListener("click", () =>
+        filterModelsByCategory("Low")
+      );
+    }
+    if (filterMediumBtn) {
+      filterMediumBtn.addEventListener("click", () =>
+        filterModelsByCategory("Medium")
+      );
+    }
+    if (filterHighBtn) {
+      filterHighBtn.addEventListener("click", () =>
+        filterModelsByCategory("High")
+      );
     }
 
     await switchView(currentView); // Initial view rendering

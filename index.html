@@ -5,26 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI Model Pricing Comparator</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="icon" type="image/png" href="img/favicon/innovative-brain-icon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="img/favicon/innovative-brain-icon.png"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
     <header>
-      <button id="hamburgerBtn" class="hamburger-btn" aria-label="Open model selection menu" aria-expanded="false">
-        &#9776; <!-- Hamburger icon -->
+      <button
+        id="hamburgerBtn"
+        class="hamburger-btn"
+        aria-label="Open model selection menu"
+        aria-expanded="false"
+      >
+        &#9776;
+        <!-- Hamburger icon -->
       </button>
       <h1>AI Model Pricing Comparator</h1>
     </header>
 
     <aside class="selection-panel" id="selectionPanel" aria-hidden="true">
-      <button id="closePanelBtn" class="close-panel-btn" aria-label="Close model selection menu">&times;</button>
+      <button
+        id="closePanelBtn"
+        class="close-panel-btn"
+        aria-label="Close model selection menu"
+      >
+        &times;
+      </button>
       <h2>Select Models</h2>
       <div class="panel-actions-container">
-        <button id="selectAllBtn" class="panel-action-btn select-all-btn">Select All Models</button>
-        <button id="expandAllBtn" class="panel-action-btn expand-all-btn">Expand All Providers</button>
-        <!-- **** ADD NEW CLEAR BUTTON HERE **** -->
-        <button id="clearPanelBtn" class="panel-action-btn clear-panel-btn">Clear & Collapse Selections</button>
-        <!-- **** END NEW CLEAR BUTTON **** -->
+        <button id="selectAllBtn" class="panel-action-btn select-all-btn">
+          Select All Models
+        </button>
+        <button id="expandAllBtn" class="panel-action-btn expand-all-btn">
+          Expand All Providers
+        </button>
+        <button id="clearPanelBtn" class="panel-action-btn clear-panel-btn">
+          Clear & Collapse Selections
+        </button>
+
+        <!-- Filter Buttons -->
+        <div class="filter-btn-group">
+          <button id="filterLowBtn" class="panel-action-btn filter-btn low">
+            Low
+          </button>
+          <button
+            id="filterMediumBtn"
+            class="panel-action-btn filter-btn medium"
+          >
+            Medium
+          </button>
+          <button id="filterHighBtn" class="panel-action-btn filter-btn high">
+            High
+          </button>
+        </div>
       </div>
       <div id="model-selection-list">
         <p>Loading models...</p>
