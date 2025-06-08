@@ -295,7 +295,7 @@ function populateModelSelection() {
       checkbox.type = "checkbox";
       checkbox.id = `model-checkbox-${model.id}`;
       checkbox.value = model.id;
-      checkbox.addEventListener("change", () => updateDisplay()); // updateDisplay is async
+      checkbox.addEventListener("change", () => updateDisplay());
       const label = document.createElement("label");
       label.htmlFor = `model-checkbox-${model.id}`;
 
@@ -334,7 +334,7 @@ function selectAllModels() {
   checkboxes.forEach((checkbox) => {
     checkbox.checked = true;
   });
-  updateDisplay(); // This is async
+  updateDisplay();
   console.log("All models selected.");
 }
 
@@ -379,7 +379,7 @@ function clearAndCollapseSelections() {
       }
     }
   });
-  updateDisplay(); // This is async
+  updateDisplay();
   console.log("All selections cleared and providers collapsed.");
 }
 
@@ -482,13 +482,17 @@ async function renderBarChart(selectedModelsData) {
 
   await preloadLogosForChart(selectedModelsData);
 
-  const minBarWidthPerModel = 80, chartPadding = 100;
-  const calculatedMinWidth = selectedModelsData.length * minBarWidthPerModel + chartPadding;
+  const minBarWidthPerModel = 80,
+    chartPadding = 100;
+  const calculatedMinWidth =
+    selectedModelsData.length * minBarWidthPerModel + chartPadding;
   barChartCanvasContainer.style.minWidth = `${calculatedMinWidth}px`;
 
   const labels = selectedModelsData.map((model) => model.name);
   const inputPrices = selectedModelsData.map((model) => model.inputPrice ?? 0);
-  const outputPrices = selectedModelsData.map((model) => model.outputPrice ?? 0);
+  const outputPrices = selectedModelsData.map(
+    (model) => model.outputPrice ?? 0
+  );
   const data = { labels, datasets: [] };
   data.datasets = [
     {
@@ -509,7 +513,7 @@ async function renderBarChart(selectedModelsData) {
 
   const logoSize = 16;
   const textPadding = 4;
-  const xAxisItemHeight = logoSize + textPadding + 12 + 5; // logo + padding + text height + extra buffer
+  const xAxisItemHeight = logoSize + textPadding + 12 + 5;
 
   const config = {
     type: "bar",
@@ -536,11 +540,21 @@ async function renderBarChart(selectedModelsData) {
               let label = context.dataset.label || "";
               if (label) label += ": ";
               const modelIndex = context.dataIndex;
-              if (!selectedModelsData || modelIndex >= selectedModelsData.length) return label + "Error";
+              if (!selectedModelsData || modelIndex >= selectedModelsData.length)
+                return label + "Error";
               const model = selectedModelsData[modelIndex];
               if (!model) return label + "Error";
-              const originalValue = context.dataset.label.toLowerCase().startsWith("input") ? model.inputPrice : model.outputPrice;
-              if (originalValue !== null && originalValue !== undefined && !isNaN(originalValue)) label += `$${context.parsed.y.toFixed(2)}`;
+              const originalValue = context.dataset.label
+                .toLowerCase()
+                .startsWith("input")
+                ? model.inputPrice
+                : model.outputPrice;
+              if (
+                originalValue !== null &&
+                originalValue !== undefined &&
+                !isNaN(originalValue)
+              )
+                label += `$${context.parsed.y.toFixed(2)}`;
               else label += "N/A";
               return label;
             },
@@ -590,13 +604,19 @@ async function renderBarChart(selectedModelsData) {
 
 async function switchView(view) {
   if (tableViewBtn) tableViewBtn.classList.toggle("active", view === "table");
-  if (barChartViewBtn) barChartViewBtn.classList.toggle("active", view === "bar");
+  if (barChartViewBtn)
+    barChartViewBtn.classList.toggle("active", view === "bar");
   if (tableView) tableView.classList.toggle("active", view === "table");
   if (barChartView) barChartView.classList.toggle("active", view === "bar");
   if (viewTitle) {
     switch (view) {
-      case "bar": viewTitle.textContent = "Bar Chart"; break;
-      case "table": default: viewTitle.textContent = "Table"; break;
+      case "bar":
+        viewTitle.textContent = "Bar Chart";
+        break;
+      case "table":
+      default:
+        viewTitle.textContent = "Table";
+        break;
     }
   }
   currentView = view;
@@ -607,7 +627,8 @@ async function updateDisplay() {
   console.log("updateDisplay called. Current view:", currentView);
   if (!modelsData || modelsData.length === 0) {
     console.warn("updateDisplay: modelsData is empty or not loaded.");
-    if (comparisonTableBody) comparisonTableBody.innerHTML = `<tr><td colspan="5">No model data loaded.</td></tr>`;
+    if (comparisonTableBody)
+      comparisonTableBody.innerHTML = `<tr><td colspan="5">No model data loaded.</td></tr>`;
     if (barChartMessage) barChartMessage.textContent = "No model data loaded.";
     if (priceChartInstance) priceChartInstance.destroy();
     if (priceChartCanvas) priceChartCanvas.style.display = "none";
@@ -618,8 +639,12 @@ async function updateDisplay() {
     return;
   }
 
-  const selectedCheckboxes = modelSelectionList.querySelectorAll('input[type="checkbox"]:checked');
-  const selectedModelIds = Array.from(selectedCheckboxes).map((checkbox) => checkbox.value);
+  const selectedCheckboxes = modelSelectionList.querySelectorAll(
+    'input[type="checkbox"]:checked'
+  );
+  const selectedModelIds = Array.from(selectedCheckboxes).map(
+    (checkbox) => checkbox.value
+  );
 
   let filteredModelsData = modelsData.filter((model) => {
     return model.id && selectedModelIds.includes(model.id);
@@ -644,20 +669,38 @@ function setDynamicTimestamp() {
     return;
   }
   const now = new Date();
-  const optionsDate = { year: 'numeric', month: 'long' };
-  const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-  const dateString = now.toLocaleDateString(undefined, optionsDate);
-  const timeString = now.toLocaleTimeString(undefined, optionsTime);
-  dynamicTimestampSpan.textContent = `${dateString}, ${timeString}`;
+  // UPDATED OPTIONS to include the day of the week
+  const options = {
+    weekday: "long", // "Saturday"
+    year: "numeric", // "2025"
+    month: "long", // "June"
+    day: "numeric", // "7"
+    hour: "numeric", // "11"
+    minute: "numeric", // "59"
+    second: "numeric", // "01"
+    hour12: true, // Use 12-hour clock with AM/PM
+  };
+  // UPDATED FORMATTING to be simpler and more robust
+  const formattedTimestamp = new Intl.DateTimeFormat("en-US", options)
+    .format(now)
+    .replace(" at", ",");
+  dynamicTimestampSpan.textContent = formattedTimestamp;
   console.log("Timestamp updated:", dynamicTimestampSpan.textContent);
 }
 
 // --- Initialization ---
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("DOM fully loaded and parsed.");
-  if (!modelSelectionList || !comparisonTableBody || !priceChartCanvas || !dynamicTimestampSpan) {
+  if (
+    !modelSelectionList ||
+    !comparisonTableBody ||
+    !priceChartCanvas ||
+    !dynamicTimestampSpan
+  ) {
     console.error("Initialization failed: Essential DOM elements are missing.");
-    if (document.body) document.body.innerHTML = "<h1>Error: Application structure incomplete.</h1>";
+    if (document.body)
+      document.body.innerHTML =
+        "<h1>Error: Application structure incomplete.</h1>";
     return;
   }
 
@@ -667,31 +710,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     populateModelSelection();
     setDynamicTimestamp();
 
-    if (tableViewBtn) tableViewBtn.addEventListener("click", () => switchView("table"));
-    if (barChartViewBtn) barChartViewBtn.addEventListener("click", () => switchView("bar"));
-    if (refreshPageBtn) refreshPageBtn.addEventListener("click", () => location.reload());
+    if (tableViewBtn)
+      tableViewBtn.addEventListener("click", () => switchView("table"));
+    if (barChartViewBtn)
+      barChartViewBtn.addEventListener("click", () => switchView("bar"));
+    if (refreshPageBtn)
+      refreshPageBtn.addEventListener("click", () => location.reload());
 
     if (hamburgerBtn) hamburgerBtn.addEventListener("click", openPanel);
     if (closePanelBtn) closePanelBtn.addEventListener("click", closePanel);
     if (overlay) overlay.addEventListener("click", closePanel);
 
     if (selectAllBtn) {
-      selectAllBtn.addEventListener("click", () => { // selectAllModels calls async updateDisplay
+      selectAllBtn.addEventListener("click", () => {
         selectAllModels();
       });
     }
+    // **** ADDED MISSING EVENT LISTENERS ****
     if (expandAllBtn) {
       expandAllBtn.addEventListener("click", expandAllProviders);
     }
     if (clearPanelBtn) {
-      clearPanelBtn.addEventListener("click", () => { // clearAndCollapseSelections calls async updateDisplay
+      clearPanelBtn.addEventListener("click", () => {
         clearAndCollapseSelections();
       });
     }
+    // **** END ADDED LISTENERS ****
+
     await switchView(currentView); // Initial view rendering
   } else {
     console.warn("No model data loaded. Check models.csv and console.");
-    if (modelSelectionList) modelSelectionList.innerHTML = "<p>Failed to load model data. Check console.</p>";
-    if (dynamicTimestampSpan) dynamicTimestampSpan.textContent = "Data loading failed";
+    if (modelSelectionList)
+      modelSelectionList.innerHTML =
+        "<p>Failed to load model data. Check console.</p>";
+    if (dynamicTimestampSpan)
+      dynamicTimestampSpan.textContent = "Data loading failed";
   }
 });
