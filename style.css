@@ -544,6 +544,7 @@ tbody tr:hover {
 }
 
 /* --- Responsiveness --- */
+/* --- Responsiveness --- */
 @media (max-width: 768px) {
   body {
     padding-top: 56px; /* Adjust if header height changes on mobile */
@@ -559,6 +560,12 @@ tbody tr:hover {
   .hamburger-btn {
     padding: 0 0.75rem 0 0;
     font-size: 1.6rem;
+  }
+
+  /* --- OPTIONAL TWEAK: Make panel width more fluid on small screens --- */
+  .selection-panel {
+    width: 85vw; /* Use viewport width for smaller devices */
+    max-width: 300px; /* But never exceed 300px */
   }
 
   .container {
@@ -598,6 +605,12 @@ tbody tr:hover {
     /* Slightly reduce padding in table cells for mobile */
     padding: 0.6rem 0.75rem;
   }
+
+  /* --- OPTIONAL TWEAK: Slightly smaller font in table body for readability --- */
+  tbody td {
+    font-size: 0.85rem;
+  }
+
   .table-model-logo {
     /* Slightly smaller logo in table for mobile */
     width: 18px;
