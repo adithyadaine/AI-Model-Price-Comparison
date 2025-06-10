@@ -60,4 +60,15 @@ NVIDIA,Llama 3.1 Nemotron 70B Instruct,131000,0.12,0.3,Active
 NVIDIA,Llama 3.1 Nemotron 8B Instruct (BF16),131000,0.025,0.04,Active
 NVIDIA,Llama 3.1 405B Instruct (FP8),131000,0.8,0.8,Active
 NVIDIA,Llama 3.2 3B Instruct (BF16),131000,0.015,0.025,Active
-Vercel,v0-1.0-md,128000,3,15,Beta
+Vercel,v0-1.0-md (Medium-sized Model),128000,3,15,Beta
+Vercel,v0-1.5-lg (Large-sized Model),512000,15,75,Beta
+Perplexity AI,Sonar,4000,1,1,Active
+Perplexity AI,Sonar Pro,4000,3,15,Active
+Perplexity AI,Sonar Reasoning,4000,1,5,Active
+Perplexity AI,Sonar Reasoning Pro,4000,2,8,Active
+Perplexity AI,Sonar Deep Research,4000,2,8,Active
+Perplexity AI,r1-1776,4000,2,8,Active
+Cohere,Command R+,128000,2.5,10,Active
+Cohere,Command R,128000,0.15,0.6,Active
+Cohere,Command A,128000,2.5,10,Active
+Cohere,Command R7B,128000,0.0375,0.15,Active
