@@ -179,6 +179,25 @@ body.panel-open .overlay {
   opacity: 1;
 }
 
+/* --- NEW: Search Bar in Panel --- */
+.search-container {
+  margin-bottom: 1rem;
+}
+#modelSearchInput {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.95rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+#modelSearchInput:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
 /* Panel Action Buttons Container */
 .panel-actions-container {
   display: flex;
@@ -553,7 +572,38 @@ th {
   background-color: #e9ecef; /* Light gray for table headers */
   font-weight: 500;
   color: var(--text-color);
+  position: relative;
 }
+
+/* --- NEW: Table Sorting Styles --- */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+th.sortable:hover {
+  background-color: #dde6ef;
+}
+th.sortable::after {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  margin-left: 8px;
+  opacity: 0.4;
+  position: relative;
+  top: -1px;
+}
+th.sortable.sorted-asc::after {
+  border-bottom: 5px solid var(--text-color);
+  opacity: 1;
+}
+th.sortable.sorted-desc::after {
+  border-top: 5px solid var(--text-color);
+  opacity: 1;
+}
+
 tbody tr:nth-child(even) {
   background-color: var(--light-gray-bg); /* Zebra striping for rows */
 }

@@ -35,6 +35,15 @@
         &times;
       </button>
       <h2>Select Models</h2>
+      <!-- Search/Filter Bar -->
+      <div class="search-container">
+        <input
+          type="text"
+          id="modelSearchInput"
+          placeholder="Search models..."
+          aria-label="Search for models"
+        />
+      </div>
       <div class="panel-actions-container">
         <button id="selectAllBtn" class="panel-action-btn select-all-btn">
           Select All Models
@@ -86,11 +95,18 @@
             <table>
               <thead>
                 <tr>
-                  <th>Model Name</th>
-                  <th>Provider</th>
-                  <th>Input ($/1M tokens)</th>
-                  <th>Output ($/1M tokens)</th>
-                  <th>Context Window</th>
+                  <!-- Added data-sort-key for sorting functionality -->
+                  <th class="sortable" data-sort-key="name">Model Name</th>
+                  <th class="sortable" data-sort-key="provider">Provider</th>
+                  <th class="sortable" data-sort-key="inputPrice">
+                    Input ($/1M tokens)
+                  </th>
+                  <th class="sortable" data-sort-key="outputPrice">
+                    Output ($/1M tokens)
+                  </th>
+                  <th class="sortable" data-sort-key="contextWindow">
+                    Context Window
+                  </th>
                 </tr>
               </thead>
               <tbody id="comparison-table-body">

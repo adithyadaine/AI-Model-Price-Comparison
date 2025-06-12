@@ -2,6 +2,7 @@
 let currentView = "table";
 let priceChartInstance = null;
 let modelsData = []; // Will be populated from CSV
+let sortState = { column: null, direction: "asc" }; // For table sorting
 
 // --- DOM Elements ---
 const modelSelectionList = document.getElementById("model-selection-list");
@@ -28,6 +29,7 @@ const dynamicTimestampSpan = document.getElementById("dynamicTimestamp");
 const filterLowBtn = document.getElementById("filterLowBtn");
 const filterMediumBtn = document.getElementById("filterMediumBtn");
 const filterHighBtn = document.getElementById("filterHighBtn");
+const modelSearchInput = document.getElementById("modelSearchInput"); // NEW: Search input
 
 // --- Global Image Cache ---
 const imageCache = {};
@@ -59,6 +61,16 @@ function formatNumber(numStr) {
     return (num / 1000000).toFixed(num % 1000000 !== 0 ? 1 : 0) + "M";
   if (num >= 1000) return (num / 1000).toFixed(num % 1000 !== 0 ? 1 : 0) + "k";
   return num.toString();
+}
+
+// NEW: Helper to parse context window string back to a number for sorting
+function parseContextWindow(str) {
+  if (typeof str !== "string" || str === "N/A") return 0;
+  const lower = str.toLowerCase();
+  const num = parseFloat(lower);
+  if (lower.endsWith("m")) return num * 1000000;
+  if (lower.endsWith("k")) return num * 1000;
+  return num;
 }
 
 function getLogoFilename(vendorName) {
@@ -374,6 +386,32 @@ function populateModelSelection() {
     modelSelectionList.appendChild(groupDiv);
   }
   console.log("Model selection populated.");
+}
+
+// NEW: Function to filter models in the selection panel based on search input
+function filterModelSelectionList() {
+  const searchTerm = modelSearchInput.value.toLowerCase();
+  const modelGroups = modelSelectionList.querySelectorAll(".model-group");
+
+  modelGroups.forEach((group) => {
+    const modelItems = group.querySelectorAll(".model-item");
+    let groupHasVisibleModel = false;
+
+    modelItems.forEach((item) => {
+      const modelName = item
+        .querySelector(".model-name-text")
+        .textContent.toLowerCase();
+      if (modelName.includes(searchTerm)) {
+        item.style.display = "flex";
+        groupHasVisibleModel = true;
+      } else {
+        item.style.display = "none";
+      }
+    });
+
+    // Show or hide the entire provider group
+    group.style.display = groupHasVisibleModel ? "block" : "none";
+  });
 }
 
 function selectAllModels() {
@@ -737,7 +775,35 @@ async function updateDisplay() {
     return model.id && selectedModelIds.includes(model.id);
   });
 
-  filteredModelsData.sort((a, b) => a.name.localeCompare(b.name));
+  // --- NEW: Sorting Logic ---
+  if (sortState.column && currentView === "table") {
+    filteredModelsData.sort((a, b) => {
+      const valA = a[sortState.column];
+      const valB = b[sortState.column];
+      let comparison = 0;
+
+      // Handle null/undefined values by pushing them to the bottom
+      if (valA === null || valA === undefined) return 1;
+      if (valB === null || valB === undefined) return -1;
+
+      if (sortState.column === "contextWindow") {
+        comparison = parseContextWindow(valA) - parseContextWindow(valB);
+      } else if (
+        sortState.column === "inputPrice" ||
+        sortState.column === "outputPrice"
+      ) {
+        comparison = valA - valB;
+      } else {
+        // Default to string comparison for name, provider, etc.
+        comparison = valA.localeCompare(valB);
+      }
+
+      return sortState.direction === "asc" ? comparison : -comparison;
+    });
+  } else {
+    // Default sort by name if no sort state is active
+    filteredModelsData.sort((a, b) => a.name.localeCompare(b.name));
+  }
 
   switch (currentView) {
     case "bar":
@@ -834,6 +900,37 @@ document.addEventListener("DOMContentLoaded", async () => {
         filterModelsByCategory("High")
       );
     }
+
+    // --- NEW: Event Listener for Search Input ---
+    if (modelSearchInput) {
+      modelSearchInput.addEventListener("input", filterModelSelectionList);
+    }
+
+    // --- NEW: Event Listeners for Table Sorting ---
+    document
+      .querySelectorAll("th.sortable")
+      .forEach((header) => {
+        header.addEventListener("click", () => {
+          const sortKey = header.dataset.sortKey;
+          if (sortState.column === sortKey) {
+            sortState.direction =
+              sortState.direction === "asc" ? "desc" : "asc";
+          } else {
+            sortState.column = sortKey;
+            sortState.direction = "asc";
+          }
+
+          // Update header styles
+          document.querySelectorAll("th.sortable").forEach((th) => {
+            th.classList.remove("sorted-asc", "sorted-desc");
+          });
+          header.classList.add(
+            sortState.direction === "asc" ? "sorted-asc" : "sorted-desc"
+          );
+
+          updateDisplay();
+        });
+      });
 
     await switchView(currentView); // Initial view rendering
   } else {
