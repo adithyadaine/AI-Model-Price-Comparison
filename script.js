@@ -56,6 +56,14 @@ function getPriceCategory(model) {
   return { name: "N/A", className: "na" };
 }
 
+// NEW: Helper function to generate a CSS class from capability text
+function getCapabilityClass(capabilityText) {
+  if (!capabilityText) return "";
+  return `capability-${capabilityText
+    .toLowerCase()
+    .replace(/\s+/g, "-")}`;
+}
+
 function formatNumber(numStr) {
   if (numStr === null || numStr === undefined || numStr.trim() === "")
     return "N/A";
@@ -129,96 +137,121 @@ function getPreloadedImage(logoFilename) {
 }
 
 // --- CSV Processing Functions ---
+
+/**
+ * A more robust CSV parser that handles quoted fields.
+ * This prevents errors if a model name or other field contains a comma.
+ * @param {string} csvText The raw CSV text.
+ * @returns {object[]} An array of parsed model objects.
+ */
 function parseCSV(csvText) {
-  console.log(
-    "Starting CSV Parse (Direct Header Match, Robust Price Handling)..."
-  );
   const lines = csvText.trim().split(/\r\n|\n/);
-  if (lines.length < 2) {
-    console.warn("CSV has too few lines (header + data expected).");
-    return [];
-  }
   const headers = lines[0]
     .trim()
     .split(",")
-    .map((header) => header.trim());
-  const vendorIdx = headers.indexOf("Vendor");
-  const modelIdx = headers.indexOf("Model");
-  const contextIdx = headers.indexOf("Context (tokens)");
-  const inputPriceIdx = headers.indexOf("Input Price ($/1M tokens)");
-  const outputPriceIdx = headers.indexOf("Output Price ($/1M tokens)");
-  const statusIdx = headers.indexOf("Status");
+    .map((h) => h.trim());
+  const headerMap = headers.reduce((acc, h, i) => ({ ...acc, [h]: i }), {});
 
-  if (
-    [
-      vendorIdx,
-      modelIdx,
-      contextIdx,
-      inputPriceIdx,
-      outputPriceIdx,
-      statusIdx,
-    ].some((idx) => idx === -1)
-  ) {
-    console.error(
-      "One or more required CSV headers are missing. Check your models.csv file headers."
-    );
-    return [];
+  const requiredHeaders = [
+    "Vendor",
+    "Model",
+    "Context (tokens)",
+    "Input Price ($/1M tokens)",
+    "Output Price ($/1M tokens)",
+    "Status",
+  ];
+  for (const h of requiredHeaders) {
+    if (headerMap[h] === undefined) {
+      console.error(`Required CSV header missing: "${h}"`);
+      return [];
+    }
   }
+
   const dataRows = lines.slice(1);
   const parsedData = [];
+
   dataRows.forEach((line, rowIndex) => {
     if (line.trim() === "") return;
-    const values = line
-      .trim()
-      .split(",")
-      .map((value) => value.trim());
+
+    // Robust value splitting
+    const values = [];
+    let currentVal = "";
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === "," && !inQuotes) {
+        values.push(currentVal.trim());
+        currentVal = "";
+      } else {
+        currentVal += char;
+      }
+    }
+    values.push(currentVal.trim());
+
     if (values.length !== headers.length) {
       console.warn(
-        `Row ${rowIndex + 1} has incorrect column count. Line: "${line}"`
+        `Row ${
+          rowIndex + 2
+        } has incorrect column count. Expected ${headers.length}, got ${
+          values.length
+        }. Line: "${line}"`
       );
       return;
     }
-    const modelName = values[modelIdx];
+
+    const get = (headerName) => values[headerMap[headerName]] || "";
+
+    const modelName = get("Model");
     if (!modelName) {
-      console.warn(`Model name missing at row ${rowIndex + 1}.`);
+      console.warn(`Model name missing at row ${rowIndex + 2}.`);
       return;
     }
+
     const parsePrice = (priceValue) => {
       if (
+        !priceValue ||
         priceValue === "Open Source" ||
-        priceValue === "Not Public" ||
-        priceValue === "" ||
-        priceValue === undefined
+        priceValue === "Not Public"
       )
         return null;
       const num = parseFloat(priceValue);
       return isNaN(num) ? null : num;
     };
+
+    const capabilitiesRaw = get("Capabilities");
     const modelObject = {
-      provider: values[vendorIdx],
+      provider: get("Vendor"),
       name: modelName,
       id: modelName
         .toLowerCase()
         .replace(/\s+/g, "-")
         .replace(/[^a-z0-9-]/gi, ""),
-      contextWindow: formatNumber(values[contextIdx]),
-      inputPrice: parsePrice(values[inputPriceIdx]),
-      outputPrice: parsePrice(values[outputPriceIdx]),
-      status: values[statusIdx],
-      logo: getLogoFilename(values[vendorIdx]), // Logo is based on provider
+      contextWindow: formatNumber(get("Context (tokens)")),
+      inputPrice: parsePrice(get("Input Price ($/1M tokens)")),
+      outputPrice: parsePrice(get("Output Price ($/1M tokens)")),
+      status: get("Status"),
+      logo: getLogoFilename(get("Vendor")),
+      capabilities: capabilitiesRaw
+        ? capabilitiesRaw.split(",").map((t) => t.trim())
+        : [],
     };
+
     if (modelObject.name === "Grok 1") {
       if (modelObject.inputPrice === 0) modelObject.inputPrice = null;
       if (modelObject.outputPrice === 0) modelObject.outputPrice = null;
     }
+
     if (!modelObject.id) {
       console.warn(
-        `Model at row ${rowIndex + 1} resulted in empty ID. Name: "${modelName}"`
+        `Model at row ${rowIndex + 2} resulted in empty ID. Name: "${modelName}"`
       );
       return;
     }
     parsedData.push(modelObject);
   });
+
   console.log("CSV Parsed Data (first 5):", parsedData.slice(0, 5));
   return parsedData;
 }
@@ -236,7 +269,7 @@ async function loadModelsData() {
     if (modelSelectionList)
       modelSelectionList.innerHTML = `<p>Error loading model data: ${error.message}.</p>`;
     if (comparisonTableBody)
-      comparisonTableBody.innerHTML = `<tr><td colspan="5">Error loading model data.</td></tr>`;
+      comparisonTableBody.innerHTML = `<tr><td colspan="6">Error loading model data.</td></tr>`;
     return [];
   }
 }
@@ -372,6 +405,17 @@ function populateModelSelection() {
       nameSpan.textContent = model.name || "Unnamed Model";
       label.appendChild(nameSpan);
 
+      // Add capability tags to the selection panel
+      if (model.capabilities && model.capabilities.length > 0) {
+        model.capabilities.forEach((cap) => {
+          if (!cap) return; // Skip if a tag is empty
+          const capTag = document.createElement("span");
+          capTag.className = `capability-tag ${getCapabilityClass(cap)}`;
+          capTag.textContent = cap;
+          label.appendChild(capTag);
+        });
+      }
+
       const category = getPriceCategory(model);
       if (category.name !== "N/A") {
         const categoryTag = document.createElement("span");
@@ -498,23 +542,23 @@ function filterModelsByCategory(categoryName) {
   console.log(`Filtered to show only "${categoryName}" cost models.`);
 }
 
+// --- THIS IS THE CORRECTED FUNCTION ---
 function updateTableView(selectedModelsData) {
   if (!comparisonTableBody) return;
-  comparisonTableBody.innerHTML = "";
+  comparisonTableBody.innerHTML = ""; // Clear existing rows
   if (!selectedModelsData || selectedModelsData.length === 0) {
-    comparisonTableBody.innerHTML = `<tr><td colspan="5">Select models to compare.</td></tr>`;
+    comparisonTableBody.innerHTML = `<tr><td colspan="6">Select models to compare.</td></tr>`;
     return;
   }
+
   selectedModelsData.forEach((model) => {
     const row = document.createElement("tr");
     const formatPrice = (price) =>
-      price !== null && price !== undefined && !isNaN(price)
-        ? `$${price.toFixed(2)}`
-        : "N/A";
+      price !== null && !isNaN(price) ? `$${price.toFixed(2)}` : "N/A";
 
+    // Cell 1: Model Name
     const modelNameCell = document.createElement("td");
     modelNameCell.className = "model-name-cell";
-
     if (model.logo) {
       const logoImg = document.createElement("img");
       logoImg.src = `img/logos/${model.logo}`;
@@ -529,7 +573,6 @@ function updateTableView(selectedModelsData) {
     const modelNameSpan = document.createElement("span");
     modelNameSpan.textContent = model.name || "N/A";
     modelNameCell.appendChild(modelNameSpan);
-
     const category = getPriceCategory(model);
     if (category.name !== "N/A") {
       const categoryTag = document.createElement("span");
@@ -537,15 +580,51 @@ function updateTableView(selectedModelsData) {
       categoryTag.textContent = category.name;
       modelNameCell.appendChild(categoryTag);
     }
-
     row.appendChild(modelNameCell);
 
-    row.innerHTML += `
-            <td>${model.provider || "N/A"}</td>
-            <td>${formatPrice(model.inputPrice)}</td>
-            <td>${formatPrice(model.outputPrice)}</td>
-            <td>${model.contextWindow || "N/A"}</td>
-        `;
+    // Cell 2: Provider
+    const providerCell = document.createElement("td");
+    providerCell.textContent = model.provider || "N/A";
+    row.appendChild(providerCell);
+
+    // Cell 3: Input Price
+    const inputPriceCell = document.createElement("td");
+    inputPriceCell.textContent = formatPrice(model.inputPrice);
+    row.appendChild(inputPriceCell);
+
+    // Cell 4: Output Price
+    const outputPriceCell = document.createElement("td");
+    outputPriceCell.textContent = formatPrice(model.outputPrice);
+    row.appendChild(outputPriceCell);
+
+    // Cell 5: Context Window
+    const contextCell = document.createElement("td");
+    contextCell.textContent = model.contextWindow || "N/A";
+    row.appendChild(contextCell);
+
+    // Cell 6: Capabilities
+    const capabilitiesCell = document.createElement("td");
+    const hasCapabilities =
+      model.capabilities && model.capabilities.some((cap) => cap);
+    if (hasCapabilities) {
+      const container = document.createElement("div");
+      container.className = "capabilities-container";
+      model.capabilities.forEach((cap) => {
+        if (cap) {
+          // Ensure we don't create empty tags
+          const capTag = document.createElement("span");
+          capTag.className = `capability-tag ${getCapabilityClass(cap)}`;
+          capTag.textContent = cap;
+          container.appendChild(capTag);
+        }
+      });
+      capabilitiesCell.appendChild(container);
+    } else {
+      capabilitiesCell.textContent = "N/A";
+    }
+    row.appendChild(capabilitiesCell);
+
+    // Finally, append the fully constructed row to the table body
     comparisonTableBody.appendChild(row);
   });
 }
@@ -819,7 +898,7 @@ async function updateDisplay() {
   if (!modelsData || modelsData.length === 0) {
     console.warn("updateDisplay: modelsData is empty or not loaded.");
     if (comparisonTableBody)
-      comparisonTableBody.innerHTML = `<tr><td colspan="5">No model data loaded.</td></tr>`;
+      comparisonTableBody.innerHTML = `<tr><td colspan="6">No model data loaded.</td></tr>`;
     if (barChartMessage) barChartMessage.textContent = "No model data loaded.";
     if (priceChartInstance) priceChartInstance.destroy();
     if (priceChartCanvas) priceChartCanvas.style.display = "none";
@@ -937,14 +1016,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (barChartViewBtn)
       barChartViewBtn.addEventListener("click", () => switchView("bar"));
 
-    // --- THIS IS THE CHANGED PART ---
     if (refreshPageBtn) {
-      // Remapped to call the clear function instead of reloading the page.
       refreshPageBtn.addEventListener("click", () => {
         clearAndCollapseSelections();
       });
     }
-    // --- END OF CHANGE ---
 
     if (hamburgerBtn) hamburgerBtn.addEventListener("click", openPanel);
     if (closePanelBtn) closePanelBtn.addEventListener("click", closePanel);

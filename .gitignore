@@ -1,5 +1,6 @@
 # Ignore all files in the models directory
 models.js
+*.xlsx
 Icon
 node_modules/
 .env

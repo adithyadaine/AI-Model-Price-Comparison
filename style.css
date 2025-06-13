@@ -418,19 +418,22 @@ body.panel-open .overlay {
   font-size: 0.9rem;
   flex-grow: 1;
   color: var(--text-color);
+  flex-wrap: wrap; /* Allow tags to wrap */
+  gap: 0 0.4em; /* Space between items in the label */
 }
 
 .model-logo {
   /* Logo for individual models in the selection panel list */
   width: 18px;
   height: 18px;
-  margin-right: 0.6em;
+  margin-right: 0.2em; /* Reduced margin */
   flex-shrink: 0;
   object-fit: contain;
 }
 
 .model-name-text {
   line-height: 1.4;
+  margin-right: 0.4em;
 }
 
 /* --- Price Category Tags --- */
@@ -460,6 +463,40 @@ body.panel-open .overlay {
 .price-tag.high {
   background-color: #f8d7da; /* Light Red */
   color: #721c24; /* Dark Red */
+}
+
+/* --- Capability Tags --- */
+.capability-tag {
+  font-size: 0.65rem;
+  font-weight: 500;
+  padding: 0.15em 0.5em;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  background-color: #e9ecef; /* Default gray */
+  color: var(--text-muted-color);
+  flex-shrink: 0;
+}
+
+/* --- NEW: Specific colors for capability tags --- */
+.capability-tag.capability-vision {
+  background-color: #e0f2fe; /* Light Blue */
+  color: #0c4a6e; /* Dark Blue */
+}
+.capability-tag.capability-function-calling {
+  background-color: #dcfce7; /* Light Green */
+  color: #14532d; /* Dark Green */
+}
+.capability-tag.capability-multilingual {
+  background-color: #fef3c7; /* Light Yellow */
+  color: #78350f; /* Dark Yellow/Brown */
+}
+
+.capabilities-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
 /* --- Main Content Area --- */
@@ -575,7 +612,7 @@ th {
   position: relative;
 }
 
-/* --- NEW: Table Sorting Styles --- */
+/* --- Table Sorting Styles --- */
 th.sortable {
   cursor: pointer;
   user-select: none;

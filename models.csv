@@ -1,74 +1,74 @@
-Vendor,Model,Context (tokens),Input Price ($/1M tokens),Output Price ($/1M tokens),Status
-OpenAI,GPT-4o,128000,2.5,10,Active
-OpenAI,GPT-4o Mini,128000,0.15,0.6,Active
-OpenAI,GPT-4.1,1000000,2,8,Active
-OpenAI,GPT-4.1 Mini,1000000,0.4,1.6,Active
-OpenAI,GPT-4.1 Nano,1000000,0.1,0.4,Active
-OpenAI,o1,200000,15,60,Active
-OpenAI,o1 Mini,128000,1.1,4.4,Active
-OpenAI,o3 Mini,200000,1.1,4.4,Active
-OpenAI,o3-Mini-High,200000,1.1,4.4,Active
-OpenAI,GPT-3.5 Turbo,16000,0.5,1.5,Active
-OpenAI,o4-Mini-High,200000,1.1,4.4,Active
-OpenAI,o3-Pro,200000,20,80,Active
-Anthropic,Claude 3.5 Haiku,200000,0.8,4,Active
-Anthropic,Claude 3.5 Sonnet,200000,3,15,Active
-Anthropic,Claude 3.7 Sonnet,200000,3,15,Active
-Anthropic,Claude 3.7 Sonnet Thinking,200000,3,15,Active
-Anthropic,Claude 3 Opus,200000,15,75,Active
-Anthropic,Claude 4 Opus,200000,15,75,Active
-Anthropic,Claude Sonnet 4,200000,3,15,Active
-Google,Gemini 2.5 Pro (Preview),1048576,1.25,10,Active
-Google,Gemini 2.0 Pro Exp.,2000000,1.25,10,Active
-Google,Gemini 2.5 Flash (Preview),1048576,0.15,0.6,Active
-Google,Gemini 2.0 Flash,1048576,0.15,0.6,Active
-Google,Gemini 2.0 Flash-Lite,1048576,0.15,0.6,Active
-Google,Gemini 1.5 Pro,2097152,1.25,10,Legacy
-Google,Gemini 1.5 Flash,1048576,0.15,0.6,Legacy
-Google,Gemini 1.5 Flash-8B,1000000,0.075,0.3,Active
-DeepSeek,DeepSeek R1,128000,0.55,2.19,Active
-DeepSeek,DeepSeek V3,128000,0.14,0.28,Active
-DeepSeek,DeepSeek V2.5,128000,0.14,0.28,Active
-DeepSeek,DeepSeek R1 Distill Qwen,128000,0.27,1.1,Active
-Mistral,Mistral Small,32000,0.1,0.3,Active
-Mistral,Mistral Small 3,128000,0.2,0.6,Active
-Mistral,Mistral Large,128000,2,6,Active
-Mistral,Mistral Large 2,128000,2,6,Active
-Mistral,Mixtral 8x7B,32000,0.5,0.5,Active
-Mistral,Mixtral 8x22B,65000,0.5,0.5,Active
-Mistral,Mistral NeMo,128000,0.15,0.15,Active
-Meta,LLaMA 4 Scout,10000000,0.00017,0.00017,Active
-Meta,LLaMA 4 Maverick,1000000,0.00019,0.00049,Active
-Meta,LLaMA 3.3 70B,128000,0.23,0.4,Active
-Meta,LLaMA 3.1 405B,128000,1.79,1.79,Active
-Meta,LLaMA 3.2 90B Vision,128000,0.35,0.4,Active
-Meta,LLaMA 3.1 70B,128000,0.23,0.4,Active
-Meta,LLaMA 3.2 11B Vision,128000,0.055,0.055,Active
-xAI (Grok),Grok 3,1000000,0.003,0.015,Active
-xAI (Grok),Grok 2,200000,0.002,0.01,Active
-xAI (Grok),Grok 1,128000,0,0,Active
-Amazon,Nova Micro,128000,0.035,0.14,Active
-Amazon,Nova Lite,300000,0.06,0.24,Active
-Amazon,Nova Pro,300000,0.8,3.2,Active
-Alibaba,Qwen-Max,128000,1.6,6.4,Active
-Alibaba,Qwen-Plus,128000,0.4,1.2,Active
-Alibaba,Qwen-Plus-Latest (Thinking),128000,0.4,8,Active
-Alibaba,Qwen-Plus-Latest,128000,0.4,1.2,Active
-Alibaba,Qwen-Turbo,32000,0.05,0.2,Active
-Alibaba,Qwen-VL-Max,128000,0.41,0.41,Active
-NVIDIA,Llama 3.1 Nemotron 70B Instruct,131000,0.12,0.3,Active
-NVIDIA,Llama 3.1 Nemotron 8B Instruct (BF16),131000,0.025,0.04,Active
-NVIDIA,Llama 3.1 405B Instruct (FP8),131000,0.8,0.8,Active
-NVIDIA,Llama 3.2 3B Instruct (BF16),131000,0.015,0.025,Active
-Vercel,v0-1.0-md (Medium-sized Model),128000,3,15,Beta
-Vercel,v0-1.5-lg (Large-sized Model),512000,15,75,Beta
-Perplexity AI,Sonar,4000,1,1,Active
-Perplexity AI,Sonar Pro,4000,3,15,Active
-Perplexity AI,Sonar Reasoning,4000,1,5,Active
-Perplexity AI,Sonar Reasoning Pro,4000,2,8,Active
-Perplexity AI,Sonar Deep Research,4000,2,8,Active
-Perplexity AI,r1-1776,4000,2,8,Active
-Cohere,Command R+,128000,2.5,10,Active
-Cohere,Command R,128000,0.15,0.6,Active
-Cohere,Command A,128000,2.5,10,Active
-Cohere,Command R7B,128000,0.0375,0.15,Active
+Vendor,Model,Context (tokens),Input Price ($/1M tokens),Output Price ($/1M tokens),Status,Capabilities
+OpenAI,GPT-4o,128000,2.5,10,Active,"Vision, Function Calling, Multilingual"
+OpenAI,GPT-4o Mini,128000,0.15,0.6,Active,"Function Calling, Multilingual"
+OpenAI,GPT-4.1,1000000,2,8,Active,"Function Calling, Multilingual"
+OpenAI,GPT-4.1 Mini,1000000,0.4,1.6,Active,"Function Calling, Multilingual"
+OpenAI,GPT-4.1 Nano,1000000,0.1,0.4,Active,"Function Calling, Multilingual"
+OpenAI,o1,200000,15,60,Active,Multilingual
+OpenAI,o1 Mini,128000,1.1,4.4,Active,Multilingual
+OpenAI,o3 Mini,200000,1.1,4.4,Active,Multilingual
+OpenAI,o3-Mini-High,200000,1.1,4.4,Active,Multilingual
+OpenAI,GPT-3.5 Turbo,16000,0.5,1.5,Active,"Function Calling, Multilingual"
+OpenAI,o4-Mini-High,200000,1.1,4.4,Active,Multilingual
+OpenAI,o3-Pro,200000,20,80,Active,Multilingual
+Anthropic,Claude 3.5 Haiku,200000,0.8,4,Active,"Vision, Multilingual"
+Anthropic,Claude 3.5 Sonnet,200000,3,15,Active,"Vision, Multilingual"
+Anthropic,Claude 3.7 Sonnet,200000,3,15,Active,"Vision, Multilingual"
+Anthropic,Claude 3.7 Sonnet Thinking,200000,3,15,Active,"Vision, Multilingual"
+Anthropic,Claude 3 Opus,200000,15,75,Active,"Vision, Multilingual"
+Anthropic,Claude 4 Opus,200000,15,75,Active,"Vision, Multilingual"
+Anthropic,Claude Sonnet 4,200000,3,15,Active,"Vision, Multilingual"
+Google,Gemini 2.5 Pro (Preview),1048576,1.25,10,Active,"Vision, Function Calling, Multilingual"
+Google,Gemini 2.0 Pro Exp.,2000000,1.25,10,Active,"Vision, Function Calling, Multilingual"
+Google,Gemini 2.5 Flash (Preview),1048576,0.15,0.6,Active,"Vision, Multilingual"
+Google,Gemini 2.0 Flash,1048576,0.15,0.6,Active,"Vision, Multilingual"
+Google,Gemini 2.0 Flash-Lite,1048576,0.15,0.6,Active,"Vision, Multilingual"
+Google,Gemini 1.5 Pro,2097152,1.25,10,Legacy,"Vision, Function Calling, Multilingual"
+Google,Gemini 1.5 Flash,1048576,0.15,0.6,Legacy,"Vision, Multilingual"
+Google,Gemini 1.5 Flash-8B,1000000,0.075,0.3,Active,"Vision, Multilingual"
+DeepSeek,DeepSeek R1,128000,0.55,2.19,Active,Multilingual
+DeepSeek,DeepSeek V3,128000,0.14,0.28,Active,Multilingual
+DeepSeek,DeepSeek V2.5,128000,0.14,0.28,Active,Multilingual
+DeepSeek,DeepSeek R1 Distill Qwen,128000,0.27,1.1,Active,Multilingual
+Mistral,Mistral Small,32000,0.1,0.3,Active,Multilingual
+Mistral,Mistral Small 3,128000,0.2,0.6,Active,Multilingual
+Mistral,Mistral Large,128000,2,6,Active,Multilingual
+Mistral,Mistral Large 2,128000,2,6,Active,Multilingual
+Mistral,Mixtral 8x7B,32000,0.5,0.5,Active,Multilingual
+Mistral,Mixtral 8x22B,65000,0.5,0.5,Active,Multilingual
+Mistral,Mistral NeMo,128000,0.15,0.15,Active,Multilingual
+Meta,LLaMA 4 Scout,10000000,0.00017,0.00017,Active,Multilingual
+Meta,LLaMA 4 Maverick,1000000,0.00019,0.00049,Active,Multilingual
+Meta,LLaMA 3.3 70B,128000,0.23,0.4,Active,Multilingual
+Meta,LLaMA 3.1 405B,128000,1.79,1.79,Active,Multilingual
+Meta,LLaMA 3.2 90B Vision,128000,0.35,0.4,Active,"Vision, Multilingual"
+Meta,LLaMA 3.1 70B,128000,0.23,0.4,Active,Multilingual
+Meta,LLaMA 3.2 11B Vision,128000,0.055,0.055,Active,"Vision, Multilingual"
+xAI (Grok),Grok 3,1000000,0.003,0.015,Active,Multilingual
+xAI (Grok),Grok 2,200000,0.002,0.01,Active,Multilingual
+xAI (Grok),Grok 1,128000,0,0,Active,Multilingual
+Amazon,Nova Micro,128000,0.035,0.14,Active,Multilingual
+Amazon,Nova Lite,300000,0.06,0.24,Active,Multilingual
+Amazon,Nova Pro,300000,0.8,3.2,Active,Multilingual
+Alibaba,Qwen-Max,128000,1.6,6.4,Active,"Vision, Function Calling, Multilingual"
+Alibaba,Qwen-Plus,128000,0.4,1.2,Active,"Function Calling, Multilingual"
+Alibaba,Qwen-Plus-Latest (Thinking),128000,0.4,8,Active,"Function Calling, Multilingual"
+Alibaba,Qwen-Plus-Latest,128000,0.4,1.2,Active,"Function Calling, Multilingual"
+Alibaba,Qwen-Turbo,32000,0.05,0.2,Active,"Function Calling, Multilingual"
+Alibaba,Qwen-VL-Max,128000,0.41,0.41,Active,"Vision, Multilingual"
+NVIDIA,Llama 3.1 Nemotron 70B Instruct,131000,0.12,0.3,Active,Multilingual
+NVIDIA,Llama 3.1 Nemotron 8B Instruct (BF16),131000,0.025,0.04,Active,Multilingual
+NVIDIA,Llama 3.1 405B Instruct (FP8),131000,0.8,0.8,Active,Multilingual
+NVIDIA,Llama 3.2 3B Instruct (BF16),131000,0.015,0.025,Active,Multilingual
+Vercel,v0-1.0-md (Medium-sized Model),128000,3,15,Beta,Multilingual
+Vercel,v0-1.5-lg (Large-sized Model),512000,15,75,Beta,Multilingual
+Perplexity AI,Sonar,4000,1,1,Active,Multilingual
+Perplexity AI,Sonar Pro,4000,3,15,Active,Multilingual
+Perplexity AI,Sonar Reasoning,4000,1,5,Active,Multilingual
+Perplexity AI,Sonar Reasoning Pro,4000,2,8,Active,Multilingual
+Perplexity AI,Sonar Deep Research,4000,2,8,Active,Multilingual
+Perplexity AI,r1-1776,4000,2,8,Active,Multilingual
+Cohere,Command R+,128000,2.5,10,Active,Multilingual
+Cohere,Command R,128000,0.15,0.6,Active,Multilingual
+Cohere,Command A,128000,2.5,10,Active,Multilingual
+Cohere,Command R7B,128000,0.0375,0.15,Active,Multilingual
