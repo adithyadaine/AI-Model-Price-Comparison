@@ -4,6 +4,10 @@ let priceChartInstance = null;
 let modelsData = []; // Will be populated from CSV
 let sortState = { column: null, direction: "asc" }; // For table sorting
 
+// --- Constants for State Management ---
+const LOCAL_STORAGE_KEY = "aiModelSelections";
+const URL_PARAM_KEY = "models";
+
 // --- DOM Elements ---
 const modelSelectionList = document.getElementById("model-selection-list");
 const comparisonTableBody = document.getElementById("comparison-table-body");
@@ -29,7 +33,7 @@ const dynamicTimestampSpan = document.getElementById("dynamicTimestamp");
 const filterLowBtn = document.getElementById("filterLowBtn");
 const filterMediumBtn = document.getElementById("filterMediumBtn");
 const filterHighBtn = document.getElementById("filterHighBtn");
-const modelSearchInput = document.getElementById("modelSearchInput"); // NEW: Search input
+const modelSearchInput = document.getElementById("modelSearchInput");
 
 // --- Global Image Cache ---
 const imageCache = {};
@@ -63,7 +67,6 @@ function formatNumber(numStr) {
   return num.toString();
 }
 
-// NEW: Helper to parse context window string back to a number for sorting
 function parseContextWindow(str) {
   if (typeof str !== "string" || str === "N/A") return 0;
   const lower = str.toLowerCase();
@@ -388,7 +391,6 @@ function populateModelSelection() {
   console.log("Model selection populated.");
 }
 
-// NEW: Function to filter models in the selection panel based on search input
 function filterModelSelectionList() {
   const searchTerm = modelSearchInput.value.toLowerCase();
   const modelGroups = modelSelectionList.querySelectorAll(".model-group");
@@ -748,6 +750,70 @@ async function switchView(view) {
   await updateDisplay();
 }
 
+// --- State Management Functions ---
+
+/**
+ * Saves the array of selected model IDs to localStorage.
+ * @param {string[]} selectedIds - Array of model IDs.
+ */
+function saveSelectionsToLocalStorage(selectedIds) {
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(selectedIds));
+}
+
+/**
+ * Updates the browser's URL with the selected model IDs without reloading the page.
+ * @param {string[]} selectedIds - Array of model IDs.
+ */
+function updateUrlWithSelections(selectedIds) {
+  const url = new URL(window.location);
+  if (selectedIds.length > 0) {
+    url.searchParams.set(URL_PARAM_KEY, selectedIds.join(","));
+  } else {
+    url.searchParams.delete(URL_PARAM_KEY);
+  }
+  // Use replaceState to avoid polluting browser history with every selection change
+  history.replaceState(null, "", url.toString());
+}
+
+/**
+ * Loads selections, prioritizing URL parameters over localStorage.
+ * This should be called once after the model list is populated.
+ */
+function loadSelections() {
+  const urlParams = new URLSearchParams(window.location.search);
+  let idsToSelect = [];
+
+  if (urlParams.has(URL_PARAM_KEY)) {
+    // Priority 1: Load from URL
+    console.log("Loading selections from URL parameters.");
+    idsToSelect = urlParams.get(URL_PARAM_KEY).split(",");
+    saveSelectionsToLocalStorage(idsToSelect); // Sync localStorage with the URL
+  } else {
+    // Priority 2: Load from localStorage
+    console.log("Loading selections from localStorage.");
+    const storedIds = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (storedIds) {
+      try {
+        idsToSelect = JSON.parse(storedIds);
+      } catch (e) {
+        console.error("Error parsing selections from localStorage:", e);
+        idsToSelect = [];
+      }
+    }
+  }
+
+  if (idsToSelect.length > 0) {
+    const allCheckboxes = modelSelectionList.querySelectorAll(
+      'input[type="checkbox"]'
+    );
+    allCheckboxes.forEach((checkbox) => {
+      if (idsToSelect.includes(checkbox.value)) {
+        checkbox.checked = true;
+      }
+    });
+  }
+}
+
 async function updateDisplay() {
   console.log("updateDisplay called. Current view:", currentView);
   if (!modelsData || modelsData.length === 0) {
@@ -771,18 +837,21 @@ async function updateDisplay() {
     (checkbox) => checkbox.value
   );
 
+  // Persist state on every update
+  saveSelectionsToLocalStorage(selectedModelIds);
+  updateUrlWithSelections(selectedModelIds);
+
   let filteredModelsData = modelsData.filter((model) => {
     return model.id && selectedModelIds.includes(model.id);
   });
 
-  // --- NEW: Sorting Logic ---
+  // Sorting Logic
   if (sortState.column && currentView === "table") {
     filteredModelsData.sort((a, b) => {
       const valA = a[sortState.column];
       const valB = b[sortState.column];
       let comparison = 0;
 
-      // Handle null/undefined values by pushing them to the bottom
       if (valA === null || valA === undefined) return 1;
       if (valB === null || valB === undefined) return -1;
 
@@ -794,14 +863,12 @@ async function updateDisplay() {
       ) {
         comparison = valA - valB;
       } else {
-        // Default to string comparison for name, provider, etc.
         comparison = valA.localeCompare(valB);
       }
 
       return sortState.direction === "asc" ? comparison : -comparison;
     });
   } else {
-    // Default sort by name if no sort state is active
     filteredModelsData.sort((a, b) => a.name.localeCompare(b.name));
   }
 
@@ -861,12 +928,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     populateModelSelection();
     setDynamicTimestamp();
 
+    // Load selections from URL/localStorage
+    loadSelections();
+
+    // Add all event listeners
     if (tableViewBtn)
       tableViewBtn.addEventListener("click", () => switchView("table"));
     if (barChartViewBtn)
       barChartViewBtn.addEventListener("click", () => switchView("bar"));
-    if (refreshPageBtn)
-      refreshPageBtn.addEventListener("click", () => location.reload());
+
+    // --- THIS IS THE CHANGED PART ---
+    if (refreshPageBtn) {
+      // Remapped to call the clear function instead of reloading the page.
+      refreshPageBtn.addEventListener("click", () => {
+        clearAndCollapseSelections();
+      });
+    }
+    // --- END OF CHANGE ---
 
     if (hamburgerBtn) hamburgerBtn.addEventListener("click", openPanel);
     if (closePanelBtn) closePanelBtn.addEventListener("click", closePanel);
@@ -901,12 +979,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
     }
 
-    // --- NEW: Event Listener for Search Input ---
     if (modelSearchInput) {
       modelSearchInput.addEventListener("input", filterModelSelectionList);
     }
 
-    // --- NEW: Event Listeners for Table Sorting ---
     document
       .querySelectorAll("th.sortable")
       .forEach((header) => {
@@ -920,7 +996,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             sortState.direction = "asc";
           }
 
-          // Update header styles
           document.querySelectorAll("th.sortable").forEach((th) => {
             th.classList.remove("sorted-asc", "sorted-desc");
           });
@@ -932,7 +1007,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
       });
 
-    await switchView(currentView); // Initial view rendering
+    // Initial view rendering based on loaded selections
+    await switchView(currentView);
   } else {
     console.warn("No model data loaded. Check models.csv and console.");
     if (modelSelectionList)
