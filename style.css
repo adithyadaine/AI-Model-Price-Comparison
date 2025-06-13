@@ -1,10 +1,10 @@
 /* --- Modern UI Reset & Base --- */
 :root {
-  --primary-color: #007bff; /* Main accent for buttons etc. */
+  --primary-color: #007bff;
   --primary-hover-color: #0056b3;
   --secondary-color: #6c757d;
-  --light-gray-bg: #f8f9fa; /* Body background */
-  --content-bg: #ffffff; /* Background for main content cards */
+  --light-gray-bg: #f8f9fa;
+  --content-bg: #ffffff;
   --border-color: #dee2e6;
   --text-color: #212529;
   --text-muted-color: #6c757d;
@@ -14,56 +14,49 @@
   --info-hover-color: #117a8b;
   --white-color: #ffffff;
   --panel-bg: #ffffff;
-
-  /* Consistent Dark Header/Footer Variables */
-  --header-footer-background: #343a40; /* Dark Charcoal / Very Dark Gray */
-  --header-footer-text: #f8f9fa; /* Light Gray / Off-White for text */
-  --header-footer-border: #495057; /* Slightly lighter dark gray for subtle borders */
-
+  --header-footer-background: #343a40;
+  --header-footer-text: #f8f9fa;
+  --header-footer-border: #495057;
   --border-radius: 0.3rem;
   --box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   --box-shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-
-  --header-height: 65px; /* Approximate height of the header, adjust as needed */
+  --header-height: 65px;
 }
 
+/* ... body, header, footer, panel styles are unchanged ... */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   margin: 0;
-  margin-bottom: 70px; /* Space for fixed footer */
+  margin-bottom: 70px;
   background-color: var(--light-gray-bg);
   color: var(--text-color);
   line-height: 1.6;
   position: relative;
   min-height: 100vh;
   font-size: 16px;
-  padding-top: var(--header-height); /* Space for fixed header */
+  padding-top: var(--header-height);
 }
-
 body.panel-open {
   overflow: hidden;
 }
-
-/* --- Header & Footer - CONSISTENT DARK STYLES --- */
 header {
   background-color: var(--header-footer-background);
   color: var(--header-footer-text);
-  padding: 0 1.5rem; /* Adjusted padding for explicit height */
+  padding: 0 1.5rem;
   text-align: center;
   display: flex;
   align-items: center;
-  position: fixed; /* Make header fixed */
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 900; /* Below panel/overlay, above content */
+  z-index: 900;
   box-sizing: border-box;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  height: var(--header-height); /* Explicit height */
+  height: var(--header-height);
 }
-
 header h1 {
   margin: 0;
   font-size: 1.65rem;
@@ -72,7 +65,6 @@ header h1 {
   flex-grow: 1;
   text-align: center;
 }
-
 footer {
   background-color: var(--header-footer-background);
   color: var(--header-footer-text);
@@ -89,49 +81,43 @@ footer {
 footer p {
   margin: 0;
 }
-
-/* Hamburger Button - UPDATED FOR DARK HEADER */
 .hamburger-btn {
   background: none;
   border: none;
   color: var(--header-footer-text);
   font-size: 1.8rem;
   cursor: pointer;
-  padding: 0 1rem 0 0; /* Padding on the right of the icon */
+  padding: 0 1rem 0 0;
   line-height: 1;
-  order: -1; /* Place before title */
+  order: -1;
   transition: opacity 0.2s ease;
-  height: 100%; /* Make it take full header height for easier click */
-  display: flex; /* For vertical centering of icon if needed */
+  height: 100%;
+  display: flex;
   align-items: center;
 }
 .hamburger-btn:hover {
   opacity: 0.8;
 }
-
-/* --- Off-Canvas Selection Panel --- */
 .selection-panel {
   position: fixed;
-  top: 0; /* Align with top of viewport */
+  top: 0;
   left: 0;
   bottom: 0;
   width: 300px;
   max-width: 90%;
   background-color: var(--panel-bg);
   padding: 1.5rem;
-  padding-top: 4.5rem; /* Space for close button & title */
+  padding-top: 4.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: translateX(-100%);
   transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
-  z-index: 1000; /* Highest z-index */
+  z-index: 1000;
   overflow-y: auto;
   box-sizing: border-box;
 }
-
 body.panel-open .selection-panel {
   transform: translateX(0);
 }
-
 .selection-panel h2 {
   margin-top: 0;
   margin-bottom: 1rem;
@@ -141,7 +127,6 @@ body.panel-open .selection-panel {
   border-bottom: none;
   padding-bottom: 0;
 }
-
 .close-panel-btn {
   position: absolute;
   top: 1rem;
@@ -159,7 +144,6 @@ body.panel-open .selection-panel {
   color: var(--primary-color);
   transform: rotate(90deg);
 }
-
 .overlay {
   position: fixed;
   top: 0;
@@ -168,7 +152,7 @@ body.panel-open .selection-panel {
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.6);
   display: none;
-  z-index: 999; /* Below panel, above fixed header and content */
+  z-index: 999;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -177,8 +161,6 @@ body.panel-open .overlay {
   display: block;
   opacity: 1;
 }
-
-/* --- NEW: Search Bar in Panel --- */
 .search-container {
   margin-bottom: 1rem;
 }
@@ -196,15 +178,12 @@ body.panel-open .overlay {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
-
-/* Panel Action Buttons Container */
 .panel-actions-container {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   margin-bottom: 1.25rem;
 }
-
 .panel-action-btn {
   display: block;
   width: 100%;
@@ -222,7 +201,6 @@ body.panel-open .overlay {
 .panel-action-btn:active {
   transform: translateY(1px);
 }
-
 .select-all-btn {
   border-color: var(--primary-color);
   background-color: var(--primary-color);
@@ -232,7 +210,6 @@ body.panel-open .overlay {
   background-color: var(--primary-hover-color);
   border-color: var(--primary-hover-color);
 }
-
 .expand-all-btn {
   border-color: var(--secondary-color);
   background-color: var(--white-color);
@@ -242,7 +219,6 @@ body.panel-open .overlay {
   background-color: var(--secondary-color);
   color: var(--white-color);
 }
-
 .clear-panel-btn {
   border-color: var(--danger-color);
   background-color: var(--white-color);
@@ -252,21 +228,17 @@ body.panel-open .overlay {
   background-color: var(--danger-color);
   color: var(--white-color);
 }
-
-/* Filter Buttons */
 .filter-btn-group {
   display: flex;
   gap: 0.5rem;
   border-top: 1px solid var(--border-color);
   padding-top: 1.25rem;
 }
-
 .filter-btn {
   flex-grow: 1;
   padding: 0.6rem 0.5rem;
   font-size: 0.85rem;
 }
-
 .filter-btn.low {
   background-color: #d4edda;
   color: #155724;
@@ -276,7 +248,6 @@ body.panel-open .overlay {
   background-color: #c3e6cb;
   color: #155724;
 }
-
 .filter-btn.medium {
   background-color: #fff3cd;
   color: #856404;
@@ -286,7 +257,6 @@ body.panel-open .overlay {
   background-color: #ffeeba;
   color: #856404;
 }
-
 .filter-btn.high {
   background-color: #f8d7da;
   color: #721c24;
@@ -296,42 +266,35 @@ body.panel-open .overlay {
   background-color: #f5c6cb;
   color: #721c24;
 }
-
-/* --- REVISED COLOR PALETTE FOR CAPABILITIES --- */
 .capability-tag.capability-vision,
 .capability-filter-btn.capability-vision {
-  background-color: #e0f7fa; /* Light Cyan/Blue */
-  color: #006064; /* Dark Teal */
+  background-color: #e0f7fa;
+  color: #006064;
 }
 .capability-filter-btn.capability-vision:hover {
   background-color: #b2ebf2;
 }
-
 .capability-tag.capability-function-calling,
 .capability-filter-btn.capability-function-calling {
-  background-color: #f3e5f5; /* Light Lavender */
-  color: #4a148c; /* Deep Purple */
+  background-color: #f3e5f5;
+  color: #4a148c;
 }
 .capability-filter-btn.capability-function-calling:hover {
   background-color: #e1bee7;
 }
-
 .capability-tag.capability-multilingual,
 .capability-filter-btn.capability-multilingual {
-  background-color: #eeeeee; /* Light Gray */
-  color: #424242; /* Dark Gray */
+  background-color: #eeeeee;
+  color: #424242;
 }
 .capability-filter-btn.capability-multilingual:hover {
   background-color: #e0e0e0;
 }
-
-/* --- Capability Filter Buttons (General Styles) --- */
 .capability-filter-group {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
-
 .capability-filter-btn {
   padding: 0.4rem 0.5rem;
   font-size: 0.75rem;
@@ -340,24 +303,20 @@ body.panel-open .overlay {
   letter-spacing: 0.5px;
   border: 1px solid transparent;
 }
-
 .filter-btn,
 .capability-filter-btn {
-  flex-grow: 0; /* Prevent buttons from growing to fill space */
-  white-space: nowrap; /* Stop text like "Function Calling" from wrapping */
+  flex-grow: 0;
+  white-space: nowrap;
 }
-
-/* Provider Dropdowns */
 .model-group {
   margin-bottom: 0.25rem;
   border-bottom: none;
   padding-bottom: 0.25rem;
 }
-
 .provider-title {
   cursor: pointer;
   padding: 0.75rem 1rem;
-  padding-left: 2.5em; /* Space for the ::before arrow */
+  padding-left: 2.5em;
   position: relative;
   margin: 0;
   font-size: 1rem;
@@ -379,7 +338,7 @@ body.panel-open .overlay {
   display: inline-block;
   padding: 3px;
   position: absolute;
-  left: 1em; /* Position of the arrow */
+  left: 1em;
   top: 50%;
   transform: translateY(-60%) rotate(45deg);
   transition: transform 0.25s ease-in-out;
@@ -387,7 +346,6 @@ body.panel-open .overlay {
 .model-group.expanded .provider-title::before {
   transform: translateY(-40%) rotate(-135deg);
 }
-
 .provider-logo-title {
   width: 20px;
   height: 20px;
@@ -395,7 +353,6 @@ body.panel-open .overlay {
   object-fit: contain;
   flex-shrink: 0;
 }
-
 .clear-provider-btn {
   background: none;
   border: none;
@@ -405,24 +362,21 @@ body.panel-open .overlay {
   font-weight: bold;
   line-height: 1;
   padding: 0 8px;
-  margin-left: auto; /* This pushes the button to the far right */
-  opacity: 0; /* Hide the button by default */
+  margin-left: auto;
+  opacity: 0;
   transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
   border-radius: var(--border-radius);
 }
-
 .provider-title:hover .clear-provider-btn {
   opacity: 1;
 }
-
 .clear-provider-btn:hover {
   color: var(--danger-color);
-  background-color: #f1f3f5; /* Use same hover as parent for consistency */
+  background-color: #f1f3f5;
 }
-
 .model-list {
   display: none;
-  padding-left: 1rem; /* Indent model items under provider */
+  padding-left: 1rem;
   margin-top: 0.25rem;
   max-height: 0;
   overflow: hidden;
@@ -431,26 +385,23 @@ body.panel-open .overlay {
 }
 .model-group.expanded .model-list {
   display: block;
-  max-height: 1000px; /* Ensure this is large enough for content */
+  max-height: 1000px;
   padding-top: 0.5rem;
   margin-top: 0;
   transition: max-height 0.4s ease-in, padding-top 0.4s ease-in,
     margin-top 0.4s ease-in;
 }
-
-/* Model Item (Checkbox, Logo, Name) in Selection Panel */
 .model-item {
   display: flex;
   align-items: center;
   margin-bottom: 0.25rem;
-  padding: 0.5rem 0.75rem; /* Padding around each model item */
+  padding: 0.5rem 0.75rem;
   border-radius: var(--border-radius);
   transition: background-color 0.15s ease;
 }
 .model-item:hover {
-  background-color: #e9ecef; /* Light hover for model items */
+  background-color: #e9ecef;
 }
-
 .model-item input[type="checkbox"] {
   margin-right: 0.75em;
   flex-shrink: 0;
@@ -458,7 +409,6 @@ body.panel-open .overlay {
   height: 1.1em;
   cursor: pointer;
 }
-
 .model-item label {
   display: flex;
   flex-direction: column;
@@ -468,14 +418,12 @@ body.panel-open .overlay {
   flex-grow: 1;
   color: var(--text-color);
 }
-
 .model-main-line {
   display: flex;
   align-items: center;
   width: 100%;
   gap: 0 0.4em;
 }
-
 .model-logo {
   width: 18px;
   height: 18px;
@@ -483,13 +431,10 @@ body.panel-open .overlay {
   flex-shrink: 0;
   object-fit: contain;
 }
-
 .model-name-text {
   line-height: 1.4;
   margin-right: 0.4em;
 }
-
-/* --- Price Category Tags --- */
 .price-tag {
   font-size: 0.7rem;
   font-weight: 600;
@@ -502,23 +447,18 @@ body.panel-open .overlay {
   vertical-align: middle;
   flex-shrink: 0;
 }
-
 .price-tag.low {
   background-color: #d4edda;
   color: #155724;
 }
-
 .price-tag.medium {
   background-color: #fff3cd;
   color: #856404;
 }
-
 .price-tag.high {
   background-color: #f8d7da;
   color: #721c24;
 }
-
-/* --- Capability Tags --- */
 .capability-tag {
   font-size: 0.65rem;
   font-weight: 500;
@@ -531,26 +471,21 @@ body.panel-open .overlay {
   color: var(--text-muted-color);
   flex-shrink: 0;
 }
-
 .capabilities-container {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
 }
-
 .model-item .capabilities-container {
   margin-top: 0.3rem;
   padding-left: 2.1em;
 }
-
-/* --- Main Content Area --- */
 .container {
   display: flex;
   flex-wrap: wrap;
   padding: 1.5rem;
   gap: 1.5rem;
 }
-
 .comparison-area {
   flex-grow: 1;
   width: 100%;
@@ -560,7 +495,6 @@ body.panel-open .overlay {
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
 }
-
 .comparison-area h2 {
   margin-top: 0;
   margin-bottom: 1rem;
@@ -573,8 +507,6 @@ body.panel-open .overlay {
 .comparison-area h2 #view-title {
   color: var(--primary-color);
 }
-
-/* View Toggles & Refresh Button */
 .view-toggles {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
@@ -583,7 +515,6 @@ body.panel-open .overlay {
   gap: 0.75rem;
   border-bottom: none;
 }
-
 .toggle-btn {
   padding: 0.6rem 1.2rem;
   border: 1px solid var(--border-color);
@@ -611,25 +542,6 @@ body.panel-open .overlay {
   background-color: var(--primary-hover-color);
   border-color: var(--primary-hover-color);
 }
-
-.toggle-btn.toggle-caps-btn {
-  color: var(--info-color);
-  border-color: var(--info-color);
-}
-.toggle-btn.toggle-caps-btn:hover {
-  background-color: #f0faff;
-  border-color: var(--info-hover-color);
-}
-.toggle-btn.toggle-caps-btn.active {
-  background-color: var(--info-color);
-  color: var(--white-color);
-  border-color: var(--info-color);
-}
-.toggle-btn.toggle-caps-btn.active:hover {
-  background-color: var(--info-hover-color);
-  border-color: var(--info-hover-color);
-}
-
 .toggle-btn.refresh-btn {
   color: var(--danger-color);
   border-color: var(--danger-color);
@@ -640,8 +552,70 @@ body.panel-open .overlay {
   color: var(--white-color);
   border-color: var(--danger-color);
 }
-
-/* View Containers (Table, Chart) */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-toggle::after {
+  content: "";
+  display: inline-block;
+  margin-left: 0.5em;
+  vertical-align: 0.1em;
+  border-top: 0.4em solid;
+  border-right: 0.4em solid transparent;
+  border-bottom: 0;
+  border-left: 0.4em solid transparent;
+}
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background-color: var(--content-bg);
+  min-width: 200px;
+  box-shadow: var(--box-shadow-lg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  z-index: 1000;
+  padding: 0.5rem 0;
+}
+.dropdown-menu.show {
+  display: block;
+}
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  box-sizing: border-box;
+  clear: both;
+  font-weight: 400;
+  color: var(--text-color);
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+}
+.dropdown-item:hover {
+  background-color: var(--light-gray-bg);
+}
+.dropdown-item label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+}
+.dropdown-item input[type="checkbox"] {
+  margin-right: 0.5em;
+}
+.dropdown-divider {
+  height: 0;
+  margin: 0.5rem 0;
+  overflow: hidden;
+  border-top: 1px solid var(--border-color);
+}
+.dropdown-menu .panel-action-btn {
+  width: calc(100% - 2rem);
+  margin: 0.25rem 1rem;
+  text-align: center;
+}
 .view-container {
   display: none;
   margin-top: 1rem;
@@ -649,8 +623,6 @@ body.panel-open .overlay {
 .view-container.active {
   display: block;
 }
-
-/* Table Styles */
 .table-container {
   overflow-x: auto;
 }
@@ -673,8 +645,6 @@ th {
   color: var(--text-color);
   position: relative;
 }
-
-/* --- Table Sorting Styles --- */
 th.sortable {
   cursor: pointer;
   user-select: none;
@@ -702,19 +672,16 @@ th.sortable.sorted-desc::after {
   border-top: 5px solid var(--text-color);
   opacity: 1;
 }
-
 tbody tr:nth-child(even) {
   background-color: var(--light-gray-bg);
 }
 tbody tr:hover {
   background-color: #dde6ef;
 }
-
 .model-name-cell {
   display: flex;
   align-items: center;
 }
-
 .table-model-logo {
   width: 20px;
   height: 20px;
@@ -722,13 +689,10 @@ tbody tr:hover {
   object-fit: contain;
   flex-shrink: 0;
 }
-
 .model-name-cell .price-tag {
   position: relative;
   top: -1px;
 }
-
-/* Bar Chart View */
 .chart-scroll-wrapper {
   width: 100%;
   overflow-x: auto;
@@ -755,26 +719,19 @@ tbody tr:hover {
   margin-top: 1rem;
   font-size: 0.9rem;
 }
-
-/* Last Updated Info */
 .last-updated {
   margin-top: 1.5rem;
   font-size: 0.85rem;
   color: var(--text-muted-color);
   text-align: right;
 }
-
-/* --- Capability Visibility Toggle --- */
 body.capabilities-hidden .capabilities-header,
 body.capabilities-hidden .capabilities-cell {
   display: none;
 }
-
 body.capabilities-hidden .model-item .capabilities-container {
   display: none;
 }
-
-/* --- Responsiveness --- */
 @media (max-width: 768px) {
   body {
     padding-top: 56px;
@@ -791,12 +748,10 @@ body.capabilities-hidden .model-item .capabilities-container {
     padding: 0 0.75rem 0 0;
     font-size: 1.6rem;
   }
-
   .selection-panel {
     width: 85vw;
     max-width: 300px;
   }
-
   .container {
     padding: 1rem;
     gap: 1rem;
@@ -807,16 +762,22 @@ body.capabilities-hidden .model-item .capabilities-container {
   .comparison-area h2 {
     font-size: 1.3rem;
   }
-
   .view-toggles {
     flex-direction: column;
     align-items: stretch;
   }
-  .toggle-btn {
+  .toggle-btn,
+  .dropdown {
     width: 100%;
-    margin-right: 0;
   }
-  .toggle-btn + .toggle-btn {
+  .dropdown-toggle {
+    width: 100%;
+    text-align: center;
+  }
+  .toggle-btn + .toggle-btn,
+  .toggle-btn + .dropdown,
+  .dropdown + .toggle-btn,
+  .dropdown + .dropdown {
     margin-top: 0.5rem;
   }
   .toggle-btn.refresh-btn {
@@ -824,26 +785,21 @@ body.capabilities-hidden .model-item .capabilities-container {
     margin-top: 0.5rem;
     width: 100%;
   }
-
   .panel-actions-container {
     align-items: stretch;
   }
-
   th,
   td {
     padding: 0.6rem 0.75rem;
   }
-
   tbody td {
     font-size: 0.85rem;
   }
-
   .table-model-logo {
     width: 18px;
     height: 18px;
     margin-right: 0.5em;
   }
-
   footer {
     padding: 0.8rem 1rem;
     font-size: 0.8rem;

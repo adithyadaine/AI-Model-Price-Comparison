@@ -26,6 +26,7 @@
     </header>
 
     <aside class="selection-panel" id="selectionPanel" aria-hidden="true">
+      <!-- Panel content is unchanged -->
       <button
         id="closePanelBtn"
         class="close-panel-btn"
@@ -52,7 +53,8 @@
         <button id="clearPanelBtn" class="panel-action-btn clear-panel-btn">
           Clear & Collapse Selections
         </button>
-        <div class="filter-btn-group">
+        <!-- This group is now hidden but used by JS to move buttons -->
+        <div class="filter-btn-group" style="display: none">
           <button id="filterLowBtn" class="panel-action-btn filter-btn low">
             Low
           </button>
@@ -99,12 +101,33 @@
         <div class="view-toggles">
           <button id="tableViewBtn" class="toggle-btn active">Table</button>
           <button id="barChartViewBtn" class="toggle-btn">Bar Chart</button>
-          <button
-            id="toggleCapabilitiesBtn"
-            class="toggle-btn toggle-caps-btn active"
-          >
-            Hide Capabilities
-          </button>
+
+          <!-- NEW: Single Filter Dropdown -->
+          <div class="dropdown">
+            <button
+              id="filterDropdownBtn"
+              class="toggle-btn dropdown-toggle"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Filter
+            </button>
+            <div
+              id="filterDropdownMenu"
+              class="dropdown-menu"
+              role="menu"
+              aria-labelledby="filterDropdownBtn"
+            >
+              <div class="dropdown-item" role="menuitem">
+                <label>
+                  <input type="checkbox" id="showCapabilitiesToggle" />
+                  Show Capabilities
+                </label>
+              </div>
+              <!-- Divider and price buttons will be added by JS -->
+            </div>
+          </div>
+
           <button id="refreshPageBtn" class="toggle-btn refresh-btn">
             Clear
           </button>

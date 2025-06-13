@@ -41,7 +41,11 @@ const filterFunctionCallingBtn = document.getElementById(
   "filterFunctionCallingBtn"
 );
 const filterMultilingualBtn = document.getElementById("filterMultilingualBtn");
-const toggleCapabilitiesBtn = document.getElementById("toggleCapabilitiesBtn");
+const filterDropdownBtn = document.getElementById("filterDropdownBtn");
+const filterDropdownMenu = document.getElementById("filterDropdownMenu");
+const showCapabilitiesToggle = document.getElementById(
+  "showCapabilitiesToggle"
+);
 
 // --- Global Image Cache ---
 const imageCache = {};
@@ -100,6 +104,26 @@ function getLogoFilename(vendorName) {
       .replace(/\(.*\)/g, "")
       .replace(/[^a-z0-9]/gi, "") + ".png"
   );
+}
+
+// NEW: Helper function to wrap text on a canvas
+function wrapText(context, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(" ");
+  let line = "";
+
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + " ";
+    const metrics = context.measureText(testLine);
+    const testWidth = metrics.width;
+    if (testWidth > maxWidth && n > 0) {
+      context.fillText(line, x, y);
+      line = words[n] + " ";
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  context.fillText(line, x, y);
 }
 
 // --- Image Preloading Functions ---
@@ -531,20 +555,10 @@ function filterModelsByCapability(capabilityName) {
   updateDisplay();
 }
 
-function toggleCapabilities() {
-  capabilitiesVisible = !capabilitiesVisible;
-  localStorage.setItem(CAPABILITIES_VISIBLE_KEY, capabilitiesVisible);
-  applyCapabilitiesVisibility();
-  updateDisplay(); // Re-render the table with the correct colspan
-}
-
 function applyCapabilitiesVisibility() {
-  if (!toggleCapabilitiesBtn) return;
+  if (!showCapabilitiesToggle) return;
   document.body.classList.toggle("capabilities-hidden", !capabilitiesVisible);
-  toggleCapabilitiesBtn.classList.toggle("active", capabilitiesVisible);
-  toggleCapabilitiesBtn.textContent = capabilitiesVisible
-    ? "Hide Capabilities"
-    : "Show Capabilities";
+  showCapabilitiesToggle.checked = capabilitiesVisible;
 }
 
 function updateTableView(selectedModelsData) {
@@ -640,6 +654,9 @@ Chart.register({
     const textPadding = pluginOpts.textPadding || 4;
     const font = pluginOpts.font || "10px Arial, sans-serif";
     const textColor = pluginOpts.textColor || "#444";
+    const barWidth = chart.getDatasetMeta(0).data[0]?.width || 80;
+    const maxWidth = barWidth + 10;
+    const lineHeight = 12;
 
     ctx.save();
     ctx.font = font;
@@ -661,7 +678,7 @@ Chart.register({
         currentY += logoSize + textPadding;
       }
       const modelName = model.name || "N/A";
-      ctx.fillText(modelName, xPos, currentY);
+      wrapText(ctx, modelName, xPos, currentY, maxWidth, lineHeight);
     });
     ctx.restore();
   },
@@ -682,8 +699,8 @@ async function renderBarChart(selectedModelsData) {
 
   await preloadLogosForChart(selectedModelsData);
 
-  const minBarWidthPerModel = 80,
-    chartPadding = 100;
+  const minBarWidthPerModel = 100;
+  const chartPadding = 100;
   const calculatedMinWidth =
     selectedModelsData.length * minBarWidthPerModel + chartPadding;
   barChartCanvasContainer.style.minWidth = `${calculatedMinWidth}px`;
@@ -713,9 +730,7 @@ async function renderBarChart(selectedModelsData) {
     ],
   };
 
-  const logoSize = 16;
-  const textPadding = 4;
-  const xAxisItemHeight = logoSize + textPadding + 12 + 5;
+  const xAxisItemHeight = 60; // Increased height for wrapped text
 
   const config = {
     type: "bar",
@@ -768,8 +783,8 @@ async function renderBarChart(selectedModelsData) {
         legend: { position: "top" },
         customXAxisRenderer: {
           selectedModels: selectedModelsData,
-          logoSize: logoSize,
-          textPadding: textPadding,
+          logoSize: 16,
+          textPadding: 4,
           font: "10px Arial, sans-serif",
           textColor: "#444",
         },
@@ -974,6 +989,47 @@ document.addEventListener("DOMContentLoaded", async () => {
     setDynamicTimestamp();
     loadSelections();
 
+    // Move price filter buttons from panel to the new single dropdown
+    const priceFilterButtons = document.querySelectorAll(
+      ".filter-btn-group .filter-btn"
+    );
+    const divider = document.createElement("div");
+    divider.className = "dropdown-divider";
+    filterDropdownMenu.appendChild(divider);
+
+    priceFilterButtons.forEach((btn) => {
+      const item = document.createElement("div");
+      item.className = "dropdown-item";
+      item.appendChild(btn);
+      filterDropdownMenu.appendChild(item);
+    });
+    const oldPriceGroup = document.querySelector(".filter-btn-group");
+    if (oldPriceGroup) oldPriceGroup.remove();
+
+    // Dropdown Logic
+    document.querySelectorAll(".dropdown-toggle").forEach((button) => {
+      button.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const menu = button.nextElementSibling;
+        const isVisible = menu.classList.contains("show");
+        document
+          .querySelectorAll(".dropdown-menu")
+          .forEach((m) => m.classList.remove("show"));
+        if (!isVisible) {
+          menu.classList.add("show");
+        }
+      });
+    });
+
+    window.addEventListener("click", (e) => {
+      if (!e.target.closest(".dropdown")) {
+        document
+          .querySelectorAll(".dropdown-menu")
+          .forEach((m) => m.classList.remove("show"));
+      }
+    });
+
+    // Event Listeners
     if (tableViewBtn)
       tableViewBtn.addEventListener("click", () => switchView("table"));
     if (barChartViewBtn)
@@ -1016,8 +1072,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
     if (modelSearchInput)
       modelSearchInput.addEventListener("input", filterModelSelectionList);
-    if (toggleCapabilitiesBtn)
-      toggleCapabilitiesBtn.addEventListener("click", toggleCapabilities);
+    if (showCapabilitiesToggle) {
+      showCapabilitiesToggle.addEventListener("change", () => {
+        capabilitiesVisible = showCapabilitiesToggle.checked;
+        localStorage.setItem(CAPABILITIES_VISIBLE_KEY, capabilitiesVisible);
+        applyCapabilitiesVisibility();
+        updateDisplay();
+      });
+    }
 
     document.querySelectorAll("th.sortable").forEach((header) => {
       header.addEventListener("click", () => {
