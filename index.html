@@ -21,7 +21,6 @@
         aria-expanded="false"
       >
         &#9776;
-        <!-- Hamburger icon -->
       </button>
       <h1>AI Model Pricing Comparator</h1>
     </header>
@@ -35,7 +34,6 @@
         &times;
       </button>
       <h2>Select Models</h2>
-      <!-- Search/Filter Bar -->
       <div class="search-container">
         <input
           type="text"
@@ -54,8 +52,6 @@
         <button id="clearPanelBtn" class="panel-action-btn clear-panel-btn">
           Clear & Collapse Selections
         </button>
-
-        <!-- Filter Buttons -->
         <div class="filter-btn-group">
           <button id="filterLowBtn" class="panel-action-btn filter-btn low">
             Low
@@ -68,6 +64,26 @@
           </button>
           <button id="filterHighBtn" class="panel-action-btn filter-btn high">
             High
+          </button>
+        </div>
+        <div class="capability-filter-group">
+          <button
+            id="filterVisionBtn"
+            class="panel-action-btn capability-filter-btn capability-vision"
+          >
+            Vision
+          </button>
+          <button
+            id="filterFunctionCallingBtn"
+            class="panel-action-btn capability-filter-btn capability-function-calling"
+          >
+            Function Calling
+          </button>
+          <button
+            id="filterMultilingualBtn"
+            class="panel-action-btn capability-filter-btn capability-multilingual"
+          >
+            Multilingual
           </button>
         </div>
       </div>
@@ -83,6 +99,12 @@
         <div class="view-toggles">
           <button id="tableViewBtn" class="toggle-btn active">Table</button>
           <button id="barChartViewBtn" class="toggle-btn">Bar Chart</button>
+          <button
+            id="toggleCapabilitiesBtn"
+            class="toggle-btn toggle-caps-btn active"
+          >
+            Hide Capabilities
+          </button>
           <button id="refreshPageBtn" class="toggle-btn refresh-btn">
             Clear
           </button>
@@ -94,7 +116,7 @@
           <div class="table-container">
             <table>
               <thead>
-                <tr>
+                <tr id="comparison-table-header">
                   <th class="sortable" data-sort-key="name">Model Name</th>
                   <th class="sortable" data-sort-key="provider">Provider</th>
                   <th class="sortable" data-sort-key="inputPrice">
@@ -106,13 +128,11 @@
                   <th class="sortable" data-sort-key="contextWindow">
                     Context Window
                   </th>
-                  <!-- NEW COLUMN HEADER -->
-                  <th>Capabilities</th>
+                  <th class="capabilities-header">Capabilities</th>
                 </tr>
               </thead>
               <tbody id="comparison-table-body">
                 <tr>
-                  <!-- UPDATED COLSPAN -->
                   <td colspan="6">Select models to compare.</td>
                 </tr>
               </tbody>

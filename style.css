@@ -85,7 +85,6 @@ footer {
   right: 0;
   box-sizing: border-box;
   z-index: 100;
-  /* border-top: 1px solid var(--header-footer-border); */ /* Optional */
 }
 footer p {
   margin: 0;
@@ -258,7 +257,6 @@ body.panel-open .overlay {
 .filter-btn-group {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.5rem;
   border-top: 1px solid var(--border-color);
   padding-top: 1.25rem;
 }
@@ -297,6 +295,56 @@ body.panel-open .overlay {
 .filter-btn.high:hover {
   background-color: #f5c6cb;
   color: #721c24;
+}
+
+/* --- REVISED COLOR PALETTE FOR CAPABILITIES --- */
+.capability-tag.capability-vision,
+.capability-filter-btn.capability-vision {
+  background-color: #e0f7fa; /* Light Cyan/Blue */
+  color: #006064; /* Dark Teal */
+}
+.capability-filter-btn.capability-vision:hover {
+  background-color: #b2ebf2;
+}
+
+.capability-tag.capability-function-calling,
+.capability-filter-btn.capability-function-calling {
+  background-color: #f3e5f5; /* Light Lavender */
+  color: #4a148c; /* Deep Purple */
+}
+.capability-filter-btn.capability-function-calling:hover {
+  background-color: #e1bee7;
+}
+
+.capability-tag.capability-multilingual,
+.capability-filter-btn.capability-multilingual {
+  background-color: #eeeeee; /* Light Gray */
+  color: #424242; /* Dark Gray */
+}
+.capability-filter-btn.capability-multilingual:hover {
+  background-color: #e0e0e0;
+}
+
+/* --- Capability Filter Buttons (General Styles) --- */
+.capability-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.capability-filter-btn {
+  padding: 0.4rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+}
+
+.filter-btn,
+.capability-filter-btn {
+  flex-grow: 0; /* Prevent buttons from growing to fill space */
+  white-space: nowrap; /* Stop text like "Function Calling" from wrapping */
 }
 
 /* Provider Dropdowns */
@@ -413,20 +461,25 @@ body.panel-open .overlay {
 
 .model-item label {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   cursor: pointer;
   font-size: 0.9rem;
   flex-grow: 1;
   color: var(--text-color);
-  flex-wrap: wrap; /* Allow tags to wrap */
-  gap: 0 0.4em; /* Space between items in the label */
+}
+
+.model-main-line {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0 0.4em;
 }
 
 .model-logo {
-  /* Logo for individual models in the selection panel list */
   width: 18px;
   height: 18px;
-  margin-right: 0.2em; /* Reduced margin */
+  margin-right: 0.2em;
   flex-shrink: 0;
   object-fit: contain;
 }
@@ -441,28 +494,28 @@ body.panel-open .overlay {
   font-size: 0.7rem;
   font-weight: 600;
   padding: 0.15em 0.5em;
-  margin-left: auto; /* This is the key change to push the tag right */
-  border-radius: 10px; /* Pill shape */
+  margin-left: auto;
+  border-radius: 10px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   line-height: 1;
-  vertical-align: middle; /* Align with text */
-  flex-shrink: 0; /* Prevent the tag from shrinking */
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 
 .price-tag.low {
-  background-color: #d4edda; /* Light Green */
-  color: #155724; /* Dark Green */
+  background-color: #d4edda;
+  color: #155724;
 }
 
 .price-tag.medium {
-  background-color: #fff3cd; /* Light Yellow */
-  color: #856404; /* Dark Yellow */
+  background-color: #fff3cd;
+  color: #856404;
 }
 
 .price-tag.high {
-  background-color: #f8d7da; /* Light Red */
-  color: #721c24; /* Dark Red */
+  background-color: #f8d7da;
+  color: #721c24;
 }
 
 /* --- Capability Tags --- */
@@ -474,29 +527,20 @@ body.panel-open .overlay {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   line-height: 1;
-  background-color: #e9ecef; /* Default gray */
+  background-color: #e9ecef;
   color: var(--text-muted-color);
   flex-shrink: 0;
-}
-
-/* --- NEW: Specific colors for capability tags --- */
-.capability-tag.capability-vision {
-  background-color: #e0f2fe; /* Light Blue */
-  color: #0c4a6e; /* Dark Blue */
-}
-.capability-tag.capability-function-calling {
-  background-color: #dcfce7; /* Light Green */
-  color: #14532d; /* Dark Green */
-}
-.capability-tag.capability-multilingual {
-  background-color: #fef3c7; /* Light Yellow */
-  color: #78350f; /* Dark Yellow/Brown */
 }
 
 .capabilities-container {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
+}
+
+.model-item .capabilities-container {
+  margin-top: 0.3rem;
+  padding-left: 2.1em;
 }
 
 /* --- Main Content Area --- */
@@ -537,7 +581,7 @@ body.panel-open .overlay {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  border-bottom: none; /* Or 1px solid var(--border-color) if preferred */
+  border-bottom: none;
 }
 
 .toggle-btn {
@@ -554,7 +598,7 @@ body.panel-open .overlay {
 }
 .toggle-btn:hover {
   border-color: var(--primary-hover-color);
-  background-color: #f8f9fa; /* Lighter hover */
+  background-color: #f8f9fa;
   box-shadow: var(--box-shadow);
 }
 .toggle-btn.active {
@@ -568,10 +612,28 @@ body.panel-open .overlay {
   border-color: var(--primary-hover-color);
 }
 
+.toggle-btn.toggle-caps-btn {
+  color: var(--info-color);
+  border-color: var(--info-color);
+}
+.toggle-btn.toggle-caps-btn:hover {
+  background-color: #f0faff;
+  border-color: var(--info-hover-color);
+}
+.toggle-btn.toggle-caps-btn.active {
+  background-color: var(--info-color);
+  color: var(--white-color);
+  border-color: var(--info-color);
+}
+.toggle-btn.toggle-caps-btn.active:hover {
+  background-color: var(--info-hover-color);
+  border-color: var(--info-hover-color);
+}
+
 .toggle-btn.refresh-btn {
   color: var(--danger-color);
   border-color: var(--danger-color);
-  margin-left: auto; /* Pushes refresh button to the right */
+  margin-left: auto;
 }
 .toggle-btn.refresh-btn:hover {
   background-color: var(--danger-color);
@@ -603,10 +665,10 @@ td {
   padding: 0.75rem 1rem;
   text-align: left;
   white-space: nowrap;
-  vertical-align: middle; /* Vertically align content in cells */
+  vertical-align: middle;
 }
 th {
-  background-color: #e9ecef; /* Light gray for table headers */
+  background-color: #e9ecef;
   font-weight: 500;
   color: var(--text-color);
   position: relative;
@@ -642,37 +704,36 @@ th.sortable.sorted-desc::after {
 }
 
 tbody tr:nth-child(even) {
-  background-color: var(--light-gray-bg); /* Zebra striping for rows */
+  background-color: var(--light-gray-bg);
 }
 tbody tr:hover {
-  background-color: #dde6ef; /* Hover effect for table rows */
+  background-color: #dde6ef;
 }
 
-/* Styles for model name cell and logo in table */
 .model-name-cell {
-  display: flex; /* Use flex to align logo and text */
-  align-items: center; /* Vertically align items in the cell */
+  display: flex;
+  align-items: center;
 }
 
 .table-model-logo {
   width: 20px;
   height: 20px;
-  margin-right: 0.75em; /* Space between logo and model name */
+  margin-right: 0.75em;
   object-fit: contain;
-  flex-shrink: 0; /* Prevent logo from shrinking */
+  flex-shrink: 0;
 }
 
 .model-name-cell .price-tag {
   position: relative;
-  top: -1px; /* Minor vertical adjustment */
+  top: -1px;
 }
 
 /* Bar Chart View */
 .chart-scroll-wrapper {
   width: 100%;
-  overflow-x: auto; /* Allow horizontal scrolling for many bars */
+  overflow-x: auto;
   overflow-y: hidden;
-  max-height: 480px; /* Max height for the chart area */
+  max-height: 480px;
   border: 1px solid var(--border-color);
   margin-bottom: 0.5rem;
   background-color: var(--white-color);
@@ -680,8 +741,7 @@ tbody tr:hover {
 }
 .chart-canvas-container {
   position: relative;
-  height: 450px; /* Fixed height for the canvas container */
-  /* min-width will be set by JS */
+  height: 450px;
 }
 #priceChart {
   display: block;
@@ -704,18 +764,28 @@ tbody tr:hover {
   text-align: right;
 }
 
+/* --- Capability Visibility Toggle --- */
+body.capabilities-hidden .capabilities-header,
+body.capabilities-hidden .capabilities-cell {
+  display: none;
+}
+
+body.capabilities-hidden .model-item .capabilities-container {
+  display: none;
+}
+
 /* --- Responsiveness --- */
 @media (max-width: 768px) {
   body {
-    padding-top: 56px; /* Adjust if header height changes on mobile */
-    margin-bottom: 60px; /* Adjust if footer height changes on mobile */
+    padding-top: 56px;
+    margin-bottom: 60px;
   }
   header {
-    height: 56px; /* Example fixed height for mobile header */
+    height: 56px;
     padding: 0 1rem;
   }
   header h1 {
-    font-size: 1.2rem; /* Smaller title on mobile */
+    font-size: 1.2rem;
   }
   .hamburger-btn {
     padding: 0 0.75rem 0 0;
@@ -723,8 +793,8 @@ tbody tr:hover {
   }
 
   .selection-panel {
-    width: 85vw; /* Use viewport width for smaller devices */
-    max-width: 300px; /* But never exceed 300px */
+    width: 85vw;
+    max-width: 300px;
   }
 
   .container {
@@ -739,29 +809,28 @@ tbody tr:hover {
   }
 
   .view-toggles {
-    flex-direction: column; /* Stack toggle buttons on mobile */
+    flex-direction: column;
     align-items: stretch;
   }
   .toggle-btn {
-    width: 100%; /* Make toggle buttons full width */
+    width: 100%;
     margin-right: 0;
   }
   .toggle-btn + .toggle-btn {
-    margin-top: 0.5rem; /* Add space between stacked buttons */
+    margin-top: 0.5rem;
   }
   .toggle-btn.refresh-btn {
-    margin-left: 0; /* Reset margin for refresh button */
+    margin-left: 0;
     margin-top: 0.5rem;
     width: 100%;
   }
 
   .panel-actions-container {
-    align-items: stretch; /* Make panel action buttons full width */
+    align-items: stretch;
   }
 
   th,
   td {
-    /* Slightly reduce padding in table cells for mobile */
     padding: 0.6rem 0.75rem;
   }
 
@@ -770,7 +839,6 @@ tbody tr:hover {
   }
 
   .table-model-logo {
-    /* Slightly smaller logo in table for mobile */
     width: 18px;
     height: 18px;
     margin-right: 0.5em;

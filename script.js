@@ -1,12 +1,14 @@
 // --- Global State ---
 let currentView = "table";
 let priceChartInstance = null;
-let modelsData = []; // Will be populated from CSV
-let sortState = { column: null, direction: "asc" }; // For table sorting
+let modelsData = [];
+let sortState = { column: null, direction: "asc" };
+let capabilitiesVisible = true;
 
 // --- Constants for State Management ---
 const LOCAL_STORAGE_KEY = "aiModelSelections";
 const URL_PARAM_KEY = "models";
+const CAPABILITIES_VISIBLE_KEY = "aiModelCapabilitiesVisible";
 
 // --- DOM Elements ---
 const modelSelectionList = document.getElementById("model-selection-list");
@@ -16,7 +18,7 @@ const tableView = document.getElementById("table-view");
 const barChartView = document.getElementById("bar-chart-view");
 const tableViewBtn = document.getElementById("tableViewBtn");
 const barChartViewBtn = document.getElementById("barChartViewBtn");
-const refreshPageBtn = document.getElementById("refreshPageBtn"); // Main clear button
+const refreshPageBtn = document.getElementById("refreshPageBtn");
 const priceChartCanvas = document.getElementById("priceChart");
 const barChartMessage = document.getElementById("bar-chart-message");
 const barChartCanvasContainer = document.querySelector(
@@ -34,6 +36,12 @@ const filterLowBtn = document.getElementById("filterLowBtn");
 const filterMediumBtn = document.getElementById("filterMediumBtn");
 const filterHighBtn = document.getElementById("filterHighBtn");
 const modelSearchInput = document.getElementById("modelSearchInput");
+const filterVisionBtn = document.getElementById("filterVisionBtn");
+const filterFunctionCallingBtn = document.getElementById(
+  "filterFunctionCallingBtn"
+);
+const filterMultilingualBtn = document.getElementById("filterMultilingualBtn");
+const toggleCapabilitiesBtn = document.getElementById("toggleCapabilitiesBtn");
 
 // --- Global Image Cache ---
 const imageCache = {};
@@ -56,7 +64,6 @@ function getPriceCategory(model) {
   return { name: "N/A", className: "na" };
 }
 
-// NEW: Helper function to generate a CSS class from capability text
 function getCapabilityClass(capabilityText) {
   if (!capabilityText) return "";
   return `capability-${capabilityText
@@ -107,13 +114,13 @@ async function preloadLogosForChart(models) {
       return new Promise((resolve) => {
         const img = new Image();
         img.src = `img/logos/${model.logo}`;
-        imageCache[model.logo] = img; // Store img object to prevent re-attempts
+        imageCache[model.logo] = img;
         img.onload = () => {
           resolve();
         };
         img.onerror = () => {
           console.warn(`Failed to load chart logo: ${model.logo}`);
-          imageCache[model.logo] = null; // Mark as failed
+          imageCache[model.logo] = null;
           resolve();
         };
       });
@@ -137,13 +144,6 @@ function getPreloadedImage(logoFilename) {
 }
 
 // --- CSV Processing Functions ---
-
-/**
- * A more robust CSV parser that handles quoted fields.
- * This prevents errors if a model name or other field contains a comma.
- * @param {string} csvText The raw CSV text.
- * @returns {object[]} An array of parsed model objects.
- */
 function parseCSV(csvText) {
   const lines = csvText.trim().split(/\r\n|\n/);
   const headers = lines[0]
@@ -173,7 +173,6 @@ function parseCSV(csvText) {
   dataRows.forEach((line, rowIndex) => {
     if (line.trim() === "") return;
 
-    // Robust value splitting
     const values = [];
     let currentVal = "";
     let inQuotes = false;
@@ -252,17 +251,14 @@ function parseCSV(csvText) {
     parsedData.push(modelObject);
   });
 
-  console.log("CSV Parsed Data (first 5):", parsedData.slice(0, 5));
   return parsedData;
 }
 
 async function loadModelsData() {
-  console.log("Loading models.csv...");
   try {
     const response = await fetch("models.csv");
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const csvText = await response.text();
-    console.log("Fetched models.csv. Length:", csvText.length);
     return parseCSV(csvText);
   } catch (error) {
     console.error("Failed to load/parse models.csv:", error);
@@ -302,14 +298,9 @@ function groupModelsByProvider(models) {
 }
 
 function populateModelSelection() {
-  console.log("Populating model selection...");
-  if (!modelSelectionList) {
-    console.error("populateModelSelection: modelSelectionList not found.");
-    return;
-  }
-  if (!modelsData || modelsData.length === 0) {
-    modelSelectionList.innerHTML = "<p>No model data available.</p>";
-    console.warn("populateModelSelection: modelsData is empty.");
+  if (!modelSelectionList || !modelsData || modelsData.length === 0) {
+    modelSelectionList.innerHTML =
+      "<p>No model data available or list not found.</p>";
     return;
   }
   modelSelectionList.innerHTML = "";
@@ -319,6 +310,7 @@ function populateModelSelection() {
     if (b === "Other") return -1;
     return a.localeCompare(b);
   });
+
   for (const provider of sortedProviders) {
     const groupDiv = document.createElement("div");
     groupDiv.className = "model-group";
@@ -333,22 +325,18 @@ function populateModelSelection() {
     logoImg.loading = "lazy";
     logoImg.onerror = function () {
       this.style.display = "none";
-      console.warn(
-        `Logo not found for provider: ${provider} (path: img/logos/${providerLogoFilename})`
-      );
     };
 
     const providerNameSpan = document.createElement("span");
     providerNameSpan.textContent = provider;
-
     providerTitle.appendChild(logoImg);
     providerTitle.appendChild(providerNameSpan);
 
     const clearProviderBtn = document.createElement("button");
     clearProviderBtn.className = "clear-provider-btn";
-    clearProviderBtn.innerHTML = "&times;"; // The 'X' symbol
+    clearProviderBtn.innerHTML = "&times;";
     clearProviderBtn.setAttribute("aria-label", `Clear ${provider} selections`);
-    clearProviderBtn.title = `Clear ${provider} selections`; // Tooltip for mouse users
+    clearProviderBtn.title = `Clear ${provider} selections`;
     providerTitle.appendChild(clearProviderBtn);
 
     providerTitle.setAttribute("aria-expanded", "false");
@@ -378,10 +366,7 @@ function populateModelSelection() {
       a.name.localeCompare(b.name)
     );
     sortedModels.forEach((model) => {
-      if (!model.id) {
-        console.warn("Skipping model due to missing ID:", model);
-        return;
-      }
+      if (!model.id) return;
       const div = document.createElement("div");
       div.className = "model-item";
       const checkbox = document.createElement("input");
@@ -389,8 +374,12 @@ function populateModelSelection() {
       checkbox.id = `model-checkbox-${model.id}`;
       checkbox.value = model.id;
       checkbox.addEventListener("change", () => updateDisplay());
+
       const label = document.createElement("label");
       label.htmlFor = `model-checkbox-${model.id}`;
+
+      const mainLineDiv = document.createElement("div");
+      mainLineDiv.className = "model-main-line";
 
       if (model.logo) {
         const modelItemLogoImg = document.createElement("img");
@@ -398,30 +387,35 @@ function populateModelSelection() {
         modelItemLogoImg.alt = `${model.provider || "Provider"} logo`;
         modelItemLogoImg.className = "model-logo";
         modelItemLogoImg.loading = "lazy";
-        label.appendChild(modelItemLogoImg);
+        mainLineDiv.appendChild(modelItemLogoImg);
       }
       const nameSpan = document.createElement("span");
       nameSpan.className = "model-name-text";
       nameSpan.textContent = model.name || "Unnamed Model";
-      label.appendChild(nameSpan);
-
-      // Add capability tags to the selection panel
-      if (model.capabilities && model.capabilities.length > 0) {
-        model.capabilities.forEach((cap) => {
-          if (!cap) return; // Skip if a tag is empty
-          const capTag = document.createElement("span");
-          capTag.className = `capability-tag ${getCapabilityClass(cap)}`;
-          capTag.textContent = cap;
-          label.appendChild(capTag);
-        });
-      }
+      mainLineDiv.appendChild(nameSpan);
 
       const category = getPriceCategory(model);
       if (category.name !== "N/A") {
         const categoryTag = document.createElement("span");
         categoryTag.className = `price-tag ${category.className}`;
         categoryTag.textContent = category.name;
-        label.appendChild(categoryTag);
+        mainLineDiv.appendChild(categoryTag);
+      }
+      label.appendChild(mainLineDiv);
+
+      if (model.capabilities && model.capabilities.length > 0) {
+        const capabilitiesDiv = document.createElement("div");
+        capabilitiesDiv.className = "capabilities-container";
+        model.capabilities.forEach((cap) => {
+          if (!cap) return;
+          const capTag = document.createElement("span");
+          capTag.className = `capability-tag ${getCapabilityClass(cap)}`;
+          capTag.textContent = cap;
+          capabilitiesDiv.appendChild(capTag);
+        });
+        if (capabilitiesDiv.hasChildNodes()) {
+          label.appendChild(capabilitiesDiv);
+        }
       }
 
       div.appendChild(checkbox);
@@ -432,7 +426,6 @@ function populateModelSelection() {
     groupDiv.appendChild(modelListDiv);
     modelSelectionList.appendChild(groupDiv);
   }
-  console.log("Model selection populated.");
 }
 
 function filterModelSelectionList() {
@@ -455,16 +448,12 @@ function filterModelSelectionList() {
       }
     });
 
-    // Show or hide the entire provider group
     group.style.display = groupHasVisibleModel ? "block" : "none";
   });
 }
 
 function selectAllModels() {
-  if (!modelSelectionList) {
-    console.error("selectAllModels: modelSelectionList not found.");
-    return;
-  }
+  if (!modelSelectionList) return;
   const checkboxes = modelSelectionList.querySelectorAll(
     'input[type="checkbox"]'
   );
@@ -472,14 +461,10 @@ function selectAllModels() {
     checkbox.checked = true;
   });
   updateDisplay();
-  console.log("All models selected.");
 }
 
 function expandAllProviders() {
-  if (!modelSelectionList) {
-    console.error("expandAllProviders: modelSelectionList not found.");
-    return;
-  }
+  if (!modelSelectionList) return;
   const providerGroups = modelSelectionList.querySelectorAll(".model-group");
   providerGroups.forEach((groupDiv) => {
     if (!groupDiv.classList.contains("expanded")) {
@@ -490,16 +475,10 @@ function expandAllProviders() {
       }
     }
   });
-  console.log("Attempted to expand all providers.");
 }
 
 function clearAndCollapseSelections() {
-  if (!modelSelectionList) {
-    console.error(
-      "clearAndCollapseSelections: modelSelectionList not found."
-    );
-    return;
-  }
+  if (!modelSelectionList) return;
   const checkboxes = modelSelectionList.querySelectorAll(
     'input[type="checkbox"]'
   );
@@ -517,37 +496,63 @@ function clearAndCollapseSelections() {
     }
   });
   updateDisplay();
-  console.log("All selections cleared and providers collapsed.");
 }
 
 function filterModelsByCategory(categoryName) {
   if (!modelSelectionList || !modelsData) return;
-
   const allCheckboxes = modelSelectionList.querySelectorAll(
     'input[type="checkbox"]'
   );
-
   const matchingModelIds = modelsData
     .filter((model) => {
       const category = getPriceCategory(model);
       return category.name.toLowerCase() === categoryName.toLowerCase();
     })
     .map((model) => model.id);
-
   allCheckboxes.forEach((checkbox) => {
     checkbox.checked = matchingModelIds.includes(checkbox.value);
   });
-
   updateDisplay();
-  console.log(`Filtered to show only "${categoryName}" cost models.`);
 }
 
-// --- THIS IS THE CORRECTED FUNCTION ---
+function filterModelsByCapability(capabilityName) {
+  if (!modelSelectionList || !modelsData) return;
+  const allCheckboxes = modelSelectionList.querySelectorAll(
+    'input[type="checkbox"]'
+  );
+  const matchingModelIds = modelsData
+    .filter(
+      (model) => model.capabilities && model.capabilities.includes(capabilityName)
+    )
+    .map((model) => model.id);
+  allCheckboxes.forEach((checkbox) => {
+    checkbox.checked = matchingModelIds.includes(checkbox.value);
+  });
+  updateDisplay();
+}
+
+function toggleCapabilities() {
+  capabilitiesVisible = !capabilitiesVisible;
+  localStorage.setItem(CAPABILITIES_VISIBLE_KEY, capabilitiesVisible);
+  applyCapabilitiesVisibility();
+  updateDisplay(); // Re-render the table with the correct colspan
+}
+
+function applyCapabilitiesVisibility() {
+  if (!toggleCapabilitiesBtn) return;
+  document.body.classList.toggle("capabilities-hidden", !capabilitiesVisible);
+  toggleCapabilitiesBtn.classList.toggle("active", capabilitiesVisible);
+  toggleCapabilitiesBtn.textContent = capabilitiesVisible
+    ? "Hide Capabilities"
+    : "Show Capabilities";
+}
+
 function updateTableView(selectedModelsData) {
   if (!comparisonTableBody) return;
-  comparisonTableBody.innerHTML = ""; // Clear existing rows
+  comparisonTableBody.innerHTML = "";
   if (!selectedModelsData || selectedModelsData.length === 0) {
-    comparisonTableBody.innerHTML = `<tr><td colspan="6">Select models to compare.</td></tr>`;
+    const colspan = capabilitiesVisible ? 6 : 5;
+    comparisonTableBody.innerHTML = `<tr><td colspan="${colspan}">Select models to compare.</td></tr>`;
     return;
   }
 
@@ -556,7 +561,6 @@ function updateTableView(selectedModelsData) {
     const formatPrice = (price) =>
       price !== null && !isNaN(price) ? `$${price.toFixed(2)}` : "N/A";
 
-    // Cell 1: Model Name
     const modelNameCell = document.createElement("td");
     modelNameCell.className = "model-name-cell";
     if (model.logo) {
@@ -582,28 +586,24 @@ function updateTableView(selectedModelsData) {
     }
     row.appendChild(modelNameCell);
 
-    // Cell 2: Provider
     const providerCell = document.createElement("td");
     providerCell.textContent = model.provider || "N/A";
     row.appendChild(providerCell);
 
-    // Cell 3: Input Price
     const inputPriceCell = document.createElement("td");
     inputPriceCell.textContent = formatPrice(model.inputPrice);
     row.appendChild(inputPriceCell);
 
-    // Cell 4: Output Price
     const outputPriceCell = document.createElement("td");
     outputPriceCell.textContent = formatPrice(model.outputPrice);
     row.appendChild(outputPriceCell);
 
-    // Cell 5: Context Window
     const contextCell = document.createElement("td");
     contextCell.textContent = model.contextWindow || "N/A";
     row.appendChild(contextCell);
 
-    // Cell 6: Capabilities
     const capabilitiesCell = document.createElement("td");
+    capabilitiesCell.className = "capabilities-cell";
     const hasCapabilities =
       model.capabilities && model.capabilities.some((cap) => cap);
     if (hasCapabilities) {
@@ -611,7 +611,6 @@ function updateTableView(selectedModelsData) {
       container.className = "capabilities-container";
       model.capabilities.forEach((cap) => {
         if (cap) {
-          // Ensure we don't create empty tags
           const capTag = document.createElement("span");
           capTag.className = `capability-tag ${getCapabilityClass(cap)}`;
           capTag.textContent = cap;
@@ -624,12 +623,10 @@ function updateTableView(selectedModelsData) {
     }
     row.appendChild(capabilitiesCell);
 
-    // Finally, append the fully constructed row to the table body
     comparisonTableBody.appendChild(row);
   });
 }
 
-// --- Chart.js Plugin Registration ---
 Chart.register({
   id: "customXAxisRenderer",
   afterDraw(chart, args, options) {
@@ -661,7 +658,7 @@ Chart.register({
         ctx.drawImage(logo, logoX, currentY, logoSize, logoSize);
         currentY += logoSize + textPadding;
       } else {
-        currentY += logoSize + textPadding; // Reserve space even if no logo
+        currentY += logoSize + textPadding;
       }
       const modelName = model.name || "N/A";
       ctx.fillText(modelName, xPos, currentY);
@@ -696,23 +693,25 @@ async function renderBarChart(selectedModelsData) {
   const outputPrices = selectedModelsData.map(
     (model) => model.outputPrice ?? 0
   );
-  const data = { labels, datasets: [] };
-  data.datasets = [
-    {
-      label: "Input Price ($/1M tokens)",
-      data: inputPrices,
-      backgroundColor: "rgba(54, 162, 235, 0.6)",
-      borderColor: "rgba(54, 162, 235, 1)",
-      borderWidth: 1,
-    },
-    {
-      label: "Output Price ($/1M tokens)",
-      data: outputPrices,
-      backgroundColor: "rgba(255, 99, 132, 0.6)",
-      borderColor: "rgba(255, 99, 132, 1)",
-      borderWidth: 1,
-    },
-  ];
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: "Input Price ($/1M tokens)",
+        data: inputPrices,
+        backgroundColor: "rgba(54, 162, 235, 0.6)",
+        borderColor: "rgba(54, 162, 235, 1)",
+        borderWidth: 1,
+      },
+      {
+        label: "Output Price ($/1M tokens)",
+        data: outputPrices,
+        backgroundColor: "rgba(255, 99, 132, 0.6)",
+        borderColor: "rgba(255, 99, 132, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
 
   const logoSize = 16;
   const textPadding = 4;
@@ -785,7 +784,7 @@ async function renderBarChart(selectedModelsData) {
           title: { display: true, text: "Model" },
           ticks: {
             callback: function (value, index, ticks) {
-              return ""; // Hide default labels
+              return "";
             },
           },
         },
@@ -829,20 +828,10 @@ async function switchView(view) {
   await updateDisplay();
 }
 
-// --- State Management Functions ---
-
-/**
- * Saves the array of selected model IDs to localStorage.
- * @param {string[]} selectedIds - Array of model IDs.
- */
 function saveSelectionsToLocalStorage(selectedIds) {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(selectedIds));
 }
 
-/**
- * Updates the browser's URL with the selected model IDs without reloading the page.
- * @param {string[]} selectedIds - Array of model IDs.
- */
 function updateUrlWithSelections(selectedIds) {
   const url = new URL(window.location);
   if (selectedIds.length > 0) {
@@ -850,37 +839,25 @@ function updateUrlWithSelections(selectedIds) {
   } else {
     url.searchParams.delete(URL_PARAM_KEY);
   }
-  // Use replaceState to avoid polluting browser history with every selection change
   history.replaceState(null, "", url.toString());
 }
 
-/**
- * Loads selections, prioritizing URL parameters over localStorage.
- * This should be called once after the model list is populated.
- */
 function loadSelections() {
   const urlParams = new URLSearchParams(window.location.search);
   let idsToSelect = [];
-
   if (urlParams.has(URL_PARAM_KEY)) {
-    // Priority 1: Load from URL
-    console.log("Loading selections from URL parameters.");
     idsToSelect = urlParams.get(URL_PARAM_KEY).split(",");
-    saveSelectionsToLocalStorage(idsToSelect); // Sync localStorage with the URL
+    saveSelectionsToLocalStorage(idsToSelect);
   } else {
-    // Priority 2: Load from localStorage
-    console.log("Loading selections from localStorage.");
     const storedIds = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (storedIds) {
       try {
         idsToSelect = JSON.parse(storedIds);
       } catch (e) {
-        console.error("Error parsing selections from localStorage:", e);
         idsToSelect = [];
       }
     }
   }
-
   if (idsToSelect.length > 0) {
     const allCheckboxes = modelSelectionList.querySelectorAll(
       'input[type="checkbox"]'
@@ -894,9 +871,7 @@ function loadSelections() {
 }
 
 async function updateDisplay() {
-  console.log("updateDisplay called. Current view:", currentView);
   if (!modelsData || modelsData.length === 0) {
-    console.warn("updateDisplay: modelsData is empty or not loaded.");
     if (comparisonTableBody)
       comparisonTableBody.innerHTML = `<tr><td colspan="6">No model data loaded.</td></tr>`;
     if (barChartMessage) barChartMessage.textContent = "No model data loaded.";
@@ -904,10 +879,7 @@ async function updateDisplay() {
     if (priceChartCanvas) priceChartCanvas.style.display = "none";
     return;
   }
-  if (!modelSelectionList) {
-    console.error("updateDisplay: modelSelectionList not found.");
-    return;
-  }
+  if (!modelSelectionList) return;
 
   const selectedCheckboxes = modelSelectionList.querySelectorAll(
     'input[type="checkbox"]:checked'
@@ -916,24 +888,20 @@ async function updateDisplay() {
     (checkbox) => checkbox.value
   );
 
-  // Persist state on every update
   saveSelectionsToLocalStorage(selectedModelIds);
   updateUrlWithSelections(selectedModelIds);
 
-  let filteredModelsData = modelsData.filter((model) => {
-    return model.id && selectedModelIds.includes(model.id);
-  });
+  let filteredModelsData = modelsData.filter(
+    (model) => model.id && selectedModelIds.includes(model.id)
+  );
 
-  // Sorting Logic
   if (sortState.column && currentView === "table") {
     filteredModelsData.sort((a, b) => {
       const valA = a[sortState.column];
       const valB = b[sortState.column];
       let comparison = 0;
-
       if (valA === null || valA === undefined) return 1;
       if (valB === null || valB === undefined) return -1;
-
       if (sortState.column === "contextWindow") {
         comparison = parseContextWindow(valA) - parseContextWindow(valB);
       } else if (
@@ -944,7 +912,6 @@ async function updateDisplay() {
       } else {
         comparison = valA.localeCompare(valB);
       }
-
       return sortState.direction === "asc" ? comparison : -comparison;
     });
   } else {
@@ -963,10 +930,7 @@ async function updateDisplay() {
 }
 
 function setDynamicTimestamp() {
-  if (!dynamicTimestampSpan) {
-    console.warn("Dynamic timestamp span not found.");
-    return;
-  }
+  if (!dynamicTimestampSpan) return;
   const now = new Date();
   const options = {
     weekday: "long",
@@ -982,19 +946,16 @@ function setDynamicTimestamp() {
     .format(now)
     .replace(" at", ",");
   dynamicTimestampSpan.textContent = formattedTimestamp;
-  console.log("Timestamp updated:", dynamicTimestampSpan.textContent);
 }
 
 // --- Initialization ---
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("DOM fully loaded and parsed.");
   if (
     !modelSelectionList ||
     !comparisonTableBody ||
     !priceChartCanvas ||
     !dynamicTimestampSpan
   ) {
-    console.error("Initialization failed: Essential DOM elements are missing.");
     if (document.body)
       document.body.innerHTML =
         "<h1>Error: Application structure incomplete.</h1>";
@@ -1004,89 +965,82 @@ document.addEventListener("DOMContentLoaded", async () => {
   modelsData = await loadModelsData();
 
   if (modelsData && modelsData.length > 0) {
+    const savedVisibility = localStorage.getItem(CAPABILITIES_VISIBLE_KEY);
+    capabilitiesVisible =
+      savedVisibility === null ? true : savedVisibility === "true";
+    applyCapabilitiesVisibility();
+
     populateModelSelection();
     setDynamicTimestamp();
-
-    // Load selections from URL/localStorage
     loadSelections();
 
-    // Add all event listeners
     if (tableViewBtn)
       tableViewBtn.addEventListener("click", () => switchView("table"));
     if (barChartViewBtn)
       barChartViewBtn.addEventListener("click", () => switchView("bar"));
-
-    if (refreshPageBtn) {
-      refreshPageBtn.addEventListener("click", () => {
-        clearAndCollapseSelections();
-      });
-    }
-
+    if (refreshPageBtn)
+      refreshPageBtn.addEventListener("click", () =>
+        clearAndCollapseSelections()
+      );
     if (hamburgerBtn) hamburgerBtn.addEventListener("click", openPanel);
     if (closePanelBtn) closePanelBtn.addEventListener("click", closePanel);
     if (overlay) overlay.addEventListener("click", closePanel);
-
-    if (selectAllBtn) {
-      selectAllBtn.addEventListener("click", () => {
-        selectAllModels();
-      });
-    }
-    if (expandAllBtn) {
+    if (selectAllBtn) selectAllBtn.addEventListener("click", selectAllModels);
+    if (expandAllBtn)
       expandAllBtn.addEventListener("click", expandAllProviders);
-    }
-    if (clearPanelBtn) {
-      clearPanelBtn.addEventListener("click", () => {
-        clearAndCollapseSelections();
-      });
-    }
-    if (filterLowBtn) {
+    if (clearPanelBtn)
+      clearPanelBtn.addEventListener("click", clearAndCollapseSelections);
+    if (filterLowBtn)
       filterLowBtn.addEventListener("click", () =>
         filterModelsByCategory("Low")
       );
-    }
-    if (filterMediumBtn) {
+    if (filterMediumBtn)
       filterMediumBtn.addEventListener("click", () =>
         filterModelsByCategory("Medium")
       );
-    }
-    if (filterHighBtn) {
+    if (filterHighBtn)
       filterHighBtn.addEventListener("click", () =>
         filterModelsByCategory("High")
       );
-    }
-
-    if (modelSearchInput) {
+    if (filterVisionBtn)
+      filterVisionBtn.addEventListener("click", () =>
+        filterModelsByCapability("Vision")
+      );
+    if (filterFunctionCallingBtn)
+      filterFunctionCallingBtn.addEventListener("click", () =>
+        filterModelsByCapability("Function Calling")
+      );
+    if (filterMultilingualBtn)
+      filterMultilingualBtn.addEventListener("click", () =>
+        filterModelsByCapability("Multilingual")
+      );
+    if (modelSearchInput)
       modelSearchInput.addEventListener("input", filterModelSelectionList);
-    }
+    if (toggleCapabilitiesBtn)
+      toggleCapabilitiesBtn.addEventListener("click", toggleCapabilities);
 
-    document
-      .querySelectorAll("th.sortable")
-      .forEach((header) => {
-        header.addEventListener("click", () => {
-          const sortKey = header.dataset.sortKey;
-          if (sortState.column === sortKey) {
-            sortState.direction =
-              sortState.direction === "asc" ? "desc" : "asc";
-          } else {
-            sortState.column = sortKey;
-            sortState.direction = "asc";
-          }
-
-          document.querySelectorAll("th.sortable").forEach((th) => {
-            th.classList.remove("sorted-asc", "sorted-desc");
-          });
-          header.classList.add(
-            sortState.direction === "asc" ? "sorted-asc" : "sorted-desc"
-          );
-
-          updateDisplay();
+    document.querySelectorAll("th.sortable").forEach((header) => {
+      header.addEventListener("click", () => {
+        const sortKey = header.dataset.sortKey;
+        if (sortState.column === sortKey) {
+          sortState.direction =
+            sortState.direction === "asc" ? "desc" : "asc";
+        } else {
+          sortState.column = sortKey;
+          sortState.direction = "asc";
+        }
+        document.querySelectorAll("th.sortable").forEach((th) => {
+          th.classList.remove("sorted-asc", "sorted-desc");
         });
+        header.classList.add(
+          sortState.direction === "asc" ? "sorted-asc" : "sorted-desc"
+        );
+        updateDisplay();
       });
+    });
 
-    // Initial view rendering based on loaded selections
     await switchView(currentView);
   } else {
-    console.warn("No model data loaded. Check models.csv and console.");
     if (modelSelectionList)
       modelSelectionList.innerHTML =
         "<p>Failed to load model data. Check console.</p>";
