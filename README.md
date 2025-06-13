@@ -1,36 +1,39 @@
-# AI Model Pricing Comparator V3
+# AI Model Pricing Comparator
 
-A modern, responsive web tool to compare the pricing and context windows of various Generative AI models. The application features a clean, dynamic, and interactive interface that pulls all model data from a simple `models.csv` file for easy maintenance.
+A modern, responsive web tool to compare the pricing, context windows, and capabilities of various Generative AI models. The application features a clean, dynamic, and interactive interface designed for both casual users and power users who need deep filtering and customization.
 
-## V3 Features: Interactivity & Persistence
+All model data is pulled from a simple `models.csv` file, making maintenance and updates incredibly easy.
 
-Version 3 transforms the comparator into a powerful, interactive, and shareable tool.
+## What's New: Power-User Filters & Customization
 
-*   **Shareable URLs:** Selections are now encoded directly into the URL. You can configure a specific comparison and share the link with colleagues, who will see the exact same view.
-*   **Persistent Selections:** The tool uses `localStorage` to remember your selections. If you refresh the page or close the tab, your previously compared models will be waiting for you when you return.
-*   **Interactive Table Sorting:** Instantly find the best model for your needs by clicking on any table header (Model Name, Price, Context Window) to sort the data.
-*   **Live Search Filter:** A search bar has been added to the selection panel, allowing you to instantly filter the list of models as you type.
+The latest version focuses on providing a cleaner interface with powerful, on-demand filtering options.
+
+*   **Consolidated Filter Dropdown:** All data filtering options are now neatly organized under a single "Filter" menu in the main view, decluttering the primary toolbar.
+*   **On-Demand Capabilities View:** You can now choose to show or hide the "Capabilities" column and tags with a simple checkbox in the Filter menu. Your preference is saved for your next visit!
+*   **Smarter Charts:** Bar chart labels now intelligently wrap to prevent overlapping text, ensuring perfect readability even when comparing many models at once.
 
 ## Key Features
 
 ### Core Functionality
 
-*   **CSV Data Source:** Model data (pricing, context, provider) is loaded from `models.csv`, making updates simple and code-free.
+*   **CSV Data Source:** Model data is loaded from `models.csv`, making updates simple and code-free.
 *   **Dual Comparison Views:** Switch seamlessly between a detailed **Table View** and a visual **Bar Chart View**.
-*   **Dynamic Charting:** The bar chart is powered by Chart.js and scrolls horizontally to cleanly accommodate any number of selected models.
-*   **Visual Logos:** Provider logos are displayed throughout the UI for quick and easy identification.
+*   **Shareable URLs:** Selections are encoded directly into the URL. Configure a specific comparison and share the link with colleagues, who will see the exact same view.
+*   **Persistent Selections:** The tool uses `localStorage` to remember your model selections and UI preferences (like capability visibility) between sessions.
 
 ### UI & UX Enhancements
 
 *   **Modern Interface:** A complete UI overhaul with a fixed header and footer for persistent navigation.
 *   **Off-Canvas Selection Panel:** The model selection list slides in from the side, keeping the main comparison area uncluttered.
-*   **Advanced Panel Controls:**
-    *   **Select All:** Quickly select all available models for a comprehensive overview.
-    *   **Expand All:** Instantly open all provider dropdowns to see every model.
-    *   **Clear & Collapse:** A single click to deselect all models and collapse all provider lists.
-    *   **Clear per Provider:** An "X" button appears on hover next to each provider's name, allowing you to clear selections for just that group.
 *   **Dynamic Timestamp:** The "Last updated" time is dynamically generated and formatted for readability.
 *   **Fully Responsive:** The layout is optimized for both desktop and mobile devices.
+
+### Interaction & Filtering
+
+*   **Interactive Table Sorting:** Instantly find the best model for your needs by clicking on any table header (Model Name, Price, etc.) to sort the data.
+*   **Live Search Filter:** A search bar in the selection panel allows you to instantly filter the list of models as you type.
+*   **Advanced Panel Controls:** Use panel buttons to "Select All" models, "Expand All" provider lists, or "Clear & Collapse" all selections with a single click.
+*   **Quick Filters:** Use the colored buttons in the panel to quickly select all models with a specific capability (e.g., Vision, Function Calling).
 
 ## Setup & Installation
 
@@ -44,13 +47,14 @@ This is a pure front-end application built with HTML, CSS, and vanilla JavaScrip
 
 ## Usage
 
-1.  Click the hamburger icon (☰) to open the "Select Models" panel.
-2.  **Find models** by scrolling or using the **search bar** at the top of the panel.
-3.  Check the boxes next to the models you want to compare. The main view updates automatically.
-4.  In the **Table View**, click on column headers like "Input Price" or "Context Window" to **sort the data**.
-5.  Use the "Table" and "Bar Chart" buttons to switch between views.
-6.  To **share your comparison**, simply copy the URL from your address bar.
-7.  Click the **"Clear"** button in the main view or **"Clear & Collapse Selections"** in the panel to reset all selections.
+1.  Click the hamburger icon (☰) to open the **"Select Models"** panel.
+2.  Select models using the checkboxes or the quick-filter buttons (e.g., "Vision", "Function Calling").
+3.  Use the **"Filter" dropdown** in the main view to:
+    *   Toggle the visibility of the "Capabilities" column.
+    *   Apply a price filter (Low, Medium, High) to your current selection.
+4.  Switch between **"Table"** and **"Bar Chart"** views.
+5.  In the Table View, click column headers to **sort the data**.
+6.  To share your comparison, simply **copy the URL** from your address bar.
 
 ## Data Updates
 
@@ -64,6 +68,7 @@ To add, remove, or modify models:
     *   `Input Price ($/1M tokens)`
     *   `Output Price ($/1M tokens)`
     *   `Status`
+    *   `Capabilities` (comma-separated, e.g., "Vision, Function Calling")
 3.  If you add a new vendor, ensure a corresponding logo (e.g., `newvendor.png`) is placed in the `img/logos/` directory.
 4.  Save the `models.csv` file. The application will reflect the new data on the next load.
 
