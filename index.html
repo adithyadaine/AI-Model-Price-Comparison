@@ -11,6 +11,7 @@
       href="img/favicon/innovative-brain-icon.png"
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
   </head>
   <body>
     <header>
@@ -26,7 +27,6 @@
     </header>
 
     <aside class="selection-panel" id="selectionPanel" aria-hidden="true">
-      <!-- Panel content is unchanged -->
       <button
         id="closePanelBtn"
         class="close-panel-btn"
@@ -53,41 +53,6 @@
         <button id="clearPanelBtn" class="panel-action-btn clear-panel-btn">
           Clear & Collapse Selections
         </button>
-        <!-- This group is now hidden but used by JS to move buttons -->
-        <div class="filter-btn-group" style="display: none">
-          <button id="filterLowBtn" class="panel-action-btn filter-btn low">
-            Low
-          </button>
-          <button
-            id="filterMediumBtn"
-            class="panel-action-btn filter-btn medium"
-          >
-            Medium
-          </button>
-          <button id="filterHighBtn" class="panel-action-btn filter-btn high">
-            High
-          </button>
-        </div>
-        <div class="capability-filter-group">
-          <button
-            id="filterVisionBtn"
-            class="panel-action-btn capability-filter-btn capability-vision"
-          >
-            Vision
-          </button>
-          <button
-            id="filterFunctionCallingBtn"
-            class="panel-action-btn capability-filter-btn capability-function-calling"
-          >
-            Function Calling
-          </button>
-          <button
-            id="filterMultilingualBtn"
-            class="panel-action-btn capability-filter-btn capability-multilingual"
-          >
-            Multilingual
-          </button>
-        </div>
       </div>
       <div id="model-selection-list">
         <p>Loading models...</p>
@@ -100,9 +65,31 @@
       <main class="comparison-area">
         <div class="view-toggles">
           <button id="tableViewBtn" class="toggle-btn active">Table</button>
-          <button id="barChartViewBtn" class="toggle-btn">Bar Chart</button>
 
-          <!-- NEW: Single Filter Dropdown -->
+          <div class="dropdown">
+            <button
+              id="chartsDropdownBtn"
+              class="toggle-btn dropdown-toggle"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Charts
+            </button>
+            <div
+              id="chartsDropdownMenu"
+              class="dropdown-menu"
+              role="menu"
+              aria-labelledby="chartsDropdownBtn"
+            >
+              <a href="#" id="barChartViewBtn" class="dropdown-item"
+                >Price Comparison (Bar)</a
+              >
+              <a href="#" id="scatterPlotViewBtn" class="dropdown-item"
+                >Price vs. Context (Scatter)</a
+              >
+            </div>
+          </div>
+
           <div class="dropdown">
             <button
               id="filterDropdownBtn"
@@ -124,7 +111,58 @@
                   Show Capabilities
                 </label>
               </div>
-              <!-- Divider and price buttons will be added by JS -->
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-header">Select by Capability</div>
+              <div class="dropdown-item dropdown-item-full-width">
+                <button
+                  id="filterVisionBtn"
+                  class="panel-action-btn capability-filter-btn capability-vision"
+                >
+                  Vision
+                </button>
+              </div>
+              <div class="dropdown-item dropdown-item-full-width">
+                <button
+                  id="filterFunctionCallingBtn"
+                  class="panel-action-btn capability-filter-btn capability-function-calling"
+                >
+                  Function Calling
+                </button>
+              </div>
+              <div class="dropdown-item dropdown-item-full-width">
+                <button
+                  id="filterMultilingualBtn"
+                  class="panel-action-btn capability-filter-btn capability-multilingual"
+                >
+                  Multilingual
+                </button>
+              </div>
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-header">Select by Price Tier</div>
+              <div class="dropdown-item dropdown-item-full-width">
+                <button
+                  id="filterLowBtn"
+                  class="panel-action-btn filter-btn low"
+                >
+                  Low Price
+                </button>
+              </div>
+              <div class="dropdown-item dropdown-item-full-width">
+                <button
+                  id="filterMediumBtn"
+                  class="panel-action-btn filter-btn medium"
+                >
+                  Medium Price
+                </button>
+              </div>
+              <div class="dropdown-item dropdown-item-full-width">
+                <button
+                  id="filterHighBtn"
+                  class="panel-action-btn filter-btn high"
+                >
+                  High Price
+                </button>
+              </div>
             </div>
           </div>
 
@@ -170,6 +208,15 @@
             </div>
           </div>
           <p class="chart-message" id="bar-chart-message"></p>
+        </div>
+
+        <div id="scatter-plot-view" class="view-container">
+          <div class="chart-scroll-wrapper">
+            <div class="chart-canvas-container">
+              <canvas id="scatterChart"></canvas>
+            </div>
+          </div>
+          <p class="chart-message" id="scatter-chart-message"></p>
         </div>
 
         <p class="last-updated">

@@ -556,15 +556,21 @@ body.panel-open .overlay {
   position: relative;
   display: inline-block;
 }
+/* UPDATED: New animated dropdown arrow */
 .dropdown-toggle::after {
   content: "";
   display: inline-block;
   margin-left: 0.5em;
-  vertical-align: 0.1em;
-  border-top: 0.4em solid;
-  border-right: 0.4em solid transparent;
-  border-bottom: 0;
-  border-left: 0.4em solid transparent;
+  width: 0.4em;
+  height: 0.4em;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: translateY(-25%) rotate(45deg);
+  transition: transform 0.25s ease-in-out;
+}
+/* NEW: Style for the arrow when the dropdown is open */
+.dropdown-toggle.active::after {
+  transform: translateY(0) rotate(-135deg);
 }
 .dropdown-menu {
   display: none;
@@ -592,6 +598,7 @@ body.panel-open .overlay {
   white-space: nowrap;
   background-color: transparent;
   border: 0;
+  text-decoration: none;
 }
 .dropdown-item:hover {
   background-color: var(--light-gray-bg);
@@ -615,6 +622,18 @@ body.panel-open .overlay {
   width: calc(100% - 2rem);
   margin: 0.25rem 1rem;
   text-align: center;
+}
+.dropdown-header {
+  padding: 0.5rem 1rem 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: default;
+}
+.dropdown-item.dropdown-item-full-width {
+  padding: 0.25rem 0.5rem;
 }
 .view-container {
   display: none;
@@ -707,7 +726,8 @@ tbody tr:hover {
   position: relative;
   height: 450px;
 }
-#priceChart {
+#priceChart,
+#scatterChart {
   display: block;
   box-sizing: border-box;
   height: 100%;

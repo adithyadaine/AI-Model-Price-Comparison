@@ -1,6 +1,8 @@
+/* --- Modern UI Reset & Base --- */
 // --- Global State ---
 let currentView = "table";
 let priceChartInstance = null;
+let scatterChartInstance = null; // NEW: Instance for scatter plot
 let modelsData = [];
 let sortState = { column: null, direction: "asc" };
 let capabilitiesVisible = true;
@@ -16,13 +18,17 @@ const comparisonTableBody = document.getElementById("comparison-table-body");
 const viewTitle = document.getElementById("view-title");
 const tableView = document.getElementById("table-view");
 const barChartView = document.getElementById("bar-chart-view");
+const scatterPlotView = document.getElementById("scatter-plot-view"); // NEW
 const tableViewBtn = document.getElementById("tableViewBtn");
 const barChartViewBtn = document.getElementById("barChartViewBtn");
+const scatterPlotViewBtn = document.getElementById("scatterPlotViewBtn"); // NEW
 const refreshPageBtn = document.getElementById("refreshPageBtn");
 const priceChartCanvas = document.getElementById("priceChart");
+const scatterChartCanvas = document.getElementById("scatterChart"); // NEW
 const barChartMessage = document.getElementById("bar-chart-message");
+const scatterChartMessage = document.getElementById("scatter-chart-message"); // NEW
 const barChartCanvasContainer = document.querySelector(
-  ".chart-canvas-container"
+  "#bar-chart-view .chart-canvas-container"
 );
 const hamburgerBtn = document.getElementById("hamburgerBtn");
 const selectionPanel = document.getElementById("selectionPanel");
@@ -106,7 +112,6 @@ function getLogoFilename(vendorName) {
   );
 }
 
-// NEW: Helper function to wrap text on a canvas
 function wrapText(context, text, x, y, maxWidth, lineHeight) {
   const words = text.split(" ");
   let line = "";
@@ -730,7 +735,7 @@ async function renderBarChart(selectedModelsData) {
     ],
   };
 
-  const xAxisItemHeight = 60; // Increased height for wrapped text
+  const xAxisItemHeight = 60;
 
   const config = {
     type: "bar",
@@ -822,16 +827,151 @@ async function renderBarChart(selectedModelsData) {
   }
 }
 
+// NEW: Function to render the scatter plot
+async function renderScatterChart(selectedModelsData) {
+  if (!scatterChartCanvas || !scatterChartMessage) return;
+  if (scatterChartInstance) scatterChartInstance.destroy();
+  scatterChartMessage.textContent = "";
+  scatterChartCanvas.style.display = "block";
+
+  const chartData = selectedModelsData
+    .map((model) => ({
+      ...model,
+      contextValue: parseContextWindow(model.contextWindow),
+    }))
+    .filter(
+      (model) =>
+        model.inputPrice !== null &&
+        model.inputPrice !== undefined &&
+        model.contextValue > 0
+    );
+
+  if (chartData.length === 0) {
+    scatterChartMessage.textContent =
+      "Select models with both price and context data to display chart.";
+    scatterChartCanvas.style.display = "none";
+    return;
+  }
+
+  const scatterData = chartData.map((model) => ({
+    x: model.contextValue,
+    y: model.inputPrice,
+    model: model, // Keep original model data for tooltips
+  }));
+
+  const config = {
+    type: "scatter",
+    data: {
+      datasets: [
+        {
+          label: "Models",
+          data: scatterData,
+          backgroundColor: "rgba(0, 123, 255, 0.6)",
+          borderColor: "rgba(0, 123, 255, 1)",
+          pointRadius: 6,
+          pointHoverRadius: 9,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        title: {
+          display: true,
+          text: "Efficiency Frontier: Price vs. Context Window",
+          font: { size: 16 },
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              const model = context.raw.model;
+              return [
+                `${model.name}`,
+                `Context: ${model.contextWindow} tokens`,
+                `Input Price: $${model.inputPrice.toFixed(2)}`,
+              ];
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          type: "logarithmic",
+          title: {
+            display: true,
+            text: "Context Window (Tokens) - Logarithmic Scale",
+          },
+          ticks: {
+            callback: function (value, index, values) {
+              if (value === 1000 || value === 1000000 || value === 1000000000) {
+                return formatNumber(String(value));
+              }
+              if (
+                Math.log10(value) % 1 === 0 ||
+                value < 10000 ||
+                index === 0 ||
+                index === values.length - 1
+              ) {
+                return formatNumber(String(value));
+              }
+              return "";
+            },
+            minRotation: 0,
+            maxRotation: 45,
+          },
+        },
+        y: {
+          type: "linear",
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: "Input Price ($/1M tokens)",
+          },
+          ticks: {
+            callback: (value) => "$" + value.toFixed(2),
+          },
+        },
+      },
+    },
+  };
+
+  const ctx = scatterChartCanvas.getContext("2d");
+  if (ctx) {
+    try {
+      scatterChartInstance = new Chart(ctx, config);
+    } catch (error) {
+      console.error("Scatter chart initialization error:", error);
+      scatterChartMessage.textContent =
+        "Error rendering scatter chart. Check console.";
+      scatterChartCanvas.style.display = "none";
+    }
+  } else {
+    console.error("Failed to get 2D context for scatter chart canvas.");
+    scatterChartMessage.textContent = "Error rendering chart context.";
+    scatterChartCanvas.style.display = "none";
+  }
+}
+
 async function switchView(view) {
-  if (tableViewBtn) tableViewBtn.classList.toggle("active", view === "table");
-  if (barChartViewBtn)
-    barChartViewBtn.classList.toggle("active", view === "bar");
-  if (tableView) tableView.classList.toggle("active", view === "table");
-  if (barChartView) barChartView.classList.toggle("active", view === "bar");
+  // Update button states
+  tableViewBtn.classList.toggle("active", view === "table");
+  const chartsBtn = document.getElementById("chartsDropdownBtn");
+  chartsBtn.classList.toggle("active", view === "bar" || view === "scatter");
+
+  // Update view container visibility
+  tableView.classList.toggle("active", view === "table");
+  barChartView.classList.toggle("active", view === "bar");
+  scatterPlotView.classList.toggle("active", view === "scatter"); // NEW
+
   if (viewTitle) {
     switch (view) {
       case "bar":
-        viewTitle.textContent = "Bar Chart";
+        viewTitle.textContent = "Price Comparison (Bar)";
+        break;
+      case "scatter":
+        viewTitle.textContent = "Price vs. Context (Scatter)"; // NEW
         break;
       case "table":
       default:
@@ -890,8 +1030,12 @@ async function updateDisplay() {
     if (comparisonTableBody)
       comparisonTableBody.innerHTML = `<tr><td colspan="6">No model data loaded.</td></tr>`;
     if (barChartMessage) barChartMessage.textContent = "No model data loaded.";
+    if (scatterChartMessage)
+      scatterChartMessage.textContent = "No model data loaded.";
     if (priceChartInstance) priceChartInstance.destroy();
+    if (scatterChartInstance) scatterChartInstance.destroy();
     if (priceChartCanvas) priceChartCanvas.style.display = "none";
+    if (scatterChartCanvas) scatterChartCanvas.style.display = "none";
     return;
   }
   if (!modelSelectionList) return;
@@ -937,6 +1081,9 @@ async function updateDisplay() {
     case "bar":
       await renderBarChart(filteredModelsData);
       break;
+    case "scatter":
+      await renderScatterChart(filteredModelsData);
+      break;
     case "table":
     default:
       updateTableView(filteredModelsData);
@@ -969,6 +1116,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     !modelSelectionList ||
     !comparisonTableBody ||
     !priceChartCanvas ||
+    !scatterChartCanvas || // Check for new canvas
     !dynamicTimestampSpan
   ) {
     if (document.body)
@@ -989,34 +1137,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     setDynamicTimestamp();
     loadSelections();
 
-    // Move price filter buttons from panel to the new single dropdown
-    const priceFilterButtons = document.querySelectorAll(
-      ".filter-btn-group .filter-btn"
-    );
-    const divider = document.createElement("div");
-    divider.className = "dropdown-divider";
-    filterDropdownMenu.appendChild(divider);
-
-    priceFilterButtons.forEach((btn) => {
-      const item = document.createElement("div");
-      item.className = "dropdown-item";
-      item.appendChild(btn);
-      filterDropdownMenu.appendChild(item);
-    });
-    const oldPriceGroup = document.querySelector(".filter-btn-group");
-    if (oldPriceGroup) oldPriceGroup.remove();
-
     // Dropdown Logic
     document.querySelectorAll(".dropdown-toggle").forEach((button) => {
       button.addEventListener("click", (e) => {
         e.stopPropagation();
         const menu = button.nextElementSibling;
         const isVisible = menu.classList.contains("show");
+
+        // First, close all dropdowns and remove active states
         document
           .querySelectorAll(".dropdown-menu")
           .forEach((m) => m.classList.remove("show"));
+        document
+          .querySelectorAll(".dropdown-toggle")
+          .forEach((b) => b.classList.remove("active"));
+
+        // If the clicked one wasn't visible, show it and set it to active
         if (!isVisible) {
           menu.classList.add("show");
+          button.classList.add("active");
         }
       });
     });
@@ -1026,6 +1165,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         document
           .querySelectorAll(".dropdown-menu")
           .forEach((m) => m.classList.remove("show"));
+        document
+          .querySelectorAll(".dropdown-toggle")
+          .forEach((b) => b.classList.remove("active"));
       }
     });
 
@@ -1033,7 +1175,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (tableViewBtn)
       tableViewBtn.addEventListener("click", () => switchView("table"));
     if (barChartViewBtn)
-      barChartViewBtn.addEventListener("click", () => switchView("bar"));
+      barChartViewBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        switchView("bar");
+      });
+    if (scatterPlotViewBtn)
+      scatterPlotViewBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        switchView("scatter");
+      });
     if (refreshPageBtn)
       refreshPageBtn.addEventListener("click", () =>
         clearAndCollapseSelections()

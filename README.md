@@ -4,22 +4,22 @@ A modern, responsive web tool to compare the pricing, context windows, and capab
 
 All model data is pulled from a simple `models.csv` file, making maintenance and updates incredibly easy.
 
-## What's New: Power-User Filters & Customization
+## What's New: Efficiency Frontier Scatter Plot
 
-The latest version focuses on providing a cleaner interface with powerful, on-demand filtering options.
+The latest version introduces a powerful new analytical view to help users find the most cost-effective models.
 
-*   **Consolidated Filter Dropdown:** All data filtering options are now neatly organized under a single "Filter" menu in the main view, decluttering the primary toolbar.
-*   **On-Demand Capabilities View:** You can now choose to show or hide the "Capabilities" column and tags with a simple checkbox in the Filter menu. Your preference is saved for your next visit!
-*   **Smarter Charts:** Bar chart labels now intelligently wrap to prevent overlapping text, ensuring perfect readability even when comparing many models at once.
+*   **Efficiency Frontier View:** A new "Price vs. Context" scatter plot helps you instantly identify models that offer the largest context window for the lowest price.
+*   **Logarithmic Scale:** The chart uses a logarithmic scale for the context window, making it easy to compare models across a vast range of context sizes (from thousands to millions of tokens).
+*   **Charts Dropdown:** The main view now features a "Charts" dropdown, allowing you to switch between the classic "Price Comparison (Bar)" chart and the new "Price vs. Context (Scatter)" plot.
 
 ## Key Features
 
 ### Core Functionality
 
 *   **CSV Data Source:** Model data is loaded from `models.csv`, making updates simple and code-free.
-*   **Dual Comparison Views:** Switch seamlessly between a detailed **Table View** and a visual **Bar Chart View**.
+*   **Multiple Comparison Views:** Switch seamlessly between a detailed **Table View**, a visual **Bar Chart**, and the new **Scatter Plot**.
 *   **Shareable URLs:** Selections are encoded directly into the URL. Configure a specific comparison and share the link with colleagues, who will see the exact same view.
-*   **Persistent Selections:** The tool uses `localStorage` to remember your model selections and UI preferences (like capability visibility) between sessions.
+*   **Persistent Selections:** The tool uses `localStorage` to remember your model selections and UI preferences between sessions.
 
 ### UI & UX Enhancements
 
@@ -48,11 +48,9 @@ This is a pure front-end application built with HTML, CSS, and vanilla JavaScrip
 ## Usage
 
 1.  Click the hamburger icon (☰) to open the **"Select Models"** panel.
-2.  Select models using the checkboxes or the quick-filter buttons (e.g., "Vision", "Function Calling").
-3.  Use the **"Filter" dropdown** in the main view to:
-    *   Toggle the visibility of the "Capabilities" column.
-    *   Apply a price filter (Low, Medium, High) to your current selection.
-4.  Switch between **"Table"** and **"Bar Chart"** views.
+2.  Select models using the checkboxes or the quick-filter buttons.
+3.  Use the **"Filter" dropdown** in the main view to toggle the "Capabilities" column or apply price filters.
+4.  Switch between **"Table"** and the **"Charts"** dropdown to select your desired view.
 5.  In the Table View, click column headers to **sort the data**.
 6.  To share your comparison, simply **copy the URL** from your address bar.
 
