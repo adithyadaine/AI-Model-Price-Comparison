@@ -266,10 +266,10 @@ function parseCSV(csvText) {
         : [],
     };
 
-    if (modelObject.name === "Grok 1") {
-      if (modelObject.inputPrice === 0) modelObject.inputPrice = null;
-      if (modelObject.outputPrice === 0) modelObject.outputPrice = null;
-    }
+    // if (modelObject.name === "Grok 1") {
+    //   if (modelObject.inputPrice === 0) modelObject.inputPrice = null;
+    //   if (modelObject.outputPrice === 0) modelObject.outputPrice = null;
+    // }
 
     if (!modelObject.id) {
       console.warn(
