@@ -32,13 +32,14 @@ DeepSeek,DeepSeek R1,128000,0.55,2.19,Active,Multilingual
 DeepSeek,DeepSeek V3,128000,0.14,0.28,Active,Multilingual
 DeepSeek,DeepSeek V2.5,128000,0.14,0.28,Active,Multilingual
 DeepSeek,DeepSeek R1 Distill Qwen,128000,0.27,1.1,Active,Multilingual
-Mistral,Mistral Small,32000,0.1,0.3,Active,Multilingual
-Mistral,Mistral Small 3,128000,0.2,0.6,Active,Multilingual
-Mistral,Mistral Large,128000,2,6,Active,Multilingual
-Mistral,Mistral Large 2,128000,2,6,Active,Multilingual
-Mistral,Mixtral 8x7B,32000,0.5,0.5,Active,Multilingual
-Mistral,Mixtral 8x22B,65000,0.5,0.5,Active,Multilingual
-Mistral,Mistral NeMo,128000,0.15,0.15,Active,Multilingual
+Mistral,Mistral Small,32000,0.1,0.3,Active,"Function Calling, Multilingual"
+Mistral,Mistral Small 3,128000,0.2,0.6,Active,"Function Calling, Multilingual"
+Mistral,Mistral Small 3.2,128000,0,0,Active,"Function Calling, Multilingual"
+Mistral,Mistral Large,128000,2,6,Active,"Function Calling, Multilingual"
+Mistral,Mistral Large 2,128000,2,6,Active,"Function Calling, Multilingual"
+Mistral,Mixtral 8x7B,32000,0.5,0.5,Active,"Function Calling, Multilingual"
+Mistral,Mixtral 8x22B,65000,0.5,0.5,Active,"Function Calling, Multilingual"
+Mistral,Mistral NeMo,128000,0.15,0.15,Active,"Function Calling, Multilingual"
 Meta,LLaMA 4 Scout,10000000,0.00017,0.00017,Active,Multilingual
 Meta,LLaMA 4 Maverick,1000000,0.00019,0.00049,Active,Multilingual
 Meta,LLaMA 3.3 70B,128000,0.23,0.4,Active,Multilingual
