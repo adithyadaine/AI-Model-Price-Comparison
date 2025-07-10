@@ -48,6 +48,8 @@ Meta,LLaMA 3.1 405B,128000,1.79,1.79,Active,Multilingual
 Meta,LLaMA 3.2 90B Vision,128000,0.35,0.4,Active,"Vision, Multilingual"
 Meta,LLaMA 3.1 70B,128000,0.23,0.4,Active,Multilingual
 Meta,LLaMA 3.2 11B Vision,128000,0.055,0.055,Active,"Vision, Multilingual"
+xAI (Grok),Grok 4,256000,3,15,Active,Multilingual
+xAI (Grok),Grok 4 Heavy,256000,6,30,Active,Multilingual
 xAI (Grok),Grok 3,1000000,0.003,0.015,Active,Multilingual
 xAI (Grok),Grok 2,200000,0.002,0.01,Active,Multilingual
 xAI (Grok),Grok 1,128000,0,0,Active,Multilingual
