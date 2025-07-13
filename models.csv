@@ -79,3 +79,4 @@ Cohere,Command R+,128000,2.5,10,Active,Multilingual
 Cohere,Command R,128000,0.15,0.6,Active,Multilingual
 Cohere,Command A,128000,2.5,10,Active,Multilingual
 Cohere,Command R7B,128000,0.0375,0.15,Active,Multilingual
+Moonshot AI,Kimi K2,128000,0.57,2.3,Active,"Function Calling, Multilingual"
