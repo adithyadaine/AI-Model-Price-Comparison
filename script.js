@@ -1,16 +1,13 @@
-/* --- Modern UI Reset & Base --- */
 // --- Global State ---
 let currentView = "table";
 let priceChartInstance = null;
-let scatterChartInstance = null; // NEW: Instance for scatter plot
+let scatterChartInstance = null;
 let modelsData = [];
 let sortState = { column: null, direction: "asc" };
-let capabilitiesVisible = true;
 
 // --- Constants for State Management ---
 const LOCAL_STORAGE_KEY = "aiModelSelections";
 const URL_PARAM_KEY = "models";
-const CAPABILITIES_VISIBLE_KEY = "aiModelCapabilitiesVisible";
 
 // --- DOM Elements ---
 const modelSelectionList = document.getElementById("model-selection-list");
@@ -18,15 +15,15 @@ const comparisonTableBody = document.getElementById("comparison-table-body");
 const viewTitle = document.getElementById("view-title");
 const tableView = document.getElementById("table-view");
 const barChartView = document.getElementById("bar-chart-view");
-const scatterPlotView = document.getElementById("scatter-plot-view"); // NEW
+const scatterPlotView = document.getElementById("scatter-plot-view");
 const tableViewBtn = document.getElementById("tableViewBtn");
 const barChartViewBtn = document.getElementById("barChartViewBtn");
-const scatterPlotViewBtn = document.getElementById("scatterPlotViewBtn"); // NEW
+const scatterPlotViewBtn = document.getElementById("scatterPlotViewBtn");
 const refreshPageBtn = document.getElementById("refreshPageBtn");
 const priceChartCanvas = document.getElementById("priceChart");
-const scatterChartCanvas = document.getElementById("scatterChart"); // NEW
+const scatterChartCanvas = document.getElementById("scatterChart");
 const barChartMessage = document.getElementById("bar-chart-message");
-const scatterChartMessage = document.getElementById("scatter-chart-message"); // NEW
+const scatterChartMessage = document.getElementById("scatter-chart-message");
 const barChartCanvasContainer = document.querySelector(
   "#bar-chart-view .chart-canvas-container"
 );
@@ -42,16 +39,8 @@ const filterLowBtn = document.getElementById("filterLowBtn");
 const filterMediumBtn = document.getElementById("filterMediumBtn");
 const filterHighBtn = document.getElementById("filterHighBtn");
 const modelSearchInput = document.getElementById("modelSearchInput");
-const filterVisionBtn = document.getElementById("filterVisionBtn");
-const filterFunctionCallingBtn = document.getElementById(
-  "filterFunctionCallingBtn"
-);
-const filterMultilingualBtn = document.getElementById("filterMultilingualBtn");
 const filterDropdownBtn = document.getElementById("filterDropdownBtn");
 const filterDropdownMenu = document.getElementById("filterDropdownMenu");
-const showCapabilitiesToggle = document.getElementById(
-  "showCapabilitiesToggle"
-);
 
 // --- Global Image Cache ---
 const imageCache = {};
@@ -72,13 +61,6 @@ function getPriceCategory(model) {
     return { name: "High", className: "high" };
   }
   return { name: "N/A", className: "na" };
-}
-
-function getCapabilityClass(capabilityText) {
-  if (!capabilityText) return "";
-  return `capability-${capabilityText
-    .toLowerCase()
-    .replace(/\s+/g, "-")}`;
 }
 
 function formatNumber(numStr) {
@@ -248,7 +230,6 @@ function parseCSV(csvText) {
       return isNaN(num) ? null : num;
     };
 
-    const capabilitiesRaw = get("Capabilities");
     const modelObject = {
       provider: get("Vendor"),
       name: modelName,
@@ -261,15 +242,7 @@ function parseCSV(csvText) {
       outputPrice: parsePrice(get("Output Price ($/1M tokens)")),
       status: get("Status"),
       logo: getLogoFilename(get("Vendor")),
-      capabilities: capabilitiesRaw
-        ? capabilitiesRaw.split(",").map((t) => t.trim())
-        : [],
     };
-
-    // if (modelObject.name === "Grok 1") {
-    //   if (modelObject.inputPrice === 0) modelObject.inputPrice = null;
-    //   if (modelObject.outputPrice === 0) modelObject.outputPrice = null;
-    // }
 
     if (!modelObject.id) {
       console.warn(
@@ -294,7 +267,7 @@ async function loadModelsData() {
     if (modelSelectionList)
       modelSelectionList.innerHTML = `<p>Error loading model data: ${error.message}.</p>`;
     if (comparisonTableBody)
-      comparisonTableBody.innerHTML = `<tr><td colspan="6">Error loading model data.</td></tr>`;
+      comparisonTableBody.innerHTML = `<tr><td colspan="5">Error loading model data.</td></tr>`;
     return [];
   }
 }
@@ -432,21 +405,6 @@ function populateModelSelection() {
       }
       label.appendChild(mainLineDiv);
 
-      if (model.capabilities && model.capabilities.length > 0) {
-        const capabilitiesDiv = document.createElement("div");
-        capabilitiesDiv.className = "capabilities-container";
-        model.capabilities.forEach((cap) => {
-          if (!cap) return;
-          const capTag = document.createElement("span");
-          capTag.className = `capability-tag ${getCapabilityClass(cap)}`;
-          capTag.textContent = cap;
-          capabilitiesDiv.appendChild(capTag);
-        });
-        if (capabilitiesDiv.hasChildNodes()) {
-          label.appendChild(capabilitiesDiv);
-        }
-      }
-
       div.appendChild(checkbox);
       div.appendChild(label);
       modelListDiv.appendChild(div);
@@ -544,34 +502,11 @@ function filterModelsByCategory(categoryName) {
   updateDisplay();
 }
 
-function filterModelsByCapability(capabilityName) {
-  if (!modelSelectionList || !modelsData) return;
-  const allCheckboxes = modelSelectionList.querySelectorAll(
-    'input[type="checkbox"]'
-  );
-  const matchingModelIds = modelsData
-    .filter(
-      (model) => model.capabilities && model.capabilities.includes(capabilityName)
-    )
-    .map((model) => model.id);
-  allCheckboxes.forEach((checkbox) => {
-    checkbox.checked = matchingModelIds.includes(checkbox.value);
-  });
-  updateDisplay();
-}
-
-function applyCapabilitiesVisibility() {
-  if (!showCapabilitiesToggle) return;
-  document.body.classList.toggle("capabilities-hidden", !capabilitiesVisible);
-  showCapabilitiesToggle.checked = capabilitiesVisible;
-}
-
 function updateTableView(selectedModelsData) {
   if (!comparisonTableBody) return;
   comparisonTableBody.innerHTML = "";
   if (!selectedModelsData || selectedModelsData.length === 0) {
-    const colspan = capabilitiesVisible ? 6 : 5;
-    comparisonTableBody.innerHTML = `<tr><td colspan="${colspan}">Select models to compare.</td></tr>`;
+    comparisonTableBody.innerHTML = `<tr><td colspan="5">Select models to compare.</td></tr>`;
     return;
   }
 
@@ -620,27 +555,6 @@ function updateTableView(selectedModelsData) {
     const contextCell = document.createElement("td");
     contextCell.textContent = model.contextWindow || "N/A";
     row.appendChild(contextCell);
-
-    const capabilitiesCell = document.createElement("td");
-    capabilitiesCell.className = "capabilities-cell";
-    const hasCapabilities =
-      model.capabilities && model.capabilities.some((cap) => cap);
-    if (hasCapabilities) {
-      const container = document.createElement("div");
-      container.className = "capabilities-container";
-      model.capabilities.forEach((cap) => {
-        if (cap) {
-          const capTag = document.createElement("span");
-          capTag.className = `capability-tag ${getCapabilityClass(cap)}`;
-          capTag.textContent = cap;
-          container.appendChild(capTag);
-        }
-      });
-      capabilitiesCell.appendChild(container);
-    } else {
-      capabilitiesCell.textContent = "N/A";
-    }
-    row.appendChild(capabilitiesCell);
 
     comparisonTableBody.appendChild(row);
   });
@@ -827,7 +741,6 @@ async function renderBarChart(selectedModelsData) {
   }
 }
 
-// NEW: Function to render the scatter plot
 async function renderScatterChart(selectedModelsData) {
   if (!scatterChartCanvas || !scatterChartMessage) return;
   if (scatterChartInstance) scatterChartInstance.destroy();
@@ -856,7 +769,7 @@ async function renderScatterChart(selectedModelsData) {
   const scatterData = chartData.map((model) => ({
     x: model.contextValue,
     y: model.inputPrice,
-    model: model, // Keep original model data for tooltips
+    model: model,
   }));
 
   const config = {
@@ -955,15 +868,13 @@ async function renderScatterChart(selectedModelsData) {
 }
 
 async function switchView(view) {
-  // Update button states
   tableViewBtn.classList.toggle("active", view === "table");
   const chartsBtn = document.getElementById("chartsDropdownBtn");
   chartsBtn.classList.toggle("active", view === "bar" || view === "scatter");
 
-  // Update view container visibility
   tableView.classList.toggle("active", view === "table");
   barChartView.classList.toggle("active", view === "bar");
-  scatterPlotView.classList.toggle("active", view === "scatter"); // NEW
+  scatterPlotView.classList.toggle("active", view === "scatter");
 
   if (viewTitle) {
     switch (view) {
@@ -971,7 +882,7 @@ async function switchView(view) {
         viewTitle.textContent = "Price Comparison (Bar)";
         break;
       case "scatter":
-        viewTitle.textContent = "Price vs. Context (Scatter)"; // NEW
+        viewTitle.textContent = "Price vs. Context (Scatter)";
         break;
       case "table":
       default:
@@ -1028,7 +939,7 @@ function loadSelections() {
 async function updateDisplay() {
   if (!modelsData || modelsData.length === 0) {
     if (comparisonTableBody)
-      comparisonTableBody.innerHTML = `<tr><td colspan="6">No model data loaded.</td></tr>`;
+      comparisonTableBody.innerHTML = `<tr><td colspan="5">No model data loaded.</td></tr>`;
     if (barChartMessage) barChartMessage.textContent = "No model data loaded.";
     if (scatterChartMessage)
       scatterChartMessage.textContent = "No model data loaded.";
@@ -1116,7 +1027,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     !modelSelectionList ||
     !comparisonTableBody ||
     !priceChartCanvas ||
-    !scatterChartCanvas || // Check for new canvas
+    !scatterChartCanvas ||
     !dynamicTimestampSpan
   ) {
     if (document.body)
@@ -1128,11 +1039,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   modelsData = await loadModelsData();
 
   if (modelsData && modelsData.length > 0) {
-    const savedVisibility = localStorage.getItem(CAPABILITIES_VISIBLE_KEY);
-    capabilitiesVisible =
-      savedVisibility === null ? true : savedVisibility === "true";
-    applyCapabilitiesVisibility();
-
     populateModelSelection();
     setDynamicTimestamp();
     loadSelections();
@@ -1144,7 +1050,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         const menu = button.nextElementSibling;
         const isVisible = menu.classList.contains("show");
 
-        // First, close all dropdowns and remove active states
         document
           .querySelectorAll(".dropdown-menu")
           .forEach((m) => m.classList.remove("show"));
@@ -1152,7 +1057,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           .querySelectorAll(".dropdown-toggle")
           .forEach((b) => b.classList.remove("active"));
 
-        // If the clicked one wasn't visible, show it and set it to active
         if (!isVisible) {
           menu.classList.add("show");
           button.classList.add("active");
@@ -1208,28 +1112,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       filterHighBtn.addEventListener("click", () =>
         filterModelsByCategory("High")
       );
-    if (filterVisionBtn)
-      filterVisionBtn.addEventListener("click", () =>
-        filterModelsByCapability("Vision")
-      );
-    if (filterFunctionCallingBtn)
-      filterFunctionCallingBtn.addEventListener("click", () =>
-        filterModelsByCapability("Function Calling")
-      );
-    if (filterMultilingualBtn)
-      filterMultilingualBtn.addEventListener("click", () =>
-        filterModelsByCapability("Multilingual")
-      );
     if (modelSearchInput)
       modelSearchInput.addEventListener("input", filterModelSelectionList);
-    if (showCapabilitiesToggle) {
-      showCapabilitiesToggle.addEventListener("change", () => {
-        capabilitiesVisible = showCapabilitiesToggle.checked;
-        localStorage.setItem(CAPABILITIES_VISIBLE_KEY, capabilitiesVisible);
-        applyCapabilitiesVisibility();
-        updateDisplay();
-      });
-    }
 
     document.querySelectorAll("th.sortable").forEach((header) => {
       header.addEventListener("click", () => {

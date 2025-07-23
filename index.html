@@ -105,39 +105,6 @@
               role="menu"
               aria-labelledby="filterDropdownBtn"
             >
-              <div class="dropdown-item" role="menuitem">
-                <label>
-                  <input type="checkbox" id="showCapabilitiesToggle" />
-                  Show Capabilities
-                </label>
-              </div>
-              <div class="dropdown-divider"></div>
-              <div class="dropdown-header">Select by Capability</div>
-              <div class="dropdown-item dropdown-item-full-width">
-                <button
-                  id="filterVisionBtn"
-                  class="panel-action-btn capability-filter-btn capability-vision"
-                >
-                  Vision
-                </button>
-              </div>
-              <div class="dropdown-item dropdown-item-full-width">
-                <button
-                  id="filterFunctionCallingBtn"
-                  class="panel-action-btn capability-filter-btn capability-function-calling"
-                >
-                  Function Calling
-                </button>
-              </div>
-              <div class="dropdown-item dropdown-item-full-width">
-                <button
-                  id="filterMultilingualBtn"
-                  class="panel-action-btn capability-filter-btn capability-multilingual"
-                >
-                  Multilingual
-                </button>
-              </div>
-              <div class="dropdown-divider"></div>
               <div class="dropdown-header">Select by Price Tier</div>
               <div class="dropdown-item dropdown-item-full-width">
                 <button
@@ -189,12 +156,11 @@
                   <th class="sortable" data-sort-key="contextWindow">
                     Context Window
                   </th>
-                  <th class="capabilities-header">Capabilities</th>
                 </tr>
               </thead>
               <tbody id="comparison-table-body">
                 <tr>
-                  <td colspan="6">Select models to compare.</td>
+                  <td colspan="5">Select models to compare.</td>
                 </tr>
               </tbody>
             </table>
