@@ -59,13 +59,20 @@ header {
   height: var(--header-height);
 }
 
+#brain {
+  height: 36px;
+  margin-right: 0.75rem;
+}
+
 header h1 {
   margin: 0;
   font-size: 1.65rem;
   font-weight: 500;
   color: var(--header-footer-text);
   flex-grow: 1;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 footer {
