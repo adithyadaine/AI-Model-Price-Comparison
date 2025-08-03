@@ -80,3 +80,10 @@ Cohere,Command R,128000,0.15,0.6,Active
 Cohere,Command A,128000,2.5,10,Active
 Cohere,Command R7B,128000,0.0375,0.15,Active
 Moonshot AI,Kimi K2,128000,0.57,2.3,Active
+OpenRouter,Horizon Alpha,256000,0,0,Active
+OpenRouter,Horizon Beta,256000,0,0,Active
+Z.ai,GLM_4.5_Air,128000,0.16,1.07,Active
+Z.ai,GLM-4.5-Standard,128000,0.48,1.92,Active
+Z.ai,GLM-4.5-X,128000,1.6,6.4,Active
+Z.ai,GLM-4.5-AirX,128000,0.02,0.06,Active
+Z.ai,GLM-4.5-Flash,128000,3.2,12.8,Active
