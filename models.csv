@@ -13,6 +13,9 @@ OpenAI,o4-Mini-High,200000,1.1,4.4,Active
 OpenAI,o3-Pro,200000,20,80,Limited
 OpenAI,GPT-OSS-20b,128000,0,0,Open Source/Active
 OpenAI,GPT-OSS-120b,128000,0,0,Open
+OpenAI,GPT-5,400000,10,40,Active
+OpenAI,GPT-5 Mini,400000,2,8,Active
+OpenAI,GPT-5 Nano,400000,0.5,2,Active
 Anthropic,Claude 3.5 Haiku,200000,0.8,4,Active
 Anthropic,Claude 3.5 Sonnet,200000,3,15,Active
 Anthropic,Claude 3.7 Sonnet,200000,3,15,Active
