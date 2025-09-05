@@ -91,6 +91,7 @@ Cohere,Command R,"128,000",0.15,0.6,Supported
 Cohere,Command A,"128,000",2.5,10,Supported
 Cohere,Command R7B,"128,000",0.0375,0.15,Supported
 Moonshot AI,Kimi K2,"128,000",0.15,2.5,"Supported, positioned as competitor to GPT and Claude"
+Moonshot AI,Kimi K2-0905,"256,000",0.6,2.5,"Direct from creator, consistent performance, global access"
 OpenRouter,Horizon Alpha,"256,000",0,0,Likely in development or limited access
 OpenRouter,Horizon Beta,"256,000",0,0,Likely in development
 Z.ai,GLM_4.5_Air,"128,000",0.11,0.28,Supported
