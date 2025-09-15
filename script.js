@@ -64,9 +64,10 @@ function getPriceCategory(model) {
 }
 
 function formatNumber(numStr) {
-  if (numStr === null || numStr === undefined || numStr.trim() === "")
-    return "N/A";
-  const num = parseInt(numStr, 10);
+  if (numStr === null || numStr === undefined) return "N/A";
+  const cleaned = String(numStr).replace(/,/g, "").trim();
+  if (cleaned === "") return "N/A";
+  const num = parseInt(cleaned, 10);
   if (isNaN(num)) return "N/A";
   if (num >= 1000000)
     return (num / 1000000).toFixed(num % 1000000 !== 0 ? 1 : 0) + "M";
@@ -77,7 +78,8 @@ function formatNumber(numStr) {
 function parseContextWindow(str) {
   if (typeof str !== "string" || str === "N/A") return 0;
   const lower = str.toLowerCase();
-  const num = parseFloat(lower);
+  const cleaned = lower.replace(/,/g, "");
+  const num = parseFloat(cleaned);
   if (lower.endsWith("m")) return num * 1000000;
   if (lower.endsWith("k")) return num * 1000;
   return num;
