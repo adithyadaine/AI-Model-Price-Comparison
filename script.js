@@ -903,7 +903,10 @@ function saveSelectionsToLocalStorage(selectedIds) {
 function updateUrlWithSelections(selectedIds) {
   const url = new URL(window.location);
   if (selectedIds.length > 0) {
-    url.searchParams.set(URL_PARAM_KEY, selectedIds.join(","));
+  // Store as a JSON string so commas and special chars are preserved when
+  // the page is published/shared. URLSearchParams will percent-encode the
+  // JSON automatically for safe transport.
+  url.searchParams.set(URL_PARAM_KEY, JSON.stringify(selectedIds));
   } else {
     url.searchParams.delete(URL_PARAM_KEY);
   }
@@ -914,7 +917,17 @@ function loadSelections() {
   const urlParams = new URLSearchParams(window.location.search);
   let idsToSelect = [];
   if (urlParams.has(URL_PARAM_KEY)) {
-    idsToSelect = urlParams.get(URL_PARAM_KEY).split(",");
+    const raw = urlParams.get(URL_PARAM_KEY) || "";
+    // Support two formats:
+    // 1) JSON-encoded array (new, safe for publishing)
+    // 2) Legacy comma-separated list (older links)
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) idsToSelect = parsed.map((v) => String(v));
+      else idsToSelect = String(raw).split(",").map((s) => s.trim()).filter(Boolean);
+    } catch (e) {
+      idsToSelect = String(raw).split(",").map((s) => s.trim()).filter(Boolean);
+    }
     saveSelectionsToLocalStorage(idsToSelect);
   } else {
     const storedIds = localStorage.getItem(LOCAL_STORAGE_KEY);

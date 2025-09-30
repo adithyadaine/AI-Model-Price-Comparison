@@ -25,6 +25,7 @@ Anthropic,Claude 3 Opus,"200,000",15,75,Superseded
 Anthropic,Claude 4 Opus,"200,000",15,75,Supported frontier model
 Anthropic,Claude Sonnet 4,"200,000",3,15,Supported
 Anthropic,Claude Opus 4.1,"200,000",15,75,"Latest release, available on API, Amazon Bedrock, Google Cloud"
+Anthropic,Claude Sonnet 4.5,"1,000,000",3,15,Live and default for most Sonnet endpoints; 1M context in beta for select orgs
 Google,Gemini 2.5 Pro (²200k),"1,000,000",1.25,10,"Stable release, actively supported"
 Google,Gemini 2.5 Pro (>200k),"1,000,000",2.5,15,Supported
 Google,Gemini 2.5 Flash (GA),"1,000,000",0.3,2.5,Stable general availability
