@@ -1,105 +1,107 @@
-Vendor,Model,Context (tokens),Input Price ($/1M tokens),Output Price ($/1M tokens),Status
-OpenAI,GPT-4o,"128,000",2.5,10,Deprecated for ChatGPT consumers as of Aug 2025 but available via API
-OpenAI,GPT-4o Mini,"128,000",0.15,0.6,"Deprecated with GPT-4o, replaced by GPT-5"
-OpenAI,GPT-4.1,"1,000,000",2,8,"Replaced by GPT-5, deprecated after July 2025"
-OpenAI,GPT-4.1 Mini,"1,000,000",0.4,1.6,Deprecated post GPT-5 release
-OpenAI,GPT-4.1 Nano,"1,000,000",0.1,0.4,Deprecated
-OpenAI,o1,"200,000",15,60,Superseded by newer GPT-5 models
-OpenAI,o1 Mini,"128,000",1.1,4.4,Replaced with GPT-5 mini/nano
-OpenAI,o3 Mini,"200,000",1.1,4.4,Superseded
-OpenAI,o3-Mini-High,"200,000",1.1,4.4,Superseded
-OpenAI,GPT-3.5 Turbo,"16,000",0.5,1.5,Actively supported
-OpenAI,o4-Mini-High,"200,000",1.1,4.4,Deprecated
-OpenAI,o3-Pro,"200,000",20,80,Deprecated
-OpenAI,GPT-OSS-20b,"128,000",0,0,"Open source, community maintained"
-OpenAI,GPT-OSS-120b,"128,000",0,0,Open source
-OpenAI,GPT-5,"400,000",10,40,"Current flagship model, default in ChatGPT"
-OpenAI,GPT-5 Mini,"400,000",2,8,Supported variant of GPT-5
-OpenAI,GPT-5 Nano,"400,000",0.5,2,Supported light variant
-OpenAI,GPT-5-Codex,"400,000",1.25,10,"Available everywhere via Codex products (CLI, IDE, cloud, GitHub, ChatGPT app); default for cloud/code review; API access planned soon"
-Anthropic,Claude 3.5 Haiku,"200,000",0.8,4,Superseded by newer Claude models
-Anthropic,Claude 3.5 Sonnet,"200,000",3,15,Superseded
-Anthropic,Claude 3.7 Sonnet,"200,000",3,15,Superseded
-Anthropic,Claude 3.7 Sonnet Thinking,"200,000",3,15,Superseded
-Anthropic,Claude 3 Opus,"200,000",15,75,Superseded
-Anthropic,Claude 4 Opus,"200,000",15,75,Supported frontier model
-Anthropic,Claude Sonnet 4,"200,000",3,15,Supported
-Anthropic,Claude Opus 4.1,"200,000",15,75,"Latest release, available on API, Amazon Bedrock, Google Cloud"
-Anthropic,Claude Sonnet 4.5,"1,000,000",3,15,Live and default for most Sonnet endpoints; 1M context in beta for select orgs
-Google,Gemini 2.5 Pro (²200k),"1,000,000",1.25,10,"Stable release, actively supported"
-Google,Gemini 2.5 Pro (>200k),"1,000,000",2.5,15,Supported
-Google,Gemini 2.5 Flash (GA),"1,000,000",0.3,2.5,Stable general availability
-Google,Gemini 2.5 Flash-Lite (w/o Reasoning),"1,000,000",0.1,0.4,Supported
-Google,Gemini 2.5 Flash-Lite (w/ Reasoning),"1,000,000",0.1,3.5,Supported
-Google,Gemini 2.0 Flash,"1,048,576",0.15,0.6,Supported
-Google,Gemini 2.0 Flash-Lite,"1,048,576",0.075,0.3,Supported
-Google,Gemini 1.5 Pro (Base-1),"2,097,152",1.25,5,"Older model, mostly superseded"
-Google,Gemini 1.5 Pro (Base-2),"2,097,152",2.5,10,Older model
-Google,Gemini 1.5 Flash (Model-1),"1,048,576",0.075,0.3,Older variant
-Google,Gemini 1.5 Flash (Model-2),"1,048,576",0.15,0.6,Older variant
-Google,Gemini 1.5 Flash-8B (Model-1),"1,000,000",0.0375,0.15,Active lower-cost model
-Google,Gemini 1.5 Flash-8B (Model-2),"1,000,000",0.075,0.3,Active
-DeepSeek,DeepSeek R1,"128,000",0.55,2.19,Superseded by DeepSeek V3.1
-DeepSeek,DeepSeek R1-0528,"128,000",0.55,2.19,Superseded
-DeepSeek,DeepSeek V3,"128,000",0.14,0.28,Superseded
-DeepSeek,DeepSeek V2.5,"128,000",0.14,0.28,Superseded
-DeepSeek,DeepSeek R1 Distill Qwen,"128,000",0.27,1.1,Superseded
-DeepSeek,DeepSeek V3.1 (Non-thinking),"128,000",0.07,0.56,"Current main version, actively supported"
-DeepSeek,DeepSeek V3.1 (Thinking),"128,000",0.14,0.55,"Current variant with enhanced reasoning, actively supported"
-Mistral,Mistral Small,"32,000",0.2,0.6,Supported
-Mistral,Mistral Small 3,"32,000",0.1,0.3,Supported
-Mistral,Mistral Small 3.2,"128,000",0.1,0.3,Supported
-Mistral,Mistral Large,"128,000",2,6,Supported
-Mistral,Mistral Large 2,"128,000",2,6,"Supported, planned further improvements"
-Mistral,Mixtral 8x7B,"32,000",0.45,0.6,Supported
-Mistral,Mixtral 8x22B,"65,000",2,6,Supported
-Mistral,Mistral NeMo,"128,000",0.3,0.3,Supported
-Meta,LLaMA 4 Scout,"10,000,000",0.15,0.5,"Released in early 2025, actively supported"
-Meta,LLaMA 4 Maverick,"1,000,000",0.23,0.85,"Released in 2025, actively supported"
-Meta,LLaMA 3.3 70B,"128,000",0.58,0.66,Supported
-Meta,LLaMA 3.1 405B,"128,000",3.25,3.25,Supported
-Meta,LLaMA 3.2 90B Vision,"128,000",0.53,0.56,Supported
-Meta,LLaMA 3.1 70B,"128,000",2.68,3.54,Supported
-Meta,LLaMA 3.2 11B Vision,"128,000",0.1,0.1,Supported
-xAI (Grok),Grok 4,"256,000",3,15,"Recently released, actively supported"
-xAI (Grok),Grok 4 Heavy,"256,000",6,30,Released
-xAI (Grok),Grok 3,"1,000,000",0.003,0.015,Supported
-xAI (Grok),Grok 2,"200,000",0.002,0.01,Supported
-xAI (Grok),Grok 1,"128,000",0,0,Discontinued or legacy
-Amazon,Nova Micro,"128,000",0.035,0.14,Supported
-Amazon,Nova Lite,"300,000",0.06,0.24,Supported
-Amazon,Nova Pro,"300,000",0.8,3.2,Supported
-Alibaba,Qwen2.5_Max,"32,768",1.6,6.4,Supported
-Alibaba,Qwen2.5-Omni-7B,"131,000",0,0,"Released with open weights, supported"
-Alibaba,Qwen3_Coder_480B_A35B_Instruct,"256,000",1,5,Supported
-Alibaba,Qwen3_235B_A22B_Instruct_FP8,"131,072",0.12,0.59,Supported
-Alibaba,Qwen3_30B_A3B (MoE),"131,072",0.08,0.29,Supported
-Alibaba,Qwen3_32B (dense),"131,072",0.027,0.027,Supported
-NVIDIA,Llama 3.1 Nemotron 70B Instruct,"131,000",0.12,0.3,Supported
-NVIDIA,Llama 3.1 Nemotron 8B Instruct (BF16),"131,000",0.025,0.04,Supported
-NVIDIA,Llama 3.1 405B Instruct (FP8),"131,000",0.8,0.8,Supported
-NVIDIA,Llama 3.2 3B Instruct (BF16),"131,000",0.015,0.025,Supported
-Vercel,v0-1.0-md (Medium-sized Model),"128,000",3,15,Supported
-Vercel,v0-1.5-md (Medium-sized Model),"128,000",1.5,7.5,Supported
-Vercel,v0-1.5-lg (Large-sized Model),"512,000",15,75,Supported
-Perplexity AI,Sonar,"4,000",1,1,Supported
-Perplexity AI,Sonar Pro,"4,000",3,15,Supported
-Perplexity AI,Sonar Reasoning,"4,000",1,5,Supported
-Perplexity AI,Sonar Reasoning Pro,"4,000",2,8,Supported
-Perplexity AI,Sonar Deep Research,"4,000",2,8,Supported
-Perplexity AI,r1-1776,"4,000",2,8,Supported
-Cohere,Command R+,"128,000",2.5,10,Supported
-Cohere,Command R,"128,000",0.15,0.6,Supported
-Cohere,Command A,"128,000",2.5,10,Supported
-Cohere,Command R7B,"128,000",0.0375,0.15,Supported
-Moonshot AI,Kimi K2,"128,000",0.15,2.5,"Supported, positioned as competitor to GPT and Claude"
-Moonshot AI,Kimi K2-0905,"256,000",0.6,2.5,"Direct from creator, consistent performance, global access"
-OpenRouter,Horizon Alpha,"256,000",0,0,Likely in development or limited access
-OpenRouter,Horizon Beta,"256,000",0,0,Likely in development
-Zhipu AI,GLM-4.5 Air,"130,000",0.2,1.1,"Live, but being deprecated as of October 2, 2025, in favor of GLM-4.6"
-Zhipu AI,GLM-4.5-Standard,"128,000",0.48,1.92,Supported
-Zhipu AI,GLM-4.5-X,"128,000",1.6,6.4,Supported
-Zhipu AI,GLM-4.5-AirX,"128,000",0.02,0.06,Supported
-Zhipu AI,GLM-4.5-Flash,"128,000",3.2,12.8,Supported
-Zhipu AI,GLM-4.5,"130,000",0.59,2.19,Superseded by GLM-4.6; still available but not recommended
-Zhipu AI,GLM-4.6,"200,000",0.6,2.2,"Released September 30, 2025; available via Z.ai and OpenRouter"
+Vendor,Model,Context (tokens),Input Price ($/1M),Output Price ($/1M),Release Date,Status
+OpenAI,gpt-4o-transcribe-diarize,Ð,Ð,Ð,10/17/25,ASR with diarization endpoint released Oct 17 2025 via Audio/Realtime API
+Google,Gemini Enterprise,Ð,Ð,Ð,10/17/25,Platform for internal-data conversational deployments
+OpenAI,gpt-image-1-mini,Ð,Ð,Ð,10/16/25,"Lightweight image understanding/generation, available via Azure deployments"
+Anthropic,Claude Haiku 4.5,200000,0.8,4,10/15/25,"Released Oct 15 2025; compact, cost-effective on free plans"
+Google,Gemini 2.5 Computer Use,1000000,0.3,2.5,10/6/25,Specialized UI-interaction model via API since Oct 6 2025
+Zhipu AI,GLM-4.6,200000,0.6,2.2,9/30/25,"Released September 30, 2025"
+OpenAI,GPT-5-Codex,400000,1.25,10,9/23/25,Available in Responses API since Sep 23 2025
+Mistral,Mistral NeMo,128000,0.3,0.3,8/8/25,Supported
+OpenAI,GPT-5,400000,10,40,8/6/25,"Current flagship model, default in ChatGPT"
+OpenAI,GPT-5 Mini,400000,2,8,8/6/25,Supported variant
+OpenAI,GPT-5 Nano,400000,0.5,2,8/6/25,Supported light variant
+Google,Gemini 2.5 Pro (200k),1000000,1.25,10,7/30/25,"Stable release, actively supported"
+Google,Gemini 2.5 Pro (>200k),1000000,2.5,15,7/30/25,Supported
+xAI (Grok),Grok 4 Heavy,256000,6,30,7/29/25,Released
+Alibaba,Qwen2.5-Omni-7B,131000,0,0,7/24/25,"Released with open weights, supported"
+Anthropic,Claude Opus 4.1,200000,15,75,7/22/25,"Latest release, available on API, Amazon Bedrock, Google Cloud"
+xAI (Grok),Grok 4,256000,3,15,7/20/25,"Recently released, actively supported"
+Mistral,Mistral Small 3.2,128000,0.1,0.3,7/18/25,Supported
+OpenRouter,Horizon Alpha,256000,0,0,7/10/25,Likely in development or limited access
+OpenRouter,Horizon Beta,256000,0,0,7/10/25,Likely in development
+Zhipu AI,GLM-4.5-Flash,128000,3.2,12.8,7/4/25,Supported
+Vercel,v0-1.5-md (Medium-sized Model),128000,1.5,7.5,7/1/25,Supported
+Vercel,v0-1.5-lg (Large-sized Model),512000,15,75,7/1/25,Supported
+Google,Gemini 2.5 Flash (GA),1000000,0.3,2.5,6/18/25,Stable general availability
+Google,Gemini 2.5 Flash-Lite (w/o Reasoning),1000000,0.1,0.4,6/18/25,Supported
+Google,Gemini 2.5 Flash-Lite (w/ Reasoning),1000000,0.1,3.5,6/18/25,Supported
+OpenAI,o3-Pro,200000,20,80,6/10/25,Launched June 10 2025 for Pro users
+Moonshot AI,Kimi K2-0905,256000,0.6,2.5,5/29/25,"Direct from creator, consistent performance"
+Alibaba,Qwen3_Coder_480B_A35B_Instruct,256000,1,5,5/28/25,Supported
+DeepSeek,DeepSeek V3.1 (Non-thinking),128000,0.07,0.56,5/25/25,"Current main version, actively supported"
+DeepSeek,DeepSeek V3.1 (Thinking),128000,0.14,0.55,5/25/25,Active variant with enhanced reasoning
+Meta,LLaMA 4 Maverick,1000000,0.23,0.85,5/23/25,"Released 2025, actively supported"
+Cohere,Command R7B,128000,0.0375,0.15,5/10/25,Supported
+NVIDIA,Llama 3.2 3B Instruct (BF16),131000,0.015,0.025,4/20/25,Supported
+Alibaba,Qwen3_235B_A22B_Instruct_FP8,131072,0.12,0.59,4/19/25,Supported
+Alibaba,Qwen3_30B_A3B (MoE),131072,0.08,0.29,4/19/25,Supported
+Alibaba,Qwen3_32B (dense),131072,0.027,0.027,4/19/25,Supported
+Meta,LLaMA 3.2 90B Vision,128000,0.53,0.56,3/28/25,Supported
+Alibaba,Qwen2.5_Max,32768,1.6,6.4,3/21/25,Supported
+Mistral,Mixtral 8x22B,65000,2,6,3/14/25,Supported
+OpenAI,GPT-4.1,1000000,2,8,3/12/25,"Replaced by GPT-5, deprecated after July 2025"
+OpenAI,GPT-4.1 Mini,1000000,0.4,1.6,3/12/25,Deprecated post GPT-5 release
+OpenAI,GPT-4.1 Nano,1000000,0.1,0.4,3/12/25,Deprecated
+Anthropic,Claude Sonnet 4.5,1000000,3,15,3/5/25,Live and default for most Sonnet endpoints; 1M context beta
+Zhipu AI,GLM-4.5-AirX,128000,0.02,0.06,3/3/25,Supported
+Meta,LLaMA 3.2 11B Vision,128000,0.1,0.1,2/21/25,Supported
+Mistral,Mistral Large 2,128000,2,6,2/20/25,Supported
+NVIDIA,Llama 3.1 405B Instruct (FP8),131000,0.8,0.8,2/14/25,Supported
+Amazon,Nova Pro,300000,0.8,3.2,2/11/25,Supported
+DeepSeek,DeepSeek V3,128000,0.14,0.28,1/19/25,Superseded
+Meta,LLaMA 4 Scout,10000000,0.15,0.5,1/17/25,"Released early 2025, actively supported"
+Anthropic,Claude Sonnet 4,200000,3,15,1/15/25,Supported
+NVIDIA,Llama 3.1 Nemotron 70B Instruct,131000,0.12,0.3,1/3/25,Supported
+NVIDIA,Llama 3.1 Nemotron 8B Instruct (BF16),131000,0.025,0.04,1/3/25,Supported
+DeepSeek,DeepSeek R1 Distill Qwen,128000,0.27,1.1,12/22/24,Superseded
+Moonshot AI,Kimi K2,128000,0.15,2.5,12/21/24,Supported; competitor to GPT & Claude
+Vercel,v0-1.0-md (Medium-sized Model),128000,3,15,12/19/24,Supported
+Anthropic,Claude 4 Opus,200000,15,75,12/10/24,Superseded
+OpenAI,GPT-4o,128000,2.5,10,11/14/24,Deprecated for ChatGPT consumers as of Aug 2025 but available via API
+OpenAI,GPT-4o Mini,128000,0.15,0.6,11/14/24,"Deprecated with GPT-4o, replaced by GPT-5"
+OpenAI,o4-Mini-High,200000,1.1,4.4,11/14/24,Deprecated
+Google,Gemini 2.0 Flash,1048576,0.15,0.6,11/12/24,Supported
+Google,Gemini 2.0 Flash-Lite,1048576,0.075,0.3,11/12/24,Supported
+xAI (Grok),Grok 3,1000000,0.003,0.015,11/6/24,Supported
+Perplexity AI,Sonar,4000,1,1,10/1/24,Supported
+Perplexity AI,Sonar Pro,4000,3,15,10/1/24,Supported
+Perplexity AI,Sonar Reasoning,4000,1,5,10/1/24,Supported
+Perplexity AI,Sonar Reasoning Pro,4000,2,8,10/1/24,Supported
+Perplexity AI,Sonar Deep Research,4000,2,8,10/1/24,Supported
+Perplexity AI,r1-1776,4000,2,8,10/1/24,Supported
+Meta,LLaMA 3.1 405B,128000,3.25,3.25,9/24/24,Supported
+xAI (Grok),Grok 2,200000,0.002,0.01,9/22/24,Supported
+Anthropic,Claude 3.7 Sonnet,200000,3,15,8/20/24,Superseded
+Anthropic,Claude 3.7 Sonnet Thinking,200000,3,15,8/20/24,Superseded
+Meta,LLaMA 3.3 70B,128000,0.58,0.66,8/8/24,Supported
+Meta,LLaMA 3.1 70B,128000,2.68,3.54,8/8/24,Supported
+Amazon,Nova Micro,128000,0.035,0.14,8/3/24,Supported
+Amazon,Nova Lite,300000,0.06,0.24,8/3/24,Supported
+Zhipu AI,GLM-4.5-X,128000,1.6,6.4,7/15/24,Supported
+Zhipu AI,GLM-4.5 Air,130000,0.2,1.1,6/20/24,"Live, deprecated Oct 2 2025 in favor of GLM-4.6"
+Zhipu AI,GLM-4.5-Standard,128000,0.48,1.92,6/20/24,Supported
+Zhipu AI,GLM-4.5,130000,0.59,2.19,6/20/24,Superseded by GLM-4.6; available but not recommended
+DeepSeek,DeepSeek R1,128000,0.55,2.19,6/15/24,Superseded
+DeepSeek,DeepSeek R1-0528,128000,0.55,2.19,6/15/24,Superseded
+Mistral,Mistral Small 3,32000,0.1,0.3,6/6/24,Supported
+Cohere,Command R+,128000,2.5,10,6/2/24,Supported
+Cohere,Command R,128000,0.15,0.6,6/2/24,Supported
+Cohere,Command A,128000,2.5,10,6/2/24,Supported
+OpenAI,o3 Mini,200000,1.1,4.4,5/20/24,Superseded
+OpenAI,o3-Mini-High,200000,1.1,4.4,5/20/24,Superseded
+Mistral,Mixtral 8x7B,32000,0.45,0.6,4/16/24,Supported
+Anthropic,Claude 3.5 Sonnet,200000,3,15,4/10/24,Superseded
+Anthropic,Claude 3.5 Haiku,200000,0.8,4,4/10/24,Superseded by newer Claude models
+Google,Gemini 1.5 Pro (Base-1),2097152,1.25,5,3/15/24,"Older model, mostly superseded"
+Google,Gemini 1.5 Pro (Base-2),2097152,2.5,10,3/15/24,Older model
+Google,Gemini 1.5 Flash (Model-1),1048576,0.075,0.3,3/15/24,Older variant
+Google,Gemini 1.5 Flash (Model-2),1048576,0.15,0.6,3/15/24,Older variant
+Google,Gemini 1.5 Flash-8B (Model-1),1000000,0.0375,0.15,3/15/24,Active lower-cost model
+Google,Gemini 1.5 Flash-8B (Model-2),1000000,0.075,0.3,3/15/24,Active
+xAI (Grok),Grok 1,128000,0,0,3/13/24,Discontinued or legacy
+Mistral,Mistral Large,128000,2,6,1/18/24,Supported
+Mistral,Mistral Small,32000,0.2,0.6,12/5/23,Supported
+OpenAI,o1,200000,15,60,11/1/23,Superseded by newer GPT-5 models
+OpenAI,o1 Mini,128000,1.1,4.4,11/1/23,Replaced with GPT-5 mini/nano
+OpenAI,GPT-OSS-20b,128000,0,0,7/15/23,"Open source, community maintained"
+OpenAI,GPT-OSS-120b,128000,0,0,7/15/23,Open source
