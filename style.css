@@ -1,10 +1,10 @@
 /* --- Modern UI Reset & Base --- */
 :root {
-  --primary-color: #007bff;
+  --primary-color: #007bff; /* Main accent for buttons etc. */
   --primary-hover-color: #0056b3;
   --secondary-color: #6c757d;
-  --light-gray-bg: #f8f9fa;
-  --content-bg: #ffffff;
+  --light-gray-bg: #f8f9fa; /* Body background */
+  --content-bg: #ffffff; /* Background for main content cards */
   --border-color: #dee2e6;
   --text-color: #212529;
   --text-muted-color: #6c757d;
@@ -14,13 +14,17 @@
   --info-hover-color: #117a8b;
   --white-color: #ffffff;
   --panel-bg: #ffffff;
-  --header-footer-background: #343a40;
-  --header-footer-text: #f8f9fa;
-  --header-footer-border: #495057;
+
+  /* Consistent Dark Header/Footer Variables */
+  --header-footer-background: #343a40; /* Dark Charcoal / Very Dark Gray */
+  --header-footer-text: #f8f9fa; /* Light Gray / Off-White for text */
+  --header-footer-border: #495057; /* Slightly lighter dark gray for subtle borders */
+
   --border-radius: 0.3rem;
   --box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   --box-shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  --header-height: 65px;
+
+  --header-height: 65px; /* Approximate height of the header, adjust as needed */
 }
 
 body {
@@ -28,35 +32,36 @@ body {
     "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   margin: 0;
-  margin-bottom: 70px;
+  margin-bottom: 70px; /* Space for fixed footer */
   background-color: var(--light-gray-bg);
   color: var(--text-color);
   line-height: 1.6;
   position: relative;
   min-height: 100vh;
   font-size: 16px;
-  padding-top: var(--header-height);
+  padding-top: var(--header-height); /* Space for fixed header */
 }
 
 body.panel-open {
   overflow: hidden;
 }
 
+/* --- Header & Footer - CONSISTENT DARK STYLES --- */
 header {
   background-color: var(--header-footer-background);
   color: var(--header-footer-text);
-  padding: 0 1.5rem;
+  padding: 0 1.5rem; /* Adjusted padding for explicit height */
   text-align: center;
   display: flex;
   align-items: center;
-  position: fixed;
+  position: fixed; /* Make header fixed */
   top: 0;
   left: 0;
   right: 0;
-  z-index: 900;
+  z-index: 900; /* Below panel/overlay, above content */
   box-sizing: border-box;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  height: var(--header-height);
+  height: var(--header-height); /* Explicit height */
 }
 
 #brain {
@@ -88,44 +93,46 @@ footer {
   box-sizing: border-box;
   z-index: 100;
 }
-
-footer p {
+footer h3 {
   margin: 0;
+  font-weight: normal;
+  font-size: 0.875rem;
 }
 
+/* Hamburger Button - UPDATED FOR DARK HEADER */
 .hamburger-btn {
   background: none;
   border: none;
   color: var(--header-footer-text);
   font-size: 1.8rem;
   cursor: pointer;
-  padding: 0 1rem 0 0;
+  padding: 0 1rem 0 0; /* Padding on the right of the icon */
   line-height: 1;
-  order: -1;
+  order: -1; /* Place before title */
   transition: opacity 0.2s ease;
-  height: 100%;
-  display: flex;
+  height: 100%; /* Make it take full header height for easier click */
+  display: flex; /* For vertical centering of icon if needed */
   align-items: center;
 }
-
 .hamburger-btn:hover {
   opacity: 0.8;
 }
 
+/* --- Off-Canvas Selection Panel --- */
 .selection-panel {
   position: fixed;
-  top: 0;
+  top: 0; /* Align with top of viewport */
   left: 0;
   bottom: 0;
   width: 300px;
   max-width: 90%;
   background-color: var(--panel-bg);
   padding: 1.5rem;
-  padding-top: 4.5rem;
+  padding-top: 4.5rem; /* Space for close button & title */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: translateX(-100%);
   transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
-  z-index: 1000;
+  z-index: 1000; /* Highest z-index */
   overflow-y: auto;
   box-sizing: border-box;
 }
@@ -157,7 +164,6 @@ body.panel-open .selection-panel {
   padding: 0.5rem;
   transition: color 0.2s ease, transform 0.2s ease;
 }
-
 .close-panel-btn:hover {
   color: var(--primary-color);
   transform: rotate(90deg);
@@ -171,37 +177,17 @@ body.panel-open .selection-panel {
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.6);
   display: none;
-  z-index: 999;
+  z-index: 999; /* Below panel, above fixed header and content */
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
 }
-
 body.panel-open .overlay {
   display: block;
   opacity: 1;
 }
 
-.search-container {
-  margin-bottom: 1rem;
-}
-
-#modelSearchInput {
-  width: 100%;
-  padding: 0.6rem 0.8rem;
-  font-size: 0.95rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  box-sizing: border-box;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-#modelSearchInput:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
+/* Panel Action Buttons Container */
 .panel-actions-container {
   display: flex;
   flex-direction: column;
@@ -223,7 +209,6 @@ body.panel-open .overlay {
     color 0.2s ease, transform 0.1s ease;
   border: 1px solid transparent;
 }
-
 .panel-action-btn:active {
   transform: translateY(1px);
 }
@@ -233,7 +218,6 @@ body.panel-open .overlay {
   background-color: var(--primary-color);
   color: var(--white-color);
 }
-
 .select-all-btn:hover {
   background-color: var(--primary-hover-color);
   border-color: var(--primary-hover-color);
@@ -244,7 +228,6 @@ body.panel-open .overlay {
   background-color: var(--white-color);
   color: var(--secondary-color);
 }
-
 .expand-all-btn:hover {
   background-color: var(--secondary-color);
   color: var(--white-color);
@@ -255,15 +238,16 @@ body.panel-open .overlay {
   background-color: var(--white-color);
   color: var(--danger-color);
 }
-
 .clear-panel-btn:hover {
   background-color: var(--danger-color);
   color: var(--white-color);
 }
 
+/* Filter Buttons */
 .filter-btn-group {
   display: flex;
   gap: 0.5rem;
+  margin-top: 0.5rem;
   border-top: 1px solid var(--border-color);
   padding-top: 1.25rem;
 }
@@ -279,7 +263,6 @@ body.panel-open .overlay {
   color: #155724;
   border-color: #c3e6cb;
 }
-
 .filter-btn.low:hover {
   background-color: #c3e6cb;
   color: #155724;
@@ -290,7 +273,6 @@ body.panel-open .overlay {
   color: #856404;
   border-color: #ffeeba;
 }
-
 .filter-btn.medium:hover {
   background-color: #ffeeba;
   color: #856404;
@@ -301,17 +283,12 @@ body.panel-open .overlay {
   color: #721c24;
   border-color: #f5c6cb;
 }
-
 .filter-btn.high:hover {
   background-color: #f5c6cb;
   color: #721c24;
 }
 
-.filter-btn {
-  flex-grow: 0;
-  white-space: nowrap;
-}
-
+/* Provider Dropdowns */
 .model-group {
   margin-bottom: 0.25rem;
   border-bottom: none;
@@ -321,7 +298,7 @@ body.panel-open .overlay {
 .provider-title {
   cursor: pointer;
   padding: 0.75rem 1rem;
-  padding-left: 2.5em;
+  padding-left: 2.5em; /* Space for the ::before arrow */
   position: relative;
   margin: 0;
   font-size: 1rem;
@@ -333,11 +310,9 @@ body.panel-open .overlay {
   display: flex;
   align-items: center;
 }
-
 .provider-title:hover {
   background-color: #f1f3f5;
 }
-
 .provider-title::before {
   content: "";
   border: solid var(--secondary-color);
@@ -345,12 +320,11 @@ body.panel-open .overlay {
   display: inline-block;
   padding: 3px;
   position: absolute;
-  left: 1em;
+  left: 1em; /* Position of the arrow */
   top: 50%;
   transform: translateY(-60%) rotate(45deg);
   transition: transform 0.25s ease-in-out;
 }
-
 .model-group.expanded .provider-title::before {
   transform: translateY(-40%) rotate(-135deg);
 }
@@ -372,8 +346,8 @@ body.panel-open .overlay {
   font-weight: bold;
   line-height: 1;
   padding: 0 8px;
-  margin-left: auto;
-  opacity: 0;
+  margin-left: auto; /* This pushes the button to the far right */
+  opacity: 0; /* Hide the button by default */
   transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
   border-radius: var(--border-radius);
 }
@@ -384,45 +358,42 @@ body.panel-open .overlay {
 
 .clear-provider-btn:hover {
   color: var(--danger-color);
-  background-color: #f1f3f5;
+  background-color: #f1f3f5; /* Use same hover as parent for consistency */
 }
 
 .model-list {
   display: none;
-  padding-left: 1rem;
+  padding-left: 1rem; /* Indent model items under provider */
   margin-top: 0.25rem;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s ease-out, padding-top 0.3s ease-out,
     margin-top 0.3s ease-out;
 }
-
 .model-group.expanded .model-list {
   display: block;
-  max-height: 1000px;
+  max-height: 1000px; /* Ensure this is large enough for content */
   padding-top: 0.5rem;
   margin-top: 0;
   transition: max-height 0.4s ease-in, padding-top 0.4s ease-in,
     margin-top 0.4s ease-in;
 }
 
+/* Model Item (Checkbox, Logo, Name) in Selection Panel */
 .model-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 0.25rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.75rem; /* Padding around each model item */
   border-radius: var(--border-radius);
   transition: background-color 0.15s ease;
-  min-height: 2.5rem;
 }
-
 .model-item:hover {
-  background-color: #e9ecef;
+  background-color: #e9ecef; /* Light hover for model items */
 }
 
 .model-item input[type="checkbox"] {
   margin-right: 0.75em;
-  margin-top: 0.1rem;
   flex-shrink: 0;
   width: 1.1em;
   height: 1.1em;
@@ -431,69 +402,56 @@ body.panel-open .overlay {
 
 .model-item label {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   cursor: pointer;
   font-size: 0.9rem;
   flex-grow: 1;
   color: var(--text-color);
-  min-width: 0;
-}
-
-.model-main-line {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 0 0.4em;
-  min-width: 0;
 }
 
 .model-logo {
+  /* Logo for individual models in the selection panel list */
   width: 18px;
   height: 18px;
-  margin-right: 0.2em;
+  margin-right: 0.6em;
   flex-shrink: 0;
   object-fit: contain;
 }
 
 .model-name-text {
   line-height: 1.4;
-  margin-right: 0.4em;
-  flex-grow: 1;
-  min-width: 0;
-  word-break: break-word;
-  hyphens: auto;
-  overflow-wrap: break-word;
 }
 
+/* --- Price Category Tags --- */
 .price-tag {
   font-size: 0.7rem;
   font-weight: 600;
   padding: 0.15em 0.5em;
-  border-radius: 10px;
+  margin-left: auto; /* This is the key change to push the tag right */
+  border-radius: 10px; /* Pill shape */
   text-transform: uppercase;
   letter-spacing: 0.5px;
   line-height: 1;
-  vertical-align: middle;
-  flex-shrink: 0;
-  white-space: nowrap;
+  vertical-align: middle; /* Align with text */
+  flex-shrink: 0; /* Prevent the tag from shrinking */
 }
 
 .price-tag.low {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: #d4edda; /* Light Green */
+  color: #155724; /* Dark Green */
 }
 
 .price-tag.medium {
-  background-color: #fff3cd;
-  color: #856404;
+  background-color: #fff3cd; /* Light Yellow */
+  color: #856404; /* Dark Yellow */
 }
 
 .price-tag.high {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: #f8d7da; /* Light Red */
+  color: #721c24; /* Dark Red */
 }
 
+/* --- Main Content Area --- */
 .container {
   display: flex;
   flex-wrap: wrap;
@@ -520,18 +478,18 @@ body.panel-open .overlay {
   font-weight: 500;
   border-bottom: 1px solid var(--border-color);
 }
-
 .comparison-area h2 #view-title {
   color: var(--primary-color);
 }
 
+/* View Toggles & Refresh Button */
 .view-toggles {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  border-bottom: none;
+  border-bottom: none; /* Or 1px solid var(--border-color) if preferred */
 }
 
 .toggle-btn {
@@ -546,248 +504,211 @@ body.panel-open .overlay {
   transition: background-color 0.2s ease, color 0.2s ease,
     border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
 .toggle-btn:hover {
   border-color: var(--primary-hover-color);
-  background-color: #f8f9fa;
+  background-color: #f8f9fa; /* Lighter hover */
   box-shadow: var(--box-shadow);
 }
-
 .toggle-btn.active {
   background-color: var(--primary-color);
   color: var(--white-color);
   border-color: var(--primary-color);
   box-shadow: none;
 }
-
 .toggle-btn.active:hover {
   background-color: var(--primary-hover-color);
   border-color: var(--primary-hover-color);
 }
 
+.chart-dropdown {
+  position: relative;
+  display: inline-block;
+}
+#chartViewBtn {
+  position: relative;
+  padding-right: 2.5rem; /* Space for arrow */
+}
+#chartViewBtn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  border: solid var(--primary-color);
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 4px;
+  transform: translateY(-60%) rotate(45deg);
+}
+#chartViewBtn.active::after {
+  border-color: var(--white-color);
+}
+
+.chart-dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: var(--content-bg);
+  min-width: 160px;
+  box-shadow: var(--box-shadow-lg);
+  border-radius: var(--border-radius);
+  z-index: 1;
+  overflow: hidden;
+}
+.chart-dropdown-content.show {
+  display: block;
+}
+
+.dropdown-option {
+  color: var(--text-color);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+.dropdown-option:hover {
+  background-color: #f1f1f1;
+}
+
 .toggle-btn.refresh-btn {
   color: var(--danger-color);
   border-color: var(--danger-color);
-  margin-left: auto;
+  margin-left: auto; /* Pushes refresh button to the right */
 }
-
 .toggle-btn.refresh-btn:hover {
   background-color: var(--danger-color);
   color: var(--white-color);
   border-color: var(--danger-color);
 }
 
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-toggle::after {
-  content: "";
-  display: inline-block;
-  margin-left: 0.5em;
-  width: 0.4em;
-  height: 0.4em;
-  border: solid currentColor;
-  border-width: 0 2px 2px 0;
-  transform: translateY(-25%) rotate(45deg);
-  transition: transform 0.25s ease-in-out;
-}
-
-.dropdown-toggle.active::after {
-  transform: translateY(0) rotate(-135deg);
-}
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  background-color: var(--content-bg);
-  min-width: 200px;
-  box-shadow: var(--box-shadow-lg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  z-index: 1000;
-  padding: 0.5rem 0;
-}
-
-.dropdown-menu.show {
-  display: block;
-}
-
-.dropdown-item {
-  display: block;
-  width: 100%;
-  padding: 0.5rem 1rem;
-  box-sizing: border-box;
-  clear: both;
-  font-weight: 400;
-  color: var(--text-color);
-  text-align: inherit;
-  white-space: nowrap;
-  background-color: transparent;
-  border: 0;
-  text-decoration: none;
-}
-
-.dropdown-item:hover {
-  background-color: var(--light-gray-bg);
-}
-
-.dropdown-item label {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  width: 100%;
-}
-
-.dropdown-item input[type="checkbox"] {
-  margin-right: 0.5em;
-}
-
-.dropdown-divider {
-  height: 0;
-  margin: 0.5rem 0;
-  overflow: hidden;
-  border-top: 1px solid var(--border-color);
-}
-
-.dropdown-menu .panel-action-btn {
-  width: calc(100% - 2rem);
-  margin: 0.25rem 1rem;
-  text-align: center;
-}
-
-.dropdown-header {
-  padding: 0.5rem 1rem 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-muted-color);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  cursor: default;
-}
-
-.dropdown-item.dropdown-item-full-width {
-  padding: 0.25rem 0.5rem;
-}
-
+/* View Containers (Table, Chart) */
 .view-container {
   display: none;
   margin-top: 1rem;
 }
-
 .view-container.active {
   display: block;
 }
 
+/* Table Styles */
 .table-container {
   overflow-x: auto;
 }
-
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
 }
-
 th,
 td {
   border: 1px solid var(--border-color);
   padding: 0.75rem 1rem;
   text-align: left;
+  vertical-align: middle; /* Vertically align content in cells */
   white-space: nowrap;
-  vertical-align: middle;
 }
 
 th {
-  background-color: #e9ecef;
+  background-color: #e9ecef; /* Light gray for table headers */
   font-weight: 500;
   color: var(--text-color);
-  position: relative;
 }
 
-th.sortable {
+/* --- START: New Styles for Sorting --- */
+th[data-sort] {
   cursor: pointer;
-  user-select: none;
+  position: relative;
+  padding-right: 1.5em;
 }
-
-th.sortable:hover {
+th[data-sort]:hover {
   background-color: #dde6ef;
 }
-
-th.sortable::after {
-  content: "";
-  display: inline-block;
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  margin-left: 8px;
+.sort-icon {
+  position: absolute;
+  right: 0.5em;
+  top: 50%;
+  transform: translateY(-50%);
   opacity: 0.4;
-  position: relative;
-  top: -1px;
 }
-
-th.sortable.sorted-asc::after {
-  border-bottom: 5px solid var(--text-color);
+th.asc .sort-icon,
+th.desc .sort-icon {
   opacity: 1;
 }
-
-th.sortable.sorted-desc::after {
-  border-top: 5px solid var(--text-color);
-  opacity: 1;
+.sort-icon::before,
+.sort-icon::after {
+  content: "";
+  display: block;
+  border-style: solid;
+  border-width: 0 4px 4px 4px;
+  border-color: transparent transparent var(--secondary-color) transparent;
 }
+.sort-icon::before {
+  margin-bottom: 2px;
+}
+.sort-icon::after {
+  transform: rotate(180deg);
+}
+th:not(.asc):not(.desc) .sort-icon:hover {
+  opacity: 0.8;
+}
+th.asc .sort-icon::after {
+  opacity: 0.2;
+}
+th.desc .sort-icon::before {
+  opacity: 0.2;
+}
+/* --- END: New Styles for Sorting --- */
 
 tbody tr:nth-child(even) {
-  background-color: var(--light-gray-bg);
+  background-color: var(--light-gray-bg); /* Zebra striping for rows */
 }
-
 tbody tr:hover {
-  background-color: #dde6ef;
+  background-color: #dde6ef; /* Hover effect for table rows */
 }
 
+/* Styles for model name cell and logo in table */
 .model-name-cell {
-  display: flex;
-  align-items: center;
+  display: flex; /* Use flex to align logo and text */
+  align-items: center; /* Vertically align items in the cell */
 }
 
 .table-model-logo {
   width: 20px;
   height: 20px;
-  margin-right: 0.75em;
+  margin-right: 0.75em; /* Space between logo and model name */
   object-fit: contain;
-  flex-shrink: 0;
+  flex-shrink: 0; /* Prevent logo from shrinking */
 }
 
 .model-name-cell .price-tag {
   position: relative;
-  top: -1px;
+  top: -1px; /* Minor vertical adjustment */
 }
 
+/* Bar Chart View */
 .chart-scroll-wrapper {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: auto; /* Allow horizontal scrolling for many bars */
   overflow-y: hidden;
-  max-height: 480px;
+  max-height: 480px; /* Max height for the chart area */
   border: 1px solid var(--border-color);
   margin-bottom: 0.5rem;
   background-color: var(--white-color);
   border-radius: var(--border-radius);
 }
-
 .chart-canvas-container {
   position: relative;
-  height: 450px;
+  height: 450px; /* Fixed height for the canvas container */
+  /* min-width will be set by JS */
 }
-
-#priceChart,
-#scatterChart {
+#priceChart {
   display: block;
   box-sizing: border-box;
   height: 100%;
   width: 100%;
 }
-
 .chart-message {
   text-align: center;
   color: var(--text-muted-color);
@@ -795,6 +716,7 @@ tbody tr:hover {
   font-size: 0.9rem;
 }
 
+/* Last Updated Info */
 .last-updated {
   margin-top: 1.5rem;
   font-size: 0.85rem;
@@ -802,91 +724,85 @@ tbody tr:hover {
   text-align: right;
 }
 
+/* --- Responsiveness --- */
 @media (max-width: 768px) {
   body {
-    padding-top: 56px;
-    margin-bottom: 60px;
+    padding-top: 56px; /* Adjust if header height changes on mobile */
+    margin-bottom: 60px; /* Adjust if footer height changes on mobile */
   }
-  
   header {
-    height: 56px;
+    height: 56px; /* Example fixed height for mobile header */
     padding: 0 1rem;
   }
-  
   header h1 {
-    font-size: 1.2rem;
+    font-size: 1.2rem; /* Smaller title on mobile */
   }
-  
+  #brain {
+    height: 30px;
+    margin-right: 0.5rem;
+  }
   .hamburger-btn {
     padding: 0 0.75rem 0 0;
     font-size: 1.6rem;
   }
-  
+
   .selection-panel {
-    width: 85vw;
-    max-width: 300px;
+    width: 85vw; /* Use viewport width for smaller devices */
+    max-width: 300px; /* But never exceed 300px */
   }
-  
+
   .container {
     padding: 1rem;
     gap: 1rem;
   }
-  
   .comparison-area {
     padding: 1rem;
   }
-  
   .comparison-area h2 {
     font-size: 1.3rem;
   }
-  
+
   .view-toggles {
-    flex-direction: column;
+    flex-direction: column; /* Stack toggle buttons on mobile */
     align-items: stretch;
   }
-  
   .toggle-btn,
-  .dropdown {
-    width: 100%;
+  .chart-dropdown {
+    width: 100%; /* Make toggle buttons full width */
+    margin-right: 0;
   }
-  
-  .dropdown-toggle {
-    width: 100%;
-    text-align: center;
-  }
-  
   .toggle-btn + .toggle-btn,
-  .toggle-btn + .dropdown,
-  .dropdown + .toggle-btn,
-  .dropdown + .dropdown {
-    margin-top: 0.5rem;
+  .toggle-btn + .chart-dropdown,
+  .chart-dropdown + .toggle-btn {
+    margin-top: 0.5rem; /* Add space between stacked buttons */
   }
-  
   .toggle-btn.refresh-btn {
-    margin-left: 0;
+    margin-left: 0; /* Reset margin for refresh button */
     margin-top: 0.5rem;
     width: 100%;
   }
-  
+
   .panel-actions-container {
-    align-items: stretch;
+    align-items: stretch; /* Make panel action buttons full width */
   }
-  
+
   th,
   td {
+    /* Slightly reduce padding in table cells for mobile */
     padding: 0.6rem 0.75rem;
   }
-  
+
   tbody td {
     font-size: 0.85rem;
   }
-  
+
   .table-model-logo {
+    /* Slightly smaller logo in table for mobile */
     width: 18px;
     height: 18px;
     margin-right: 0.5em;
   }
-  
+
   footer {
     padding: 0.8rem 1rem;
     font-size: 0.8rem;

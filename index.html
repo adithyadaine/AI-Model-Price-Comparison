@@ -12,6 +12,7 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom/dist/chartjs-plugin-zoom.min.js"></script>
   </head>
   <body>
     <header>
@@ -23,11 +24,14 @@
       >
         &#9776;
       </button>
-       
-    <h1>
-      <img src="./img/favicon/innovative-brain-icon.png" alt="brain icon" id="brain">
-      AI Model Pricing Comparator
-    </h1>
+      <h1>
+        <img
+          src="./img/favicon/innovative-brain-icon.png"
+          alt="brain icon"
+          id="brain"
+        />
+        AI Model Pricing Comparator
+      </h1>
     </header>
 
     <aside class="selection-panel" id="selectionPanel" aria-hidden="true">
@@ -39,14 +43,6 @@
         &times;
       </button>
       <h2>Select Models</h2>
-      <div class="search-container">
-        <input
-          type="text"
-          id="modelSearchInput"
-          placeholder="Search models..."
-          aria-label="Search for models"
-        />
-      </div>
       <div class="panel-actions-container">
         <button id="selectAllBtn" class="panel-action-btn select-all-btn">
           Select All Models
@@ -57,6 +53,22 @@
         <button id="clearPanelBtn" class="panel-action-btn clear-panel-btn">
           Clear & Collapse Selections
         </button>
+
+        <!-- Price Filter Buttons -->
+        <div class="filter-btn-group">
+          <button id="filterLowBtn" class="panel-action-btn filter-btn low">
+            Low
+          </button>
+          <button
+            id="filterMediumBtn"
+            class="panel-action-btn filter-btn medium"
+          >
+            Medium
+          </button>
+          <button id="filterHighBtn" class="panel-action-btn filter-btn high">
+            High
+          </button>
+        </div>
       </div>
       <div id="model-selection-list">
         <p>Loading models...</p>
@@ -70,70 +82,15 @@
         <div class="view-toggles">
           <button id="tableViewBtn" class="toggle-btn active">Table</button>
 
-          <div class="dropdown">
-            <button
-              id="chartsDropdownBtn"
-              class="toggle-btn dropdown-toggle"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Charts
-            </button>
-            <div
-              id="chartsDropdownMenu"
-              class="dropdown-menu"
-              role="menu"
-              aria-labelledby="chartsDropdownBtn"
-            >
-              <a href="#" id="barChartViewBtn" class="dropdown-item"
-                >Price Comparison (Bar)</a
-              >
-              <a href="#" id="scatterPlotViewBtn" class="dropdown-item"
-                >Price vs. Context (Scatter)</a
-              >
-            </div>
-          </div>
-
-          <div class="dropdown">
-            <button
-              id="filterDropdownBtn"
-              class="toggle-btn dropdown-toggle"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Filter
-            </button>
-            <div
-              id="filterDropdownMenu"
-              class="dropdown-menu"
-              role="menu"
-              aria-labelledby="filterDropdownBtn"
-            >
-              <div class="dropdown-header">Select by Price Tier</div>
-              <div class="dropdown-item dropdown-item-full-width">
-                <button
-                  id="filterLowBtn"
-                  class="panel-action-btn filter-btn low"
-                >
-                  Low Price
-                </button>
-              </div>
-              <div class="dropdown-item dropdown-item-full-width">
-                <button
-                  id="filterMediumBtn"
-                  class="panel-action-btn filter-btn medium"
-                >
-                  Medium Price
-                </button>
-              </div>
-              <div class="dropdown-item dropdown-item-full-width">
-                <button
-                  id="filterHighBtn"
-                  class="panel-action-btn filter-btn high"
-                >
-                  High Price
-                </button>
-              </div>
+          <div class="chart-dropdown">
+            <button id="chartViewBtn" class="toggle-btn">Chart Type</button>
+            <div id="chart-dropdown-content" class="chart-dropdown-content">
+              <button id="barChartViewBtn" class="dropdown-option">
+                Bar Chart
+              </button>
+              <button id="scatterChartViewBtn" class="dropdown-option">
+                Scatter Plot
+              </button>
             </div>
           </div>
 
@@ -148,23 +105,32 @@
           <div class="table-container">
             <table>
               <thead>
-                <tr id="comparison-table-header">
-                  <th class="sortable" data-sort-key="name">Model Name</th>
-                  <th class="sortable" data-sort-key="provider">Provider</th>
-                  <th class="sortable" data-sort-key="inputPrice">
-                    Input ($/1M tokens)
+                <!-- **** START: UPDATED TABLE HEADERS FOR SORTING **** -->
+                <tr>
+                  <th data-sort="name">
+                    Model Name<span class="sort-icon"></span>
                   </th>
-                  <th class="sortable" data-sort-key="outputPrice">
-                    Output ($/1M tokens)
+                  <th data-sort="provider">
+                    Provider<span class="sort-icon"></span>
                   </th>
-                  <th class="sortable" data-sort-key="contextWindow">
-                    Context Window
+                  <th data-sort="inputPrice">
+                    Input ($/1M)<span class="sort-icon"></span>
+                  </th>
+                  <th data-sort="outputPrice">
+                    Output ($/1M)<span class="sort-icon"></span>
+                  </th>
+                  <th data-sort="contextWindow">
+                    Context Window<span class="sort-icon"></span>
+                  </th>
+                  <th data-sort="releaseDate">
+                    Release Date<span class="sort-icon"></span>
                   </th>
                 </tr>
+                <!-- **** END: UPDATED TABLE HEADERS **** -->
               </thead>
               <tbody id="comparison-table-body">
                 <tr>
-                  <td colspan="5">Select models to compare.</td>
+                  <td colspan="6">Select models to compare.</td>
                 </tr>
               </tbody>
             </table>
@@ -178,15 +144,6 @@
             </div>
           </div>
           <p class="chart-message" id="bar-chart-message"></p>
-        </div>
-
-        <div id="scatter-plot-view" class="view-container">
-          <div class="chart-scroll-wrapper">
-            <div class="chart-canvas-container">
-              <canvas id="scatterChart"></canvas>
-            </div>
-          </div>
-          <p class="chart-message" id="scatter-chart-message"></p>
         </div>
 
         <p class="last-updated">
