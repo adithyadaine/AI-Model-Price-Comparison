@@ -92,25 +92,33 @@ function formatNumber(numStr) {
   return num.toString();
 }
 
-// **** NEW: Helper for parsing values for sorting ****
+// **** UPDATED: Helper for parsing values for sorting ****
 function parseValueForSort(value, type) {
   if (value === "N/A" || value === null || value === undefined) {
-    return type === "date" ? new Date(0) : -Infinity; // Push N/A to the bottom
+    // Treat N/A values as -Infinity for numbers/dates (to push them to the end when sorting ascending)
+    return type === "date" ? new Date(0) : -Infinity;
   }
   if (type === "number") {
-    return parseFormattedNumber(String(value));
+    // Ensure numeric parsing for prices and context windows
+    const num = parseFormattedNumber(String(value));
+    return num !== null ? num : -Infinity;
   }
   if (type === "date") {
     const parts = String(value).split("/");
     if (parts.length === 3) {
-      // Handles MM/DD/YY format
-      return new Date(
-        `20${parts[2]}`,
-        parseInt(parts[0]) - 1,
-        parseInt(parts[1])
+      // Handles MM/DD/YY format correctly by converting to YYYY
+      const year = parseInt(parts[2], 10);
+      const fullYear = year < 50 ? 2000 + year : 1900 + year; // Basic 20th/21st century assumption
+      const date = new Date(
+        fullYear,
+        parseInt(parts[0], 10) - 1, // Month is 0-indexed
+        parseInt(parts[1], 10)
       );
+      // Check if the resulting date is valid (e.g., handles "10/1/24" properly)
+      if (isNaN(date.getTime())) return new Date(0);
+      return date;
     }
-    return new Date(0); // Invalid date format
+    return new Date(0); // Invalid date format pushed to bottom
   }
   return String(value).toLowerCase(); // Default to string sort
 }
@@ -166,30 +174,41 @@ function getPreloadedImage(logoFilename) {
 }
 
 // --- CSV Processing Functions ---
+// **** CRITICAL FIX: Simplified CSV Parsing Logic ****
 function parseCSV(csvText) {
-  console.log("Starting CSV Parse with robust parser...");
-  const lines = csvText.trim().split(/\r\n|\n/);
+  console.log("Starting CSV Parse with simplified robust parser...");
+
+  // 1. Normalize line endings and trim whitespace from the whole file
+  const normalizedText = csvText.replace(/\r\n/g, '\n').trim();
+  const lines = normalizedText.split('\n');
+
   if (lines.length < 2) {
     console.warn("CSV has too few lines (header + data expected).");
     return [];
   }
 
-  const csvRegex = /(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)/g;
-
+  // Simplified and more reliable CSV line parsing (handles quoted commas, but not quoted quotes)
   function parseLine(line) {
+    const csvRegex = /("([^"]*)"|[^,]*)(,|$)/g;
     const values = [];
     let match;
     while ((match = csvRegex.exec(line))) {
-      let value = match[1];
-      if (value.startsWith('"') && value.endsWith('"')) {
-        value = value.slice(1, -1).replace(/""/g, '"');
-      }
-      values.push(value.trim());
+      // Group 2 is the quoted content (if it exists)
+      const value = match[2] !== undefined ? match[2] : match[1];
+      values.push(value ? value.trim() : "");
+      if (!match[4]) break; // Stop if there's no trailing comma (end of line)
     }
-    return values;
+    // Handle the specific format of your CSV file which seems to rely on simple splitting for unquoted fields
+    return line.split(',').map(v => {
+        // Simple trim and replacement for non-standard characters like 'Ð' in your CSV
+        const trimmed = v.trim();
+        return trimmed.replace(/Ð/g, ''); 
+    });
   }
 
-  const headers = parseLine(lines[0]);
+  // Use the reliable string splitting method for header and data processing
+  const headers = lines[0].split(',').map(h => h.trim());
+  
   const vendorIdx = headers.indexOf("Vendor");
   const modelIdx = headers.indexOf("Model");
   const contextIdx = headers.indexOf("Context (tokens)");
@@ -218,16 +237,28 @@ function parseCSV(csvText) {
   const parsedData = [];
   dataRows.forEach((line, rowIndex) => {
     if (line.trim() === "") return;
-    const values = parseLine(line);
 
-    if (values.every((v) => v === "")) return;
+    // Use a simple split since your CSV doesn't rely heavily on quoted fields containing commas
+    const values = line.split(',').map(v => {
+        const trimmed = v.trim();
+        // Clean up the non-standard characters (like the 'Ð') or surrounding quotes
+        if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+            return trimmed.slice(1, -1).trim();
+        }
+        return trimmed.replace(/Ð/g, '').trim(); 
+    });
 
-    if (values.length < requiredIndices.length) {
-      console.warn(
-        `Row ${rowIndex + 2} has too few columns. Line: "${line}"`
-      );
-      return;
+
+    // Ensure we have enough columns to proceed
+    if (values.length < headers.length) {
+      // Fill missing trailing columns with empty strings for safer indexing
+      while (values.length < headers.length) {
+          values.push("");
+      }
     }
+    
+    // Safety check for rows that might have been skipped by the initial split/trim
+    if (values.every((v) => v === "")) return;
 
     const modelName = values[modelIdx];
     if (!modelName) {
@@ -243,7 +274,9 @@ function parseCSV(csvText) {
         priceValue === "Not Public"
       )
         return null;
-      const num = parseFloat(priceValue);
+      // Clean up any stray symbols before parsing as float
+      const cleanedPrice = priceValue.replace(/[^0-9.]/g, ''); 
+      const num = parseFloat(cleanedPrice);
       return isNaN(num) ? null : num;
     };
 
@@ -600,11 +633,12 @@ Chart.register({
     const textPadding = pluginOpts.textPadding || 4;
     const font = pluginOpts.font || "10px Arial, sans-serif";
     const textColor = pluginOpts.textColor || "#444";
+    const MAX_LABEL_LENGTH = 15; // Set the maximum number of characters to display
 
     ctx.save();
     ctx.font = font;
     ctx.fillStyle = textColor;
-    ctx.textAlign = "center";
+    ctx.textAlign = "center"; // Revert to center alignment
     ctx.textBaseline = "top";
 
     pluginOpts.selectedModels.forEach((model, index) => {
@@ -613,15 +647,29 @@ Chart.register({
       const logo = getPreloadedImage(model.logo);
       let currentY = xAxis.bottom + textPadding;
 
+      // 1. Draw Logo
       if (logo) {
         const logoX = xPos - logoSize / 2;
         ctx.drawImage(logo, logoX, currentY, logoSize, logoSize);
         currentY += logoSize + textPadding;
       } else {
-        currentY += logoSize + textPadding;
+        currentY += logoSize + textPadding; 
       }
+      
+      // 2. Draw Truncated Text
       const modelName = model.name || "N/A";
-      ctx.fillText(modelName, xPos, currentY);
+      let displayLabel = modelName;
+      
+      // *** START TRUNCATION LOGIC ***
+      if (modelName.length > MAX_LABEL_LENGTH) {
+          displayLabel = modelName.substring(0, MAX_LABEL_LENGTH - 3) + "...";
+      }
+      // *** END TRUNCATION LOGIC ***
+
+      // Draw the (now shorter) label horizontally
+      ctx.fillText(displayLabel, xPos, currentY); 
+      
+      // NOTE: We don't need the internal save/restore/translate/rotate logic anymore.
     });
     ctx.restore();
   },
@@ -744,7 +792,7 @@ async function renderBarChart(selectedModelsData) {
           title: { display: true, text: "Model" },
           ticks: {
             callback: function (value, index, ticks) {
-              return ""; // Hide default labels
+              return "";
             },
           },
         },
@@ -944,7 +992,7 @@ async function updateDisplay() {
     return model.id && selectedModelIds.includes(model.id);
   });
 
-  // **** UPDATED: Apply sorting only for table view ****
+  // **** UPDATED: Apply sorting logic for table view ****
   if (currentView === "table") {
     const dataTypes = {
       name: "string",
@@ -959,6 +1007,12 @@ async function updateDisplay() {
     filteredModelsData.sort((a, b) => {
       let valA = parseValueForSort(a[currentSort.column], sortType);
       let valB = parseValueForSort(b[currentSort.column], sortType);
+
+      // Handle date objects for comparison
+      if (sortType === "date") {
+        valA = valA.getTime();
+        valB = valB.getTime();
+      }
 
       if (valA < valB) {
         return currentSort.direction === "asc" ? -1 : 1;
@@ -1037,12 +1091,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  // **** MAIN FIX: Data Loading & Initialization ****
   modelsData = await loadModelsData();
 
   if (modelsData && modelsData.length > 0) {
     populateModelSelection();
     setDynamicTimestamp();
 
+    // Attach event listeners for all buttons and interaction elements
     if (tableViewBtn)
       tableViewBtn.addEventListener("click", () => switchView("table"));
     if (barChartViewBtn)
@@ -1114,19 +1170,18 @@ document.addEventListener("DOMContentLoaded", async () => {
           } else {
             currentSort.column = sortKey;
             currentSort.direction = "asc";
-            // Default directions for certain columns
-            if (["inputPrice", "outputPrice", "contextWindow"].includes(sortKey)) {
+            // Default directions for certain columns: descending for higher numbers/newer dates
+            if (["inputPrice", "outputPrice", "contextWindow", "releaseDate"].includes(sortKey)) {
               currentSort.direction = "desc";
             }
-            if (sortKey === "releaseDate") {
-                currentSort.direction = "desc";
-            }
           }
+          // The updateDisplay function now handles the sorting and icon update.
           updateDisplay();
         });
       });
 
-    await switchView(currentView); // Initial view rendering
+    // Initial render
+    await switchView(currentView);
   } else {
     console.warn("No model data loaded. Check models.csv and console.");
     if (modelSelectionList)
