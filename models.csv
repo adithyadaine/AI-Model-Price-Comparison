@@ -55,6 +55,7 @@ NVIDIA,Llama 3.1 Nemotron 70B Instruct,131000,0.12,0.3,1/3/25,Supported
 NVIDIA,Llama 3.1 Nemotron 8B Instruct (BF16),131000,0.025,0.04,1/3/25,Supported
 DeepSeek,DeepSeek R1 Distill Qwen,128000,0.27,1.1,1/20/25,Superseded
 Moonshot AI,Kimi K2,128000,0.15,2.5,12/21/24,Supported; competitor to GPT & Claude
+Moonshot AI,Kimi K2 Thinking,256000,1,3,11/6/25,Supported; open-source; best-in-class reasoning and agentic capabilities
 Vercel,v0-1.0-md (Medium-sized Model),128000,3,15,12/19/24,Supported
 Anthropic,Claude Opus 4,200000,15,75,5/22/25,Superseded
 OpenAI,GPT-4o,128000,2.5,10,11/14/24,Deprecated for ChatGPT consumers as of Aug 2025 but available via API
@@ -108,15 +109,3 @@ DeepSeek,DeepSeek-V3-0324,163000,0.34,0.88,3/24/25,Stable
 DeepSeek,DeepSeek-V3.1,163000,0.56,1.68,8/21/25,Stable 
 DeepSeek,DeepSeek-V3.1-Terminus,163000,0.56,1.68,9/22/25,Stable 
 DeepSeek,DeepSeek-V3.2-Exp,128000,0.28,0.42,9/29/25,Experimental
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
