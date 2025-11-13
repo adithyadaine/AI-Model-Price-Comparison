@@ -8,7 +8,7 @@ Mistral,Mistral NeMo,128000,0.3,0.3,7/18/24,Supported
 OpenAI,GPT-5,400000,10,40,8/7/25,"Current flagship model, default in ChatGPT"
 OpenAI,GPT-5 Mini,400000,2,8,8/7/25,Supported variant
 OpenAI,GPT-5 Nano,400000,0.5,2,8/7/25,Supported light variant
-OpenAI,GPT-5-Codex Mini,"400,000",0.5,2,11/7/25,"lightweight, efficient coding-focused variant of GPT-5 Codex; designed for fast code generation with cost efficiency; available via API and IDEsÊ"
+OpenAI,GPT-5-Codex Mini,400000,0.5,2,11/7/25,"lightweight, efficient coding-focused variant of GPT-5 Codex; designed for fast code generation with cost efficiency; available via API and IDEsÊ"
 Google,Gemini 2.5 Pro (200k),1000000,1.25,10,6/17/25,"Stable release, actively supported"
 Google,Gemini 2.5 Pro (>200k),1000000,2.5,15,6/17/25,Supported
 xAI (Grok),Grok 4 Heavy,256000,6,30,7/9/25,Released
