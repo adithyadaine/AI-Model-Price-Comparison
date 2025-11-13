@@ -1,7 +1,5 @@
 Vendor,Model,Context (tokens),Input Price ($/1M),Output Price ($/1M),Release Date,Status
-OpenAI,gpt-4o-transcribe-diarize,Ð,Ð,Ð,10/17/25,ASR with diarization endpoint released Oct 17 2025 via Audio/Realtime API
 Google,Gemini Enterprise,1000000,0.075,0.3,10/8/25,Platform for internal-data conversational deployments
-OpenAI,gpt-image-1-mini,Ð,Ð,Ð,10/7/25,"Lightweight image understanding/generation, available via Azure deployments"
 Anthropic,Claude Haiku 4.5,200000,0.8,4,10/15/25,"Released Oct 15 2025; compact, cost-effective on free plans"
 Google,Gemini 2.5 Computer Use,1000000,0.3,2.5,10/6/25,Specialized UI-interaction model via API since Oct 6 2025
 Zhipu AI,GLM-4.6,200000,0.6,2.2,9/30/25,"Released September 30, 2025"
@@ -10,6 +8,7 @@ Mistral,Mistral NeMo,128000,0.3,0.3,7/18/24,Supported
 OpenAI,GPT-5,400000,10,40,8/7/25,"Current flagship model, default in ChatGPT"
 OpenAI,GPT-5 Mini,400000,2,8,8/7/25,Supported variant
 OpenAI,GPT-5 Nano,400000,0.5,2,8/7/25,Supported light variant
+OpenAI,GPT-5-Codex Mini,"400,000",0.5,2,11/7/25,"lightweight, efficient coding-focused variant of GPT-5 Codex; designed for fast code generation with cost efficiency; available via API and IDEsÊ"
 Google,Gemini 2.5 Pro (200k),1000000,1.25,10,6/17/25,"Stable release, actively supported"
 Google,Gemini 2.5 Pro (>200k),1000000,2.5,15,6/17/25,Supported
 xAI (Grok),Grok 4 Heavy,256000,6,30,7/9/25,Released
@@ -109,3 +108,7 @@ DeepSeek,DeepSeek-V3-0324,163000,0.34,0.88,3/24/25,Stable
 DeepSeek,DeepSeek-V3.1,163000,0.56,1.68,8/21/25,Stable 
 DeepSeek,DeepSeek-V3.1-Terminus,163000,0.56,1.68,9/22/25,Stable 
 DeepSeek,DeepSeek-V3.2-Exp,128000,0.28,0.42,9/29/25,Experimental
+OpenAI,GPT-5.1 Instant,128000,2.5,20,11/12/25,"Fastest response, elevated throughput and context, Pro/Ent"
+OpenAI,GPT-5.1 Thinking,196000,2.5,20,11/12/25,"Longest context, advanced handling, Pro/Ent"
+OpenAI,GPT-5.1 Reasoning,Enterprise/Pro,2.5,20,11/24/25,"Advanced reasoning, for business use cases, enterprise only"
+OpenAI,GPT-5.1 Pro,Higher limits,2.5,20,11/24/25,"Highest API limits, premium support and custom features"
