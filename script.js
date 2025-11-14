@@ -173,10 +173,60 @@ function getPreloadedImage(logoFilename) {
   return null;
 }
 
+// **** CRITICAL IMPROVEMENT: Robust CSV Line Parsing Function (Corrected) ****
+/**
+ * Parses a single CSV line into an array of values, respecting double quotes
+ * for fields containing commas. Handles empty fields.
+ * Does NOT handle escaped double quotes within quoted fields (e.g., `""`).
+ * @param {string} line The CSV line to parse.
+ * @returns {string[]} An array of trimmed string values.
+ */
+function parseCsvLineRobust(line) {
+    const values = [];
+    // This regex ensures we capture fields separated by commas,
+    // handling double-quoted fields that may contain commas.
+    // Group 1: captures content of a quoted field (without quotes)
+    // Group 2: captures content of an unquoted field
+    // It looks for a comma OR start of line, then a quoted field OR an unquoted field.
+    const csvRegex = /(?:^|,)(?:"([^"]*)"|([^,]*))/g;
+    let match;
+
+    while ((match = csvRegex.exec(line)) !== null) {
+        let value;
+        // If a quoted value was found, it's in match[1]. Otherwise, unquoted in match[2].
+        // If both are undefined, it was an empty field.
+        if (match[1] !== undefined) {
+            value = match[1]; // Value from a quoted field
+        } else if (match[2] !== undefined) {
+            value = match[2]; // Value from an unquoted field
+        } else {
+            value = ''; // Should be an empty field, e.g. two commas together ",,"
+        }
+        
+        // Clean up any 'Ð' characters and trim whitespace
+        values.push(value.replace(/Ð/g, '').trim());
+
+        // Important: If the regex didn't consume any characters, it means we're stuck
+        // (e.g., at the end of the string). Increment lastIndex to prevent infinite loops.
+        if (match.index === csvRegex.lastIndex) {
+            csvRegex.lastIndex++;
+        }
+    }
+
+    // Special handling for empty lines or lines that correctly parse to a single empty string
+    // if `line.trim()` is empty.
+    if (line.trim() === "" && values.length === 1 && values[0] === "") {
+        return [];
+    }
+
+    return values;
+}
+
+
 // --- CSV Processing Functions ---
-// **** CRITICAL FIX: Simplified CSV Parsing Logic ****
+// **** UPDATED: Simplified CSV Parsing Logic to use the robust parser ****
 function parseCSV(csvText) {
-  console.log("Starting CSV Parse with simplified robust parser...");
+  console.log("Starting CSV Parse with robust parser...");
 
   // 1. Normalize line endings and trim whitespace from the whole file
   const normalizedText = csvText.replace(/\r\n/g, '\n').trim();
@@ -187,27 +237,8 @@ function parseCSV(csvText) {
     return [];
   }
 
-  // Simplified and more reliable CSV line parsing (handles quoted commas, but not quoted quotes)
-  function parseLine(line) {
-    const csvRegex = /("([^"]*)"|[^,]*)(,|$)/g;
-    const values = [];
-    let match;
-    while ((match = csvRegex.exec(line))) {
-      // Group 2 is the quoted content (if it exists)
-      const value = match[2] !== undefined ? match[2] : match[1];
-      values.push(value ? value.trim() : "");
-      if (!match[4]) break; // Stop if there's no trailing comma (end of line)
-    }
-    // Handle the specific format of your CSV file which seems to rely on simple splitting for unquoted fields
-    return line.split(',').map(v => {
-        // Simple trim and replacement for non-standard characters like 'Ð' in your CSV
-        const trimmed = v.trim();
-        return trimmed.replace(/Ð/g, ''); 
-    });
-  }
-
-  // Use the reliable string splitting method for header and data processing
-  const headers = lines[0].split(',').map(h => h.trim());
+  // Use the robust string splitting method for header
+  const headers = parseCsvLineRobust(lines[0]);
   
   const vendorIdx = headers.indexOf("Vendor");
   const modelIdx = headers.indexOf("Model");
@@ -238,20 +269,12 @@ function parseCSV(csvText) {
   dataRows.forEach((line, rowIndex) => {
     if (line.trim() === "") return;
 
-    // Use a simple split since your CSV doesn't rely heavily on quoted fields containing commas
-    const values = line.split(',').map(v => {
-        const trimmed = v.trim();
-        // Clean up the non-standard characters (like the 'Ð') or surrounding quotes
-        if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
-            return trimmed.slice(1, -1).trim();
-        }
-        return trimmed.replace(/Ð/g, '').trim(); 
-    });
-
+    // Use the robust parsing for data lines
+    const values = parseCsvLineRobust(line);
 
     // Ensure we have enough columns to proceed
+    // This is a safety net; the robust parser should ideally return correct length
     if (values.length < headers.length) {
-      // Fill missing trailing columns with empty strings for safer indexing
       while (values.length < headers.length) {
           values.push("");
       }
@@ -1052,27 +1075,65 @@ function updateSortIcons() {
   });
 }
 
-function setDynamicTimestamp() {
+// **** NEW: Fetch Last Updated Timestamp from GitHub API ****
+// REMEMBER TO REPLACE THESE PLACEHOLDERS WITH YOUR ACTUAL GITHUB DETAILS!
+const GITHUB_USERNAME = "adithyadaine"; // e.g., "your-github-username"
+const GITHUB_REPO_NAME = "AI-Model-Price-Comparison"; // e.g., "your-repo-name"
+const CSV_FILE_PATH = "models.csv"; // Path to your CSV file within the repo
+
+async function setLastUpdatedTimestampFromGithub() {
   if (!dynamicTimestampSpan) {
     console.warn("Dynamic timestamp span not found.");
     return;
   }
-  const now = new Date();
-  const options = {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
-    hour12: true,
-  };
-  const formattedTimestamp = new Intl.DateTimeFormat("en-US", options)
-    .format(now)
-    .replace(" at", ",");
-  dynamicTimestampSpan.textContent = formattedTimestamp;
-  console.log("Timestamp updated:", dynamicTimestampSpan.textContent);
+
+  // Display a loading message
+  dynamicTimestampSpan.textContent = "Fetching latest update...";
+
+  const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO_NAME}/commits?path=${CSV_FILE_PATH}&page=1&per_page=1`;
+
+  try {
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      // Check for GitHub API rate limit specifically
+      if (response.status === 403 && response.headers.get('X-RateLimit-Remaining') === '0') {
+        throw new Error("GitHub API rate limit exceeded. Please try again later.");
+      }
+      throw new Error(`GitHub API error! status: ${response.status} - ${response.statusText}`);
+    }
+
+    const commits = await response.json();
+
+    if (commits && commits.length > 0) {
+      const lastCommitDateStr = commits[0].commit.author.date; // e.g., "2023-10-27T10:00:00Z"
+      const lastCommitDate = new Date(lastCommitDateStr);
+
+      const options = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        hour12: true,
+      };
+      const formattedTimestamp = new Intl.DateTimeFormat("en-US", options)
+        .format(lastCommitDate)
+        .replace(" at", ",");
+      
+      dynamicTimestampSpan.textContent = formattedTimestamp;
+      console.log("Last updated timestamp from GitHub:", formattedTimestamp);
+    } else {
+      dynamicTimestampSpan.textContent = "Could not fetch update date (no commits found for CSV).";
+      console.warn("GitHub API returned no commits for models.csv.");
+    }
+  } catch (error) {
+    console.error("Failed to fetch last updated date from GitHub:", error);
+    // Truncate error message for display if it's too long
+    const displayError = error.message.length > 80 ? error.message.substring(0, 77) + "..." : error.message;
+    dynamicTimestampSpan.textContent = `Error fetching update date: ${displayError}`;
+  }
 }
 
 // --- Initialization ---
@@ -1096,7 +1157,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (modelsData && modelsData.length > 0) {
     populateModelSelection();
-    setDynamicTimestamp();
+    // **** CHANGED: Call the new function to fetch timestamp from GitHub ****
+    await setLastUpdatedTimestampFromGithub();
 
     // Attach event listeners for all buttons and interaction elements
     if (tableViewBtn)
