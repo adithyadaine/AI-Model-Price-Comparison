@@ -1,0 +1,172 @@
+Vendor,Model,Context (tokens),Input Price ($/1M),Output Price ($/1M),Release Date,Status
+AI21 Labs,Jamba 1.7 Mini,258000,$0.20 ,$0.40 ,7/1/25,Open weights
+AI21 Labs,Jamba 1.7 Large,256000,$2.00 ,$8.00 ,7/1/25,Open weights
+AI21 Labs,Jamba 1.6 Large,256000,$2.00 ,$8.00 ,3/1/25,Open weights
+AI21 Labs,Jamba 1.6 Mini,256000,$0.20 ,$0.40 ,3/1/25,Open weights
+Alibaba,Qwen3 235B A22B 2507 (Reasoning),256000,$0.70 ,$8.40 ,7/1/25,Open weights
+Alibaba,Qwen3 Max Thinking,262000,$1.20 ,$6.00 ,11/1/25,Proprietary
+Alibaba,Qwen3 Max,262000,$1.20 ,$6.00 ,9/1/25,Proprietary
+Alibaba,QwQ 32B,131000,$0.66 ,$1.00 ,3/1/25,Open weights
+Alibaba,Qwen3 32B (Reasoning),33000,$0.70 ,$8.40 ,4/1/25,Open weights
+Alibaba,Qwen3 8B (Reasoning),131000,$0.18 ,$2.10 ,4/1/25,Open weights
+Alibaba,Qwen3 4B (Non-reasoning),32000,$0.11 ,$0.42 ,4/1/25,Open weights
+Alibaba,Qwen3 VL 8B Instruct,256000,$0.18 ,$0.70 ,10/1/25,Open weights
+Alibaba,Qwen3 1.7B (Non-reasoning),32000,$0.11 ,$0.42 ,4/1/25,Open weights
+Alibaba,Qwen2.5 Instruct 72B,131000,$0.00 ,$0.00 ,9/1/24,Open weights
+Alibaba,Qwen2.5 Coder Instruct 32B,131000,$0.20 ,$0.20 ,11/1/24,Open weights
+Amazon Bedrock,Nova Premier,1000000,$2.50 ,$12.50 ,4/1/25,Proprietary
+Amazon Bedrock,Nova Pro,300000,$0.80 ,$3.20 ,12/1/24,Proprietary
+Amazon Bedrock,Nova Lite,300000,$0.06 ,$0.24 ,12/1/24,Proprietary
+Amazon Bedrock,Nova Micro,130000,$0.04 ,$0.14 ,12/1/24,Proprietary
+Anthropic,Claude 4.5 Sonnet,200000,$3.00 ,$15.00 ,5/1/25,"Proprietary, Reasoning"
+Anthropic,Claude 4.5 Sonnet (non-reasoning),200000,$3.00 ,$15.00 ,5/1/25,Proprietary
+Anthropic,Claude 4.1 Opus,200000,$15.00 ,$75.00 ,4/1/25,"Proprietary, Reasoning"
+Anthropic,Claude 4.1 Opus (non-reasoning),200000,$15.00 ,$75.00 ,4/1/25,Proprietary
+Anthropic,Claude 4 Sonnet,200000,$3.00 ,$15.00 ,2/1/25,"Proprietary, Reasoning"
+Anthropic,Claude 4 Sonnet (non-reasoning),200000,$3.00 ,$15.00 ,2/1/25,Proprietary
+Anthropic,Claude 4 Opus,200000,$15.00 ,$75.00 ,2/1/25,"Proprietary, Reasoning"
+Anthropic,Claude 4 Opus (non-reasoning),200000,$15.00 ,$75.00 ,2/1/25,Proprietary
+Anthropic,Claude 3.7 Sonnet,200000,$3.00 ,$15.00 ,12/1/24,"Proprietary, Reasoning"
+Anthropic,Claude 3.7 Sonnet (non-reasoning),200000,$3.00 ,$15.00 ,12/1/24,Proprietary
+Anthropic,Claude 3.5 Sonnet (Oct '24),200000,$3.00 ,$15.00 ,10/22/24,Proprietary
+Anthropic,Claude 3.5 Sonnet (June '24),200000,$3.00 ,$15.00 ,6/20/24,Proprietary
+Anthropic,Claude 3.5 Haiku,200000,$0.80 ,$4.00 ,11/4/24,Proprietary
+Anthropic,Claude 3 Opus,200000,$15.00 ,$75.00 ,3/4/24,Proprietary
+Anthropic,Claude 3 Sonnet,200000,$3.00 ,$15.00 ,3/4/24,Proprietary
+Anthropic,Claude 3 Haiku,200000,$0.25 ,$1.25 ,3/13/24,Proprietary
+Anthropic,Claude 2.1,200000,$8.00 ,$24.00 ,11/21/23,Proprietary
+Anthropic,Claude 2.0,100000,$8.00 ,$24.00 ,7/11/23,Proprietary
+Anthropic,Claude Instant 1.2,100000,$0.80 ,$2.40 ,8/9/23,Proprietary
+Cohere,Command A,256000,$2.50 ,$10.00 ,3/1/25,Open weights
+Cohere,Command-R+ (Aug '24),128000,$2.50 ,$10.00 ,8/1/24,Open weights
+Cohere,Command-R+ (Apr '24),128000,$3.00 ,$15.00 ,4/1/24,Open weights
+Cohere,Command-R (Aug '24),128000,$0.15 ,$0.60 ,8/1/24,Open weights
+Cohere,Command-R (Mar '24),128000,$0.50 ,$1.50 ,3/1/24,Open weights
+Cohere,Aya Expanse 32B,128000,$0.50 ,$1.50 ,10/1/24,Open weights
+Cohere,Aya Expanse 8B,8000,$0.50 ,$1.50 ,10/1/24,Open weights
+DeepSeek,DeepSeek V3.1 Terminus,128000,$0.27 ,$1.10 ,2/1/25,"Open weights, Reasoning"
+DeepSeek,DeepSeek V3.1 Terminus (non-reasoning),128000,$0.27 ,$1.10 ,2/1/25,Open weights
+DeepSeek,DeepSeek V3.2 Exp,128000,$0.00 ,$0.00 ,3/1/25,"Open weights, Reasoning"
+DeepSeek,DeepSeek V3.2 Exp (non-reasoning),128000,$0.00 ,$0.00 ,3/1/25,Open weights
+DeepSeek,DeepSeek V3.1,128000,$0.27 ,$1.10 ,1/20/25,"Open weights, Reasoning"
+DeepSeek,DeepSeek V3.1 (non-reasoning),128000,$0.27 ,$1.10 ,1/20/25,Open weights
+DeepSeek,DeepSeek R1 0528,128000,$0.55 ,$2.19 ,5/28/25,"Open weights, Reasoning"
+DeepSeek,DeepSeek R1 (Jan '25),128000,$0.55 ,$2.19 ,1/20/25,"Open weights, Reasoning"
+DeepSeek,DeepSeek V3 0324,128000,$0.27 ,$1.10 ,3/24/25,Open weights
+DeepSeek,DeepSeek R1 Distill Qwen 32B,128000,$0.14 ,$0.28 ,1/27/25,"Open weights, Reasoning"
+DeepSeek,DeepSeek V3 (Dec '24),128000,$0.27 ,$1.10 ,12/26/24,Open weights
+DeepSeek,DeepSeek V2.5 (Sep '24),128000,$0.14 ,$0.28 ,9/6/24,Open weights
+DeepSeek,DeepSeek V2.5 (Jul '24),128000,$0.14 ,$0.28 ,7/4/24,Open weights
+DeepSeek,DeepSeek-V2-Chat,128000,$0.14 ,$0.28 ,5/6/24,Open weights
+DeepSeek,DeepSeek-Coder-V2,128000,$0.14 ,$0.28 ,6/17/24,Open weights
+Google,Gemini 2.5 Pro,1000000,$1.25 ,$10.00 ,6/1/25,Proprietary
+Google,Gemini 2.5 Flash (Reasoning),1000000,$0.30 ,$1.20 ,5/1/25,Proprietary
+Google,Gemini 2.5 Flash (Non-reasoning),1000000,$0.15 ,$0.60 ,5/1/25,Proprietary
+Google,Gemini 2.5 Flash-Lite (Non-reasoning),1000000,$0.10 ,$0.40 ,6/1/25,Proprietary
+Google,Gemini 2.5 Flash-Lite (Reasoning),1000000,$0.10 ,$0.40 ,6/1/25,Proprietary
+Google,Gemini 2.5 Flash Preview (Sep '25) (Non-reasoning),1000000,$0.15 ,$0.60 ,9/1/25,Proprietary
+Google,Gemini 2.5 Flash Preview (Sep '25) (Reasoning),1000000,$0.30 ,$1.20 ,9/1/25,Proprietary
+Google,Gemini 2.5 Flash-Lite Preview (Sep '25) (Non-reasoning),1000000,$0.10 ,$0.40 ,9/1/25,Proprietary
+Google,Gemini 2.5 Flash-Lite Preview (Sep '25) (Reasoning),1000000,$0.10 ,$0.40 ,9/1/25,Proprietary
+Google,Gemini 2.0 Flash (experimental),1000000,$0.00 ,$0.00 ,12/1/24,Proprietary
+Google,Gemini 1.5 Pro (Sep '24),2000000,$0.00 ,$0.00 ,9/1/24,Proprietary
+Google,Gemini 1.5 Flash-8B,1000000,$0.04 ,$0.15 ,10/1/24,Proprietary
+Google,Gemini 1.5 Flash (Sep '24),1000000,$0.00 ,$0.00 ,9/1/24,Proprietary
+Google,Gemini 1.0 Pro,33000,$0.00 ,$0.00 ,12/1/23,Proprietary
+Google,Gemini 1.0 Ultra,33000,$0.00 ,$0.00 ,12/1/23,Proprietary
+Meta,Llama 4 Maverick,1000000,$0.27 ,$0.85 ,4/1/25,Open weights
+Meta,Llama 4 Scout,10000000,$0.14 ,$0.54 ,4/1/25,Open weights
+Meta,Llama 3.1 Instruct 405B,128000,$3.75 ,$6.75 ,7/1/24,Open weights
+Meta,Llama 3.3 Instruct 70B,128000,$0.54 ,$0.71 ,12/1/24,Open weights
+Meta,Llama 3.1 Instruct 70B,128000,$0.72 ,$0.72 ,7/1/24,Open weights
+Meta,Llama 3.2 Instruct 90B (Vision),128000,$0.72 ,$0.72 ,9/1/24,Open weights
+Meta,Llama 3.1 Instruct 8B,128000,$0.10 ,$0.10 ,7/1/24,Open weights
+Meta,Llama 3.2 Instruct 11B (Vision),128000,$0.16 ,$0.16 ,9/1/24,Open weights
+Meta,Llama 3 Instruct 70B,8000,$0.65 ,$0.88 ,4/1/24,Open weights
+Meta,Llama 2 Chat 7B,4000,$0.05 ,$0.25 ,7/1/23,Open weights
+Meta,Llama 3.2 Instruct 3B,128000,$0.06 ,$0.06 ,9/1/24,Open weights
+Meta,Llama 3.2 Instruct 1B,128000,$0.05 ,$0.08 ,9/1/24,Open weights
+Meta,Llama 3 Instruct 8B,8000,$0.04 ,$0.15 ,4/1/24,Open weights
+Meta,Llama 2 Chat 70B,4000,$0.00 ,$0.00 ,7/1/23,Open weights
+Meta,Llama 2 Chat 13B,4000,$0.00 ,$0.00 ,7/1/23,Open weights
+Meta,Llama 65B,2000,$0.00 ,$0.00 ,2/1/23,Open weights
+MiniMax,MiniMax-Text-01,4000000,$0.20 ,$1.10 ,1/1/25,Open weights
+MiniMax,MiniMax-M2,205000,$0.30 ,$1.20 ,10/1/25,Open weights
+Mistral,Magistral Medium 1.2,128000,$0.30 ,$1.50 ,9/16/25,Proprietary
+Mistral,Mistral Large 2 (Nov '24),1000000,$0.80 ,$2.40 ,11/1/24,Proprietary
+Mistral,Mistral Small 3.2,128000,$0.10 ,$0.30 ,12/1/24,Open weights
+Mistral,Mixtral 8x7B Instruct,32000,$0.24 ,$0.24 ,12/1/23,Open weights
+Mistral,Ministral 8B,128000,$0.10 ,$0.10 ,10/1/24,Open weights
+Mistral,Mistral NeMo,128000,$0.15 ,$0.15 ,7/1/24,Open weights
+Mistral,Mistral Saba,32000,$0.00 ,$0.00 ,2/1/25,Proprietary
+Mistral,Mistral 7B Instruct,8000,$0.25 ,$0.25 ,9/1/23,Open weights
+Mistral,Mistral Medium 3,128000,$0.40 ,$2.00 ,5/1/25,Proprietary
+Mistral,Mistral Medium 3.1,128000,$0.40 ,$2.00 ,8/1/25,Proprietary
+Mistral,Mistral Small 3,32000,$0.10 ,$0.30 ,1/1/25,Open weights
+Mistral,Mistral Small 3.1,128000,$0.10 ,$0.30 ,3/1/25,Open weights
+Mistral,Mistral Large (Feb '24),33000,$4.00 ,$12.00 ,2/1/24,Proprietary
+Mistral,Mistral Small (Sep '24),33000,$0.20 ,$0.60 ,9/1/24,Open weights
+Mistral,Ministral 3B,128000,$0.04 ,$0.04 ,10/1/24,Proprietary
+Mistral,Codestral-Mamba,256000,$0.00 ,$0.00 ,7/1/24,Open weights
+Mistral,Devstral Medium,256000,$0.40 ,$2.00 ,7/1/25,Proprietary
+Mistral,Codestral (Jan '25),256000,$0.30 ,$0.90 ,1/1/25,Proprietary
+Mistral,Devstral Small (Jul '25),256000,$0.10 ,$0.30 ,7/1/25,Open weights
+Mistral,Mistral Medium,33000,$2.75 ,$8.10 ,12/1/23,Proprietary
+Mistral,Codestral (May '24),33000,$0.00 ,$0.00 ,5/1/24,Open weights
+Moonshot AI,Kimi K2 Thinking,256000,$0.60 ,$2.50 ,11/1/25,Open weights
+Moonshot AI,Kimi K2 0905,256000,$0.99 ,$2.50 ,9/1/25,Open weights
+Moonshot AI,Kimi K2,128000,$0.60 ,$2.50 ,7/1/25,Open weights
+NVIDIA,Llama Nemotron Super 49B v1.5 (Non-reasoning),128000,$0.10 ,$0.40 ,7/1/25,Open weights
+NVIDIA,Llama Nemotron Super 49B v1.5 (Reasoning),128000,$0.10 ,$0.40 ,7/1/25,Open weights
+NVIDIA,Llama 3.1 Nemotron Ultra 253B v1 (Reasoning),128000,$0.60 ,$1.80 ,4/1/25,Open weights
+NVIDIA,NVIDIA Nemotron Nano 9B V2 (Non-reasoning),131000,$0.04 ,$0.16 ,8/1/25,Open weights
+NVIDIA,NVIDIA Nemotron Nano 9B V2 (Reasoning),131000,$0.04 ,$0.16 ,8/1/25,Open weights
+NVIDIA,Llama 3.3 Nemotron Super 49B v1 (Non-reasoning),128000,$0.00 ,$0.00 ,3/1/25,Open weights
+NVIDIA,Llama 3.3 Nemotron Super 49B v1 (Reasoning),128000,$0.00 ,$0.00 ,3/1/25,Open weights
+NVIDIA,Llama 3.1 Nemotron Nano 4B v1.1 (Reasoning),128000,$0.00 ,$0.00 ,5/1/25,Open weights
+NVIDIA,Llama 3.1 Nemotron Instruct 70B,128000,$0.60 ,$0.60 ,10/1/24,Open weights
+OpenAI,GPT-4o mini,128000,$0.15 ,$0.60 ,7/18/24,Proprietary
+OpenAI,GPT-4o (Nov),128000,$2.50 ,$10.00 ,11/1/24,Proprietary
+OpenAI,o1,200000,$15.00 ,$60.00 ,12/17/24,"Proprietary, Reasoning"
+OpenAI,o1-mini,128000,$3.00 ,$12.00 ,9/12/24,"Proprietary, Reasoning"
+OpenAI,o1-preview,128000,$15.00 ,$60.00 ,9/12/24,"Proprietary, Reasoning"
+OpenAI,o1-pro,128000,$150.00 ,$600.00 ,12/1/24,"Proprietary, Reasoning"
+OpenAI,o3,200000,$10.00 ,$40.00 ,1/31/25,"Proprietary, Reasoning"
+OpenAI,o3-mini,200000,$1.10 ,$4.40 ,1/31/25,"Proprietary, Reasoning"
+OpenAI,o3-mini (high),200000,$2.20 ,$8.80 ,1/31/25,"Proprietary, Reasoning"
+OpenAI,o3-pro,200000,$40.00 ,$160.00 ,1/31/25,"Proprietary, Reasoning"
+OpenAI,GPT-5 (ChatGPT),1000000,$5.00 ,$15.00 ,5/1/25,"Proprietary, Reasoning"
+OpenAI,GPT-5 (high),1000000,$10.00 ,$30.00 ,5/1/25,"Proprietary, Reasoning"
+OpenAI,GPT-5.1,1000000,$7.50 ,$22.50 ,8/1/25,"Proprietary, Reasoning"
+OpenAI,GPT-5.1 (high),1000000,$15.00 ,$45.00 ,8/1/25,"Proprietary, Reasoning"
+OpenAI,GPT-4 Turbo,128000,$10.00 ,$30.00 ,4/9/24,Proprietary
+OpenAI,GPT-3.5 Turbo,16000,$0.50 ,$1.50 ,11/6/23,Proprietary
+OpenAI,gpt-oss-120B (high),131000,$0.15 ,$0.60 ,8/1/25,Open weights
+OpenAI,gpt-oss-20B (high),131000,$0.06 ,$0.20 ,8/1/25,Open weights
+OpenAI,gpt-oss-120B (low),131000,$0.15 ,$0.59 ,8/1/25,Open weights
+OpenAI,gpt-oss-20B (low),131000,$0.06 ,$0.20 ,8/1/25,Open weights
+OpenAI,GPT-5 mini (high),400000,$0.25 ,$2.00 ,8/1/25,Proprietary
+OpenAI,GPT-5 Codex (high),400000,$1.25 ,$10.00 ,9/1/25,Proprietary
+OpenAI,GPT-4.1,1000000,$2.00 ,$8.00 ,4/1/25,Proprietary
+OpenAI,GPT-4.1 mini,1000000,$0.40 ,$1.60 ,4/1/25,Proprietary
+Perplexity AI,Sonar Reasoning Pro,127000,$0.00 ,$0.00 ,1/1/25,Proprietary
+Perplexity AI,Sonar Reasoning,127000,$1.00 ,$5.00 ,1/1/25,Proprietary
+Perplexity AI,Sonar,127000,$1.00 ,$1.00 ,1/1/25,Proprietary
+Perplexity AI,Sonar Pro,200000,$3.00 ,$15.00 ,1/1/25,Proprietary
+Perplexity AI,R1 1776,128000,$0.00 ,$0.00 ,2/1/25,Open weights
+xAI,Grok 4,256000,$3.00 ,$15.00 ,7/1/25,Proprietary
+xAI,Grok 4 Fast (Reasoning),2000000,$0.20 ,$0.60 ,9/1/25,Proprietary
+xAI,Grok 3 mini Reasoning (high),1000000,$0.30 ,$0.60 ,2/1/25,Proprietary
+xAI,Grok Code Fast 1,256000,$0.20 ,$1.50 ,8/1/25,Proprietary
+xAI,Grok 3,1000000,$3.00 ,$15.00 ,2/1/25,Proprietary
+xAI,Grok 3 Reasoning Beta,1000000,$0.00 ,$0.00 ,2/1/25,Proprietary
+xAI,Grok 4 Fast (Non-reasoning),2000000,$0.20 ,$0.50 ,9/1/25,Proprietary
+xAI,Grok 2 (Dec '24),131000,$2.00 ,$10.00 ,12/1/24,Open weights
+xAI,Grok Beta,128000,$0.00 ,$0.00 ,8/1/24,Proprietary
+xAI,Grok-1,8000,$0.00 ,$0.00 ,3/1/24,Open weights
+Zhipu AI,GLM-4.6 (Reasoning),200000,$0.60 ,$2.20 ,9/1/25,Open weights
+Zhipu AI,GLM-4.5 (Reasoning),128000,$0.57 ,$2.20 ,7/1/25,Open weights
+Zhipu AI,GLM-4.5-Air,128000,$0.20 ,$1.10 ,7/1/25,Open weights
+Zhipu AI,GLM-4.6 (Non-reasoning),200000,$0.60 ,$2.15 ,9/1/25,Open weights
+Zhipu AI,GLM-4.5V (Reasoning),64000,$0.55 ,$1.75 ,8/1/25,Open weights
+Zhipu AI,GLM-4.5V (Non-reasoning),64000,$0.60 ,$1.80 ,8/1/25,Open weights

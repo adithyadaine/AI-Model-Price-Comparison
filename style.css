@@ -42,7 +42,8 @@ body {
   padding-top: var(--header-height); /* Space for fixed header */
 }
 
-body.panel-open {
+body.panel-open,
+body.modal-open { /* NEW: Add modal-open to prevent body scroll */
   overflow: hidden;
 }
 
@@ -136,6 +137,32 @@ footer h3 {
   overflow-y: auto;
   box-sizing: border-box;
 }
+
+/* NEW: Model Search Input Styles */
+.model-search-wrapper {
+  padding: 0 0.5rem 1rem; /* Adjust padding as needed */
+  border-bottom: 1px solid var(--border-color); /* Separator */
+  margin-bottom: 1rem; /* Space below search */
+}
+
+#modelSearchInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  color: var(--text-color);
+  background-color: var(--content-bg);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#modelSearchInput:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+/* ----------------------------------*/
 
 body.panel-open .selection-panel {
   transform: translateX(0);
@@ -442,13 +469,23 @@ body.panel-open .overlay {
 }
 
 .price-tag.medium {
-  background-color: #fff3cd; /* Light Yellow */
-  color: #856404; /* Dark Yellow */
+  background-color: #fff3cd;
+  color: #856404;
+  border-color: #ffeeba;
+}
+.price-tag.medium:hover {
+  background-color: #ffeeba;
+  color: #856404;
 }
 
 .price-tag.high {
-  background-color: #f8d7da; /* Light Red */
-  color: #721c24; /* Dark Red */
+  background-color: #f8d7da;
+  color: #721c24;
+  border-color: #f5c6cb;
+}
+.price-tag.high:hover {
+  background-color: #f5c6cb;
+  color: #721c24;
 }
 
 /* --- Main Content Area --- */
@@ -595,10 +632,17 @@ body.panel-open .overlay {
 /* Table Styles */
 .table-container {
   overflow-x: auto;
+  /* NEW: Essential for sticky header to work, defines the scrollable area */
+  max-height: calc(100vh - var(--header-height) - 220px); /* Adjust as needed */
+  overflow-y: auto;
+  /* Also add a nice border-radius and shadow to the container for better look if it scrolls */
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
 }
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate; /* NEW: Important for sticky headers with borders */
+  border-spacing: 0;         /* NEW: Important for sticky headers with borders */
   font-size: 0.9rem;
 }
 th,
@@ -614,50 +658,26 @@ th {
   background-color: #e9ecef; /* Light gray for table headers */
   font-weight: 500;
   color: var(--text-color);
+  /* NEW: Make header sticky */
+  position: sticky;
+  top: 0; /* Sticks to the top of its scrolling container */
+  z-index: 10; /* Ensures it stays above scrolling table body content */
+  /* Re-apply border color to bottom if it's missing due to sticky */
+  border-bottom-color: var(--border-color);
 }
 
-/* --- START: New Styles for Sorting --- */
-th[data-sort] {
-  cursor: pointer;
-  position: relative;
-  padding-right: 1.5em;
+/* Fix for borders on sticky headers, particularly first/last cell */
+th:first-child {
+  border-top-left-radius: var(--border-radius);
 }
-th[data-sort]:hover {
-  background-color: #dde6ef;
+th:last-child {
+  border-top-right-radius: var(--border-radius);
 }
-.sort-icon {
-  position: absolute;
-  right: 0.5em;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0.4;
-}
-th.asc .sort-icon,
-th.desc .sort-icon {
-  opacity: 1;
-}
-.sort-icon::before,
-.sort-icon::after {
-  content: "";
-  display: block;
-  border-style: solid;
-  border-width: 0 4px 4px 4px;
-  border-color: transparent transparent var(--secondary-color) transparent;
-}
-.sort-icon::before {
-  margin-bottom: 2px;
-}
-.sort-icon::after {
-  transform: rotate(180deg);
-}
-th:not(.asc):not(.desc) .sort-icon:hover {
-  opacity: 0.8;
-}
-th.asc .sort-icon::after {
-  opacity: 0.2;
-}
-th.desc .sort-icon::before {
-  opacity: 0.2;
+
+/* If the table has a border, ensure it shows consistently */
+.table-container table {
+  /* This ensures the table itself gets the rounded corners from its container */
+  border-radius: var(--border-radius);
 }
 /* --- END: New Styles for Sorting --- */
 
@@ -724,6 +744,89 @@ tbody tr:hover {
   text-align: right;
 }
 
+/* NEW: Model Detail Modal Styles */
+.model-detail-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex; /* Use flex for centering */
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  z-index: 1010; /* Above everything else, including selection panel */
+  visibility: hidden; /* Hide by default */
+  opacity: 0;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.model-detail-modal.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.modal-content {
+  background-color: var(--content-bg);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow-lg);
+  max-width: 500px; /* Max width for readability */
+  width: 90%; /* Responsive width */
+  position: relative;
+  max-height: 80vh; /* Max height to allow scrolling if content is long */
+  overflow-y: auto; /* Enable scrolling for modal body */
+  transform: translateY(20px); /* Small animation effect */
+  transition: transform 0.3s ease-out;
+}
+
+.model-detail-modal.show .modal-content {
+  transform: translateY(0);
+}
+
+.close-modal-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: var(--secondary-color);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.5rem;
+  transition: color 0.2s ease;
+}
+.close-modal-btn:hover {
+  color: var(--danger-color);
+}
+
+.modal-title {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.75rem;
+  color: var(--primary-color);
+  text-align: center;
+}
+
+.modal-body {
+  line-height: 1.8;
+  color: var(--text-color);
+}
+
+.modal-body p {
+  margin-bottom: 0.5rem;
+}
+
+.modal-model-logo {
+  display: block;
+  margin: 0 auto 1.5rem;
+  width: 48px; /* Larger logo in modal */
+  height: 48px;
+  object-fit: contain;
+}
+/* ------------------------------------ */
+
 /* --- Responsiveness --- */
 @media (max-width: 768px) {
   body {
@@ -750,6 +853,17 @@ tbody tr:hover {
     width: 85vw; /* Use viewport width for smaller devices */
     max-width: 300px; /* But never exceed 300px */
   }
+
+  /* Adjustments for search bar on smaller screens */
+  .model-search-wrapper {
+    padding: 0 0.25rem 0.75rem; /* Slightly less padding on mobile */
+    margin-bottom: 0.75rem;
+  }
+  #modelSearchInput {
+    font-size: 0.95rem;
+    padding: 0.6rem 0.8rem;
+  }
+  /* End search bar adjustments */
 
   .container {
     padding: 1rem;
@@ -807,4 +921,20 @@ tbody tr:hover {
     padding: 0.8rem 1rem;
     font-size: 0.8rem;
   }
+  /* Adjustments for model detail modal on smaller screens */
+  .modal-content {
+    padding: 1.5rem;
+    width: 95%;
+  }
+  .modal-title {
+    font-size: 1.5rem;
+  }
+  .close-modal-btn {
+    font-size: 1.5rem;
+  }
+  .modal-model-logo {
+    width: 40px;
+    height: 40px;
+  }
+  /* End modal adjustments */
 }
