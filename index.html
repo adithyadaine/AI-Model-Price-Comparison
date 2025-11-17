@@ -12,7 +12,6 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom/dist/chartjs-plugin-zoom.min.js"></script>
   </head>
   <body>
     <header>
@@ -70,12 +69,37 @@
           </button>
         </div>
       </div>
+
+      <!-- Search Input for Models -->
+      <div class="model-search-wrapper">
+        <input type="search" id="modelSearchInput" placeholder="Search models or providers..." aria-label="Search models or providers">
+      </div>
+      <!---------------------------------->
+
       <div id="model-selection-list">
         <p>Loading models...</p>
       </div>
     </aside>
 
     <div id="overlay" class="overlay"></div>
+
+    <!-- Model Detail Modal Structure -->
+    <div id="modelDetailModal" class="model-detail-modal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <button id="closeDetailModalBtn" class="close-modal-btn" aria-label="Close model details">&times;</button>
+        <h3 id="modalModelName" class="modal-title"></h3>
+        <div class="modal-body">
+          <img id="modalModelLogo" src="" alt="Model Logo" class="modal-model-logo">
+          <p><strong>Provider:</strong> <span id="modalModelProvider"></span></p>
+          <p><strong>Input Price ($/1M):</strong> <span id="modalInputPrice"></span></p>
+          <p><strong>Output Price ($/1M):</strong> <span id="modalOutputPrice"></span></p>
+          <p><strong>Context Window (tokens):</strong> <span id="modalContextWindow"></span></p>
+          <p><strong>Release Date:</strong> <span id="modalReleaseDate"></span></p>
+          <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+        </div>
+      </div>
+    </div>
+    <!------------------------------------->
 
     <div class="container">
       <main class="comparison-area">
@@ -105,7 +129,6 @@
           <div class="table-container">
             <table>
               <thead>
-                <!-- **** START: UPDATED TABLE HEADERS FOR SORTING **** -->
                 <tr>
                   <th data-sort="name">
                     Model Name<span class="sort-icon"></span>
@@ -126,7 +149,6 @@
                     Release Date<span class="sort-icon"></span>
                   </th>
                 </tr>
-                <!-- **** END: UPDATED TABLE HEADERS **** -->
               </thead>
               <tbody id="comparison-table-body">
                 <tr>
@@ -156,6 +178,8 @@
       <h3>Maintained with ❤️ by Adithya D M</h3>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

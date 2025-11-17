@@ -36,6 +36,20 @@ const dynamicTimestampSpan = document.getElementById("dynamicTimestamp");
 const filterLowBtn = document.getElementById("filterLowBtn");
 const filterMediumBtn = document.getElementById("filterMediumBtn");
 const filterHighBtn = document.getElementById("filterHighBtn");
+// NEW: Search input element
+const modelSearchInput = document.getElementById("modelSearchInput");
+// NEW: Model Detail Modal Elements
+const modelDetailModal = document.getElementById("modelDetailModal");
+const closeDetailModalBtn = document.getElementById("closeDetailModalBtn");
+const modalModelName = document.getElementById("modalModelName");
+const modalModelLogo = document.getElementById("modalModelLogo");
+const modalModelProvider = document.getElementById("modalModelProvider");
+const modalInputPrice = document.getElementById("modalInputPrice");
+const modalOutputPrice = document.getElementById("modalOutputPrice");
+const modalContextWindow = document.getElementById("modalContextWindow");
+const modalReleaseDate = document.getElementById("modalReleaseDate");
+const modalStatus = document.getElementById("modalStatus");
+// --------------------
 
 // --- Global Image Cache ---
 const imageCache = {};
@@ -92,35 +106,30 @@ function formatNumber(numStr) {
   return num.toString();
 }
 
-// **** UPDATED: Helper for parsing values for sorting ****
 function parseValueForSort(value, type) {
   if (value === "N/A" || value === null || value === undefined) {
-    // Treat N/A values as -Infinity for numbers/dates (to push them to the end when sorting ascending)
     return type === "date" ? new Date(0) : -Infinity;
   }
   if (type === "number") {
-    // Ensure numeric parsing for prices and context windows
     const num = parseFormattedNumber(String(value));
     return num !== null ? num : -Infinity;
   }
   if (type === "date") {
     const parts = String(value).split("/");
     if (parts.length === 3) {
-      // Handles MM/DD/YY format correctly by converting to YYYY
       const year = parseInt(parts[2], 10);
-      const fullYear = year < 50 ? 2000 + year : 1900 + year; // Basic 20th/21st century assumption
+      const fullYear = year < 50 ? 2000 + year : 1900 + year;
       const date = new Date(
         fullYear,
-        parseInt(parts[0], 10) - 1, // Month is 0-indexed
+        parseInt(parts[0], 10) - 1,
         parseInt(parts[1], 10)
       );
-      // Check if the resulting date is valid (e.g., handles "10/1/24" properly)
       if (isNaN(date.getTime())) return new Date(0);
       return date;
     }
-    return new Date(0); // Invalid date format pushed to bottom
+    return new Date(0);
   }
-  return String(value).toLowerCase(); // Default to string sort
+  return String(value).toLowerCase();
 }
 
 function getLogoFilename(vendorName) {
@@ -173,62 +182,35 @@ function getPreloadedImage(logoFilename) {
   return null;
 }
 
-// **** CRITICAL IMPROVEMENT: Robust CSV Line Parsing Function (Corrected) ****
-/**
- * Parses a single CSV line into an array of values, respecting double quotes
- * for fields containing commas. Handles empty fields.
- * Does NOT handle escaped double quotes within quoted fields (e.g., `""`).
- * @param {string} line The CSV line to parse.
- * @returns {string[]} An array of trimmed string values.
- */
+// --- CSV Processing Functions ---
 function parseCsvLineRobust(line) {
     const values = [];
-    // This regex ensures we capture fields separated by commas,
-    // handling double-quoted fields that may contain commas.
-    // Group 1: captures content of a quoted field (without quotes)
-    // Group 2: captures content of an unquoted field
-    // It looks for a comma OR start of line, then a quoted field OR an unquoted field.
     const csvRegex = /(?:^|,)(?:"([^"]*)"|([^,]*))/g;
     let match;
 
     while ((match = csvRegex.exec(line)) !== null) {
         let value;
-        // If a quoted value was found, it's in match[1]. Otherwise, unquoted in match[2].
-        // If both are undefined, it was an empty field.
         if (match[1] !== undefined) {
-            value = match[1]; // Value from a quoted field
+            value = match[1];
         } else if (match[2] !== undefined) {
-            value = match[2]; // Value from an unquoted field
+            value = match[2];
         } else {
-            value = ''; // Should be an empty field, e.g. two commas together ",,"
+            value = '';
         }
-        
-        // Clean up any 'Ð' characters and trim whitespace
         values.push(value.replace(/Ð/g, '').trim());
-
-        // Important: If the regex didn't consume any characters, it means we're stuck
-        // (e.g., at the end of the string). Increment lastIndex to prevent infinite loops.
         if (match.index === csvRegex.lastIndex) {
             csvRegex.lastIndex++;
         }
     }
-
-    // Special handling for empty lines or lines that correctly parse to a single empty string
-    // if `line.trim()` is empty.
     if (line.trim() === "" && values.length === 1 && values[0] === "") {
         return [];
     }
-
     return values;
 }
 
-
-// --- CSV Processing Functions ---
-// **** UPDATED: Simplified CSV Parsing Logic to use the robust parser ****
 function parseCSV(csvText) {
   console.log("Starting CSV Parse with robust parser...");
 
-  // 1. Normalize line endings and trim whitespace from the whole file
   const normalizedText = csvText.replace(/\r\n/g, '\n').trim();
   const lines = normalizedText.split('\n');
 
@@ -237,7 +219,6 @@ function parseCSV(csvText) {
     return [];
   }
 
-  // Use the robust string splitting method for header
   const headers = parseCsvLineRobust(lines[0]);
   
   const vendorIdx = headers.indexOf("Vendor");
@@ -248,19 +229,9 @@ function parseCSV(csvText) {
   const statusIdx = headers.indexOf("Status");
   const releaseDateIdx = headers.indexOf("Release Date");
 
-  const requiredIndices = [
-    vendorIdx,
-    modelIdx,
-    contextIdx,
-    inputPriceIdx,
-    outputPriceIdx,
-    statusIdx,
-  ];
+  const requiredIndices = [vendorIdx, modelIdx, contextIdx, inputPriceIdx, outputPriceIdx, statusIdx];
   if (requiredIndices.some((idx) => idx === -1)) {
-    console.error(
-      "One or more required CSV headers are missing. Check your models.csv file headers.",
-      headers
-    );
+    console.error("One or more required CSV headers are missing.", headers);
     return [];
   }
 
@@ -268,21 +239,13 @@ function parseCSV(csvText) {
   const parsedData = [];
   dataRows.forEach((line, rowIndex) => {
     if (line.trim() === "") return;
-
-    // Use the robust parsing for data lines
     const values = parseCsvLineRobust(line);
-
-    // Ensure we have enough columns to proceed
-    // This is a safety net; the robust parser should ideally return correct length
     if (values.length < headers.length) {
       while (values.length < headers.length) {
           values.push("");
       }
     }
-    
-    // Safety check for rows that might have been skipped by the initial split/trim
     if (values.every((v) => v === "")) return;
-
     const modelName = values[modelIdx];
     if (!modelName) {
       console.warn(`Model name missing at row ${rowIndex + 2}.`);
@@ -290,29 +253,19 @@ function parseCSV(csvText) {
     }
 
     const parsePrice = (priceValue) => {
-      if (
-        !priceValue ||
-        priceValue.includes("—") ||
-        priceValue === "Open Source" ||
-        priceValue === "Not Public"
-      )
+      if (!priceValue || priceValue.includes("—") || priceValue === "Open Source" || priceValue === "Not Public")
         return null;
-      // Clean up any stray symbols before parsing as float
       const cleanedPrice = priceValue.replace(/[^0-9.]/g, ''); 
       const num = parseFloat(cleanedPrice);
       return isNaN(num) ? null : num;
     };
 
-    const releaseDate =
-      releaseDateIdx !== -1 ? values[releaseDateIdx] || "" : "";
+    const releaseDate = releaseDateIdx !== -1 ? values[releaseDateIdx] || "" : "";
 
     const modelObject = {
       provider: values[vendorIdx],
       name: modelName,
-      id: modelName
-        .toLowerCase()
-        .replace(/\s+/g, "-")
-        .replace(/[^a-z0-9-]/gi, ""),
+      id: modelName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/gi, ""),
       contextWindow: formatNumber(values[contextIdx]),
       inputPrice: parsePrice(values[inputPriceIdx]),
       outputPrice: parsePrice(values[outputPriceIdx]),
@@ -327,9 +280,7 @@ function parseCSV(csvText) {
     }
 
     if (!modelObject.id) {
-      console.warn(
-        `Model at row ${rowIndex + 2} resulted in empty ID. Name: "${modelName}"`
-      );
+      console.warn(`Model at row ${rowIndex + 2} resulted in empty ID. Name: "${modelName}"`);
       return;
     }
     parsedData.push(modelObject);
@@ -339,19 +290,18 @@ function parseCSV(csvText) {
 }
 
 async function loadModelsData() {
-  console.log("Loading models.csv...");
+  console.log("Loading ai_model_list.csv...");
   try {
-    const response = await fetch("models.csv");
+    // UPDATED: Changed file name
+    const response = await fetch("ai_model_list.csv");
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const csvText = await response.text();
-    console.log("Fetched models.csv. Length:", csvText.length);
+    console.log("Fetched ai_model_list.csv. Length:", csvText.length);
     return parseCSV(csvText);
   } catch (error) {
-    console.error("Failed to load/parse models.csv:", error);
-    if (modelSelectionList)
-      modelSelectionList.innerHTML = `<p>Error loading model data: ${error.message}.</p>`;
-    if (comparisonTableBody)
-      comparisonTableBody.innerHTML = `<tr><td colspan="6">Error loading model data.</td></tr>`;
+    console.error("Failed to load/parse ai_model_list.csv:", error);
+    if (modelSelectionList) modelSelectionList.innerHTML = `<p>Error loading model data: ${error.message}.</p>`;
+    if (comparisonTableBody) comparisonTableBody.innerHTML = `<tr><td colspan="6">Error loading model data.</td></tr>`;
     return [];
   }
 }
@@ -406,64 +356,41 @@ function populateModelSelection() {
     groupDiv.className = "model-group";
     const providerTitle = document.createElement("h3");
     providerTitle.className = "provider-title";
-
     const providerLogoFilename = getLogoFilename(provider);
     const logoImg = document.createElement("img");
     logoImg.src = `img/logos/${providerLogoFilename}`;
     logoImg.alt = `${provider} logo`;
     logoImg.className = "provider-logo-title";
     logoImg.loading = "lazy";
-    logoImg.onerror = function () {
-      this.style.display = "none";
-      console.warn(
-        `Logo not found for provider: ${provider} (path: img/logos/${providerLogoFilename})`
-      );
-    };
-
+    logoImg.onerror = function () { this.style.display = "none"; };
     const providerNameSpan = document.createElement("span");
     providerNameSpan.textContent = provider;
-
     providerTitle.appendChild(logoImg);
     providerTitle.appendChild(providerNameSpan);
-
     const clearProviderBtn = document.createElement("button");
     clearProviderBtn.className = "clear-provider-btn";
-    clearProviderBtn.innerHTML = "&times;"; // The 'X' symbol
+    clearProviderBtn.innerHTML = "&times;";
     clearProviderBtn.setAttribute("aria-label", `Clear ${provider} selections`);
-    clearProviderBtn.title = `Clear ${provider} selections`; // Tooltip for mouse users
+    clearProviderBtn.title = `Clear ${provider} selections`;
     providerTitle.appendChild(clearProviderBtn);
-
     providerTitle.setAttribute("aria-expanded", "false");
     const modelListDiv = document.createElement("div");
     modelListDiv.className = "model-list";
     modelListDiv.id = `provider-list-${provider.replace(/\s+/g, "-")}`;
     providerTitle.setAttribute("aria-controls", modelListDiv.id);
-
     clearProviderBtn.addEventListener("click", (event) => {
       event.stopPropagation();
-      const checkboxesInGroup = modelListDiv.querySelectorAll(
-        'input[type="checkbox"]'
-      );
-      checkboxesInGroup.forEach((checkbox) => {
-        checkbox.checked = false;
-      });
+      modelListDiv.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
       updateDisplay();
     });
-
     providerTitle.addEventListener("click", () => {
-      const isCurrentlyExpanded = groupDiv.classList.contains("expanded");
-      groupDiv.classList.toggle("expanded", !isCurrentlyExpanded);
-      providerTitle.setAttribute("aria-expanded", !isCurrentlyExpanded);
+      const isExpanded = groupDiv.classList.contains("expanded");
+      groupDiv.classList.toggle("expanded", !isExpanded);
+      providerTitle.setAttribute("aria-expanded", !isExpanded);
     });
-
-    const sortedModels = groupedModels[provider].sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
+    const sortedModels = groupedModels[provider].sort((a, b) => a.name.localeCompare(b.name));
     sortedModels.forEach((model) => {
-      if (!model.id) {
-        console.warn("Skipping model due to missing ID:", model);
-        return;
-      }
+      if (!model.id) return;
       const div = document.createElement("div");
       div.className = "model-item";
       const checkbox = document.createElement("input");
@@ -473,7 +400,6 @@ function populateModelSelection() {
       checkbox.addEventListener("change", () => updateDisplay());
       const label = document.createElement("label");
       label.htmlFor = `model-checkbox-${model.id}`;
-
       if (model.logo) {
         const modelItemLogoImg = document.createElement("img");
         modelItemLogoImg.src = `img/logos/${model.logo}`;
@@ -486,7 +412,6 @@ function populateModelSelection() {
       nameSpan.className = "model-name-text";
       nameSpan.textContent = model.name || "Unnamed Model";
       label.appendChild(nameSpan);
-
       const category = getPriceCategory(model);
       if (category.name !== "N/A") {
         const categoryTag = document.createElement("span");
@@ -494,7 +419,6 @@ function populateModelSelection() {
         categoryTag.textContent = category.name;
         label.appendChild(categoryTag);
       }
-
       div.appendChild(checkbox);
       div.appendChild(label);
       modelListDiv.appendChild(div);
@@ -503,89 +427,99 @@ function populateModelSelection() {
     groupDiv.appendChild(modelListDiv);
     modelSelectionList.appendChild(groupDiv);
   }
-  console.log("Model selection populated.");
+}
+
+function filterModelsList(searchTerm) {
+  const normalizedSearchTerm = searchTerm.toLowerCase().trim();
+  const allProviderGroups = modelSelectionList.querySelectorAll(".model-group");
+  allProviderGroups.forEach(groupDiv => {
+    const providerTitle = groupDiv.querySelector(".provider-title");
+    const providerName = providerTitle ? providerTitle.textContent.toLowerCase() : "";
+    const modelListDiv = groupDiv.querySelector(".model-list");
+    const modelItems = modelListDiv ? modelListDiv.querySelectorAll(".model-item") : [];
+    let groupHasVisibleModels = false;
+    let providerMatches = providerName.includes(normalizedSearchTerm);
+    modelItems.forEach(modelItem => {
+      const modelNameText = modelItem.querySelector(".model-name-text");
+      const modelName = modelNameText ? modelNameText.textContent.toLowerCase() : "";
+      const modelMatches = modelName.includes(normalizedSearchTerm);
+      if (providerMatches || modelMatches || normalizedSearchTerm === "") {
+        modelItem.style.display = "flex";
+        if (modelMatches) groupHasVisibleModels = true;
+      } else {
+        modelItem.style.display = "none";
+      }
+    });
+    if (groupHasVisibleModels || providerMatches || normalizedSearchTerm === "") {
+      groupDiv.style.display = "block";
+      if ((groupHasVisibleModels || providerMatches) && normalizedSearchTerm !== "") {
+        groupDiv.classList.add("expanded");
+        if (providerTitle) providerTitle.setAttribute("aria-expanded", "true");
+      } else if (normalizedSearchTerm === "") {
+        groupDiv.classList.remove("expanded");
+        if (providerTitle) providerTitle.setAttribute("aria-expanded", "false");
+      }
+    } else {
+      groupDiv.style.display = "none";
+    }
+  });
 }
 
 function selectAllModels() {
-  if (!modelSelectionList) {
-    console.error("selectAllModels: modelSelectionList not found.");
-    return;
-  }
-  const checkboxes = modelSelectionList.querySelectorAll(
-    'input[type="checkbox"]'
-  );
-  checkboxes.forEach((checkbox) => {
-    checkbox.checked = true;
-  });
+  modelSelectionList.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = true);
   updateDisplay();
-  console.log("All models selected.");
 }
 
 function expandAllProviders() {
-  if (!modelSelectionList) {
-    console.error("expandAllProviders: modelSelectionList not found.");
-    return;
-  }
-  const providerGroups = modelSelectionList.querySelectorAll(".model-group");
-  providerGroups.forEach((groupDiv) => {
+  modelSelectionList.querySelectorAll(".model-group").forEach(groupDiv => {
     if (!groupDiv.classList.contains("expanded")) {
       groupDiv.classList.add("expanded");
       const providerTitle = groupDiv.querySelector(".provider-title");
-      if (providerTitle) {
-        providerTitle.setAttribute("aria-expanded", "true");
-      }
+      if (providerTitle) providerTitle.setAttribute("aria-expanded", "true");
     }
   });
-  console.log("Attempted to expand all providers.");
 }
 
 function clearAndCollapseSelections() {
-  if (!modelSelectionList) {
-    console.error(
-      "clearAndCollapseSelections: modelSelectionList not found."
-    );
-    return;
-  }
-  const checkboxes = modelSelectionList.querySelectorAll(
-    'input[type="checkbox"]'
-  );
-  checkboxes.forEach((checkbox) => {
-    checkbox.checked = false;
-  });
-  const providerGroups = modelSelectionList.querySelectorAll(".model-group");
-  providerGroups.forEach((groupDiv) => {
+  modelSelectionList.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+  modelSelectionList.querySelectorAll(".model-group").forEach(groupDiv => {
     if (groupDiv.classList.contains("expanded")) {
       groupDiv.classList.remove("expanded");
       const providerTitle = groupDiv.querySelector(".provider-title");
-      if (providerTitle) {
-        providerTitle.setAttribute("aria-expanded", "false");
-      }
+      if (providerTitle) providerTitle.setAttribute("aria-expanded", "false");
     }
   });
   updateDisplay();
-  console.log("All selections cleared and providers collapsed.");
 }
 
 function filterModelsByCategory(categoryName) {
-  if (!modelSelectionList || !modelsData) return;
-
-  const allCheckboxes = modelSelectionList.querySelectorAll(
-    'input[type="checkbox"]'
-  );
-
-  const matchingModelIds = modelsData
-    .filter((model) => {
-      const category = getPriceCategory(model);
-      return category.name.toLowerCase() === categoryName.toLowerCase();
-    })
-    .map((model) => model.id);
-
-  allCheckboxes.forEach((checkbox) => {
-    checkbox.checked = matchingModelIds.includes(checkbox.value);
-  });
-
+  const allCheckboxes = modelSelectionList.querySelectorAll('input[type="checkbox"]');
+  const matchingModelIds = modelsData.filter(model => getPriceCategory(model).name.toLowerCase() === categoryName.toLowerCase()).map(model => model.id);
+  allCheckboxes.forEach(checkbox => checkbox.checked = matchingModelIds.includes(checkbox.value));
   updateDisplay();
-  console.log(`Filtered to show only "${categoryName}" cost models.`);
+}
+
+function showModelDetail(modelId) {
+  const model = modelsData.find(m => m.id === modelId);
+  if (!model) return;
+  const formatPrice = p => (p !== null && p !== undefined && !isNaN(p)) ? `$${p.toFixed(2)}` : "N/A";
+  modalModelName.textContent = model.name || "N/A";
+  modalModelLogo.src = model.logo ? `img/logos/${model.logo}` : "";
+  modalModelLogo.alt = `${model.provider || "Provider"} logo`;
+  modalModelLogo.style.display = model.logo ? "block" : "none";
+  modalModelProvider.textContent = model.provider || "N/A";
+  modalInputPrice.textContent = formatPrice(model.inputPrice);
+  modalOutputPrice.textContent = formatPrice(model.outputPrice);
+  modalContextWindow.textContent = model.contextWindow || "N/A";
+  modalReleaseDate.textContent = model.releaseDate || "N/A";
+  modalStatus.textContent = model.status || "N/A";
+  modelDetailModal.classList.add("show");
+  document.body.classList.add("modal-open");
+}
+
+function hideModelDetail() {
+  modelDetailModal.classList.remove("show");
+  document.body.classList.remove("modal-open");
 }
 
 function updateTableView(selectedModelsData) {
@@ -597,29 +531,25 @@ function updateTableView(selectedModelsData) {
   }
   selectedModelsData.forEach((model) => {
     const row = document.createElement("tr");
-    const formatPrice = (price) =>
-      price !== null && price !== undefined && !isNaN(price)
-        ? `$${price.toFixed(2)}`
-        : "N/A";
-
+    row.dataset.modelId = model.id;
+    const formatPrice = p => (p !== null && p !== undefined && !isNaN(p)) ? `$${p.toFixed(2)}` : "N/A";
     const modelNameCell = document.createElement("td");
     modelNameCell.className = "model-name-cell";
-
+    modelNameCell.style.cursor = "pointer";
+    modelNameCell.title = `View details for ${model.name}`;
     if (model.logo) {
       const logoImg = document.createElement("img");
       logoImg.src = `img/logos/${model.logo}`;
       logoImg.alt = `${model.provider || "Provider"} logo`;
       logoImg.className = "table-model-logo";
       logoImg.loading = "lazy";
-      logoImg.onerror = function () {
-        this.style.display = "none";
-      };
+      logoImg.onerror = function () { this.style.display = "none"; };
       modelNameCell.appendChild(logoImg);
     }
     const modelNameSpan = document.createElement("span");
+    modelNameSpan.className = "model-name-text";
     modelNameSpan.textContent = model.name || "N/A";
     modelNameCell.appendChild(modelNameSpan);
-
     const category = getPriceCategory(model);
     if (category.name !== "N/A") {
       const categoryTag = document.createElement("span");
@@ -627,17 +557,13 @@ function updateTableView(selectedModelsData) {
       categoryTag.textContent = category.name;
       modelNameCell.appendChild(categoryTag);
     }
-
     row.appendChild(modelNameCell);
-
-    row.innerHTML += `
-            <td>${model.provider || "N/A"}</td>
-            <td>${formatPrice(model.inputPrice)}</td>
-            <td>${formatPrice(model.outputPrice)}</td>
-            <td>${model.contextWindow || "N/A"}</td>
-            <td>${model.releaseDate || "N/A"}</td>
-        `;
+    row.innerHTML += `<td>${model.provider || "N/A"}</td><td>${formatPrice(model.inputPrice)}</td><td>${formatPrice(model.outputPrice)}</td><td>${model.contextWindow || "N/A"}</td><td>${model.releaseDate || "N/A"}</td>`;
     comparisonTableBody.appendChild(row);
+  });
+  comparisonTableBody.querySelectorAll("tr").forEach(row => {
+    const modelNameCell = row.querySelector(".model-name-cell");
+    if (modelNameCell) modelNameCell.addEventListener("click", () => showModelDetail(row.dataset.modelId));
   });
 }
 
@@ -647,30 +573,24 @@ Chart.register({
   afterDraw(chart, args, options) {
     if (chart.config.type !== "bar") return;
     const pluginOpts = chart.config.options.plugins.customXAxisRenderer;
-    if (!pluginOpts || !pluginOpts.selectedModels) {
-      return;
-    }
+    if (!pluginOpts || !pluginOpts.selectedModels) return;
     const { ctx } = chart;
     const xAxis = chart.scales.x;
     const logoSize = pluginOpts.logoSize || 16;
     const textPadding = pluginOpts.textPadding || 4;
     const font = pluginOpts.font || "10px Arial, sans-serif";
     const textColor = pluginOpts.textColor || "#444";
-    const MAX_LABEL_LENGTH = 15; // Set the maximum number of characters to display
-
+    const MAX_LABEL_LENGTH = 15;
     ctx.save();
     ctx.font = font;
     ctx.fillStyle = textColor;
-    ctx.textAlign = "center"; // Revert to center alignment
+    ctx.textAlign = "center";
     ctx.textBaseline = "top";
-
     pluginOpts.selectedModels.forEach((model, index) => {
       if (index >= xAxis.ticks.length) return;
       const xPos = xAxis.getPixelForTick(index);
       const logo = getPreloadedImage(model.logo);
       let currentY = xAxis.bottom + textPadding;
-
-      // 1. Draw Logo
       if (logo) {
         const logoX = xPos - logoSize / 2;
         ctx.drawImage(logo, logoX, currentY, logoSize, logoSize);
@@ -678,21 +598,11 @@ Chart.register({
       } else {
         currentY += logoSize + textPadding; 
       }
-      
-      // 2. Draw Truncated Text
-      const modelName = model.name || "N/A";
-      let displayLabel = modelName;
-      
-      // *** START TRUNCATION LOGIC ***
-      if (modelName.length > MAX_LABEL_LENGTH) {
-          displayLabel = modelName.substring(0, MAX_LABEL_LENGTH - 3) + "...";
+      let displayLabel = model.name || "N/A";
+      if (displayLabel.length > MAX_LABEL_LENGTH) {
+          displayLabel = displayLabel.substring(0, MAX_LABEL_LENGTH - 3) + "...";
       }
-      // *** END TRUNCATION LOGIC ***
-
-      // Draw the (now shorter) label horizontally
       ctx.fillText(displayLabel, xPos, currentY); 
-      
-      // NOTE: We don't need the internal save/restore/translate/rotate logic anymore.
     });
     ctx.restore();
   },
@@ -715,32 +625,16 @@ async function renderBarChart(selectedModelsData) {
 
   const minBarWidthPerModel = 100;
   const chartPadding = 100;
-  const calculatedMinWidth =
-    selectedModelsData.length * minBarWidthPerModel + chartPadding;
+  const calculatedMinWidth = selectedModelsData.length * minBarWidthPerModel + chartPadding;
   barChartCanvasContainer.style.minWidth = `${calculatedMinWidth}px`;
 
   const labels = selectedModelsData.map((model) => model.name);
-  const inputPrices = selectedModelsData.map((model) => model.inputPrice ?? 0);
-  const outputPrices = selectedModelsData.map(
-    (model) => model.outputPrice ?? 0
-  );
-  const data = { labels, datasets: [] };
-  data.datasets = [
-    {
-      label: "Input Price ($/1M)",
-      data: inputPrices,
-      backgroundColor: "rgba(54, 162, 235, 0.6)",
-      borderColor: "rgba(54, 162, 235, 1)",
-      borderWidth: 1,
-    },
-    {
-      label: "Output Price ($/1M)",
-      data: outputPrices,
-      backgroundColor: "rgba(255, 99, 132, 0.6)",
-      borderColor: "rgba(255, 99, 132, 1)",
-      borderWidth: 1,
-    },
-  ];
+  const inputPrices = selectedModelsData.map((model) => model.inputPrice ?? null);
+  const outputPrices = selectedModelsData.map((model) => model.outputPrice ?? null);
+  const data = { labels, datasets: [
+    { label: "Input Price ($/1M)", data: inputPrices, backgroundColor: "rgba(54, 162, 235, 0.6)", borderColor: "rgba(54, 162, 235, 1)", borderWidth: 1 },
+    { label: "Output Price ($/1M)", data: outputPrices, backgroundColor: "rgba(255, 99, 132, 0.6)", borderColor: "rgba(255, 99, 132, 1)", borderWidth: 1 },
+  ]};
 
   const logoSize = 16;
   const textPadding = 4;
@@ -753,88 +647,36 @@ async function renderBarChart(selectedModelsData) {
       responsive: true,
       maintainAspectRatio: false,
       indexAxis: "x",
-      layout: {
-        padding: {
-          bottom: xAxisItemHeight,
-        },
-      },
+      layout: { padding: { bottom: xAxisItemHeight } },
       plugins: {
-        title: {
-          display: true,
-          text: "Model Pricing Comparison ($/1M)",
-          padding: { top: 10, bottom: 20 },
-          font: { size: 14 },
-        },
+        title: { display: true, text: "Model Pricing Comparison ($/1M)", padding: { top: 10, bottom: 20 }, font: { size: 14 } },
         tooltip: {
           callbacks: {
             label: function (context) {
               let label = context.dataset.label || "";
               if (label) label += ": ";
-              const modelIndex = context.dataIndex;
-              if (
-                !selectedModelsData ||
-                modelIndex >= selectedModelsData.length
-              )
-                return label + "Error";
-              const model = selectedModelsData[modelIndex];
-              if (!model) return label + "Error";
-              const originalValue = context.dataset.label
-                .toLowerCase()
-                .startsWith("input")
-                ? model.inputPrice
-                : model.outputPrice;
-              if (
-                originalValue !== null &&
-                originalValue !== undefined &&
-                !isNaN(originalValue)
-              )
-                label += `$${context.parsed.y.toFixed(2)}`;
+              if (context.raw === null || context.raw === undefined) return label + "N/A";
+              const model = selectedModelsData[context.dataIndex];
+              if (!model) return label + "N/A";
+              const originalValue = context.dataset.label.toLowerCase().startsWith("input") ? model.inputPrice : model.outputPrice;
+              if (originalValue !== null && originalValue !== undefined && !isNaN(originalValue)) label += `$${context.parsed.y.toFixed(2)}`;
               else label += "N/A";
               return label;
             },
           },
         },
         legend: { position: "top" },
-        customXAxisRenderer: {
-          selectedModels: selectedModelsData,
-          logoSize: logoSize,
-          textPadding: textPadding,
-          font: "10px Arial, sans-serif",
-          textColor: "#444",
-        },
+        customXAxisRenderer: { selectedModels: selectedModelsData, logoSize, textPadding, font: "10px Arial, sans-serif", textColor: "#444" },
       },
       scales: {
-        y: {
-          beginAtZero: true,
-          title: { display: true, text: "Price ($/1M)" },
-          ticks: { callback: (value) => "$" + value.toFixed(2) },
-        },
-        x: {
-          barPercentage: 0.5,
-          categoryPercentage: 0.7,
-          title: { display: true, text: "Model" },
-          ticks: {
-            callback: function (value, index, ticks) {
-              return "";
-            },
-          },
-        },
+        y: { beginAtZero: true, title: { display: true, text: "Price ($/1M)" }, ticks: { callback: (value) => "$" + value.toFixed(2) }, min: 0 },
+        x: { barPercentage: 0.5, categoryPercentage: 0.7, title: { display: true, text: "Model" }, ticks: { callback: () => "" } },
       },
     },
   };
   const ctx = priceChartCanvas.getContext("2d");
   if (ctx) {
-    try {
-      priceChartInstance = new Chart(ctx, config);
-    } catch (error) {
-      console.error("Chart.js initialization error:", error);
-      barChartMessage.textContent = "Error rendering chart. Check console.";
-      priceChartCanvas.style.display = "none";
-    }
-  } else {
-    console.error("Failed to get 2D context for price chart canvas.");
-    barChartMessage.textContent = "Error rendering chart context.";
-    priceChartCanvas.style.display = "none";
+    try { priceChartInstance = new Chart(ctx, config); } catch (e) { console.error(e); }
   }
 }
 
@@ -843,50 +685,28 @@ async function renderScatterChart(selectedModelsData) {
   if (priceChartInstance) priceChartInstance.destroy();
   barChartMessage.textContent = "";
   priceChartCanvas.style.display = "block";
-  barChartCanvasContainer.style.minWidth = "0px"; // Reset min-width
+  barChartCanvasContainer.style.minWidth = "0px";
 
-  const validModels = selectedModelsData.filter(
-    (m) =>
-      m.inputPrice !== null &&
-      m.contextWindow &&
-      parseFormattedNumber(m.contextWindow)
-  );
+  const validModels = selectedModelsData.filter(m => m.inputPrice !== null && m.contextWindow && parseFormattedNumber(m.contextWindow));
 
   if (validModels.length === 0) {
-    barChartMessage.textContent =
-      "Select models with both price and context window data to display scatter plot.";
+    barChartMessage.textContent = "Select models with price and context window data to display scatter plot.";
     priceChartCanvas.style.display = "none";
     return;
   }
 
-  const scatterData = validModels.map((model) => ({
-    x: parseFormattedNumber(model.contextWindow),
-    y: model.inputPrice,
-    model: model, // Pass the full model object for the tooltip
-  }));
+  const scatterData = validModels.map(model => ({ x: parseFormattedNumber(model.contextWindow), y: model.inputPrice, model }));
 
   const config = {
     type: "scatter",
     data: {
-      datasets: [
-        {
-          label: "Models",
-          data: scatterData,
-          backgroundColor: "rgba(0, 123, 255, 0.6)",
-          pointRadius: 5,
-          pointHoverRadius: 8,
-        },
-      ],
+      datasets: [{ label: "Models", data: scatterData, backgroundColor: "rgba(0, 123, 255, 0.6)", pointRadius: 5, pointHoverRadius: 8 }],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        title: {
-          display: true,
-          text: "Price vs. Context Window (Efficiency Frontier)",
-          font: { size: 14 },
-        },
+        title: { display: true, text: "Price vs. Context Window", font: { size: 14 } },
         legend: { display: false },
         tooltip: {
           mode: "nearest",
@@ -894,94 +714,35 @@ async function renderScatterChart(selectedModelsData) {
           callbacks: {
             label: function (context) {
               const model = context.raw.model;
-              return [
-                `${model.name}`,
-                `Context: ${model.contextWindow}`,
-                `Input Price: $${model.inputPrice.toFixed(2)} / 1M`,
-              ];
+              return [`${model.name}`, `Context: ${model.contextWindow}`, `Input Price: $${model.inputPrice.toFixed(2)} / 1M`];
             },
-          },
-        },
-        zoom: {
-          pan: {
-            enabled: true,
-            mode: "xy",
-          },
-          zoom: {
-            wheel: {
-              enabled: true,
-            },
-            pinch: {
-              enabled: true,
-            },
-            mode: "xy",
           },
         },
       },
       scales: {
-        x: {
-          type: "logarithmic",
-          title: {
-            display: true,
-            text: "Context Window (Tokens) - Logarithmic Scale",
-          },
-          ticks: {
-            callback: function (value, index, ticks) {
-              if (value >= 1000000) return value / 1000000 + "M";
-              if (value >= 1000) return value / 1000 + "k";
-              return value;
-            },
-          },
-        },
-        y: {
-          type: "linear",
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Input Price ($/1M)",
-          },
-          ticks: {
-            callback: (value) => "$" + value.toFixed(2),
-          },
-        },
+        x: { type: "logarithmic", title: { display: true, text: "Context Window (Tokens) - Logarithmic Scale" }, ticks: { callback: v => v >= 1e6 ? `${v/1e6}M` : (v >= 1e3 ? `${v/1e3}k` : v) } },
+        y: { type: "linear", beginAtZero: true, title: { display: true, text: "Input Price ($/1M)" }, ticks: { callback: v => `$${v.toFixed(2)}` }, min: 0 },
       },
     },
   };
-
   const ctx = priceChartCanvas.getContext("2d");
-  if (ctx) {
-    priceChartInstance = new Chart(ctx, config);
-  }
+  if (ctx) priceChartInstance = new Chart(ctx, config);
 }
 
 async function switchView(view) {
   const isChartView = view === "bar" || view === "scatter";
-
-  // Update button/select active states
   if (tableViewBtn) tableViewBtn.classList.toggle("active", !isChartView);
   if (chartViewBtn) {
     chartViewBtn.classList.toggle("active", isChartView);
-    if (isChartView) {
-      chartDropdownContent.classList.remove("show");
-    }
+    if (isChartView) chartDropdownContent.classList.remove("show");
   }
-
-  // Update visible container
   if (tableView) tableView.classList.toggle("active", !isChartView);
   if (barChartView) barChartView.classList.toggle("active", isChartView);
-
   if (viewTitle) {
     switch (view) {
-      case "bar":
-        viewTitle.textContent = "Bar Chart";
-        break;
-      case "scatter":
-        viewTitle.textContent = "Scatter Plot";
-        break;
-      case "table":
-      default:
-        viewTitle.textContent = "Table";
-        break;
+      case "bar": viewTitle.textContent = "Bar Chart"; break;
+      case "scatter": viewTitle.textContent = "Scatter Plot"; break;
+      default: viewTitle.textContent = "Table"; break;
     }
   }
   currentView = view;
@@ -989,85 +750,35 @@ async function switchView(view) {
 }
 
 async function updateDisplay() {
-  console.log("updateDisplay called. Current view:", currentView);
-  if (!modelsData || modelsData.length === 0) {
-    console.warn("updateDisplay: modelsData is empty or not loaded.");
-    if (comparisonTableBody)
-      comparisonTableBody.innerHTML = `<tr><td colspan="6">No model data loaded.</td></tr>`;
-    if (barChartMessage) barChartMessage.textContent = "No model data loaded.";
-    if (priceChartInstance) priceChartInstance.destroy();
-    if (priceChartCanvas) priceChartCanvas.style.display = "none";
-    return;
-  }
-  if (!modelSelectionList) {
-    console.error("updateDisplay: modelSelectionList not found.");
-    return;
-  }
+  if (!modelsData || modelsData.length === 0) return;
+  const selectedModelIds = Array.from(modelSelectionList.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
+  let filteredModelsData = modelsData.filter(model => model.id && selectedModelIds.includes(model.id));
 
-  const selectedCheckboxes = modelSelectionList.querySelectorAll(
-    'input[type="checkbox"]:checked'
-  );
-  const selectedModelIds = Array.from(selectedCheckboxes).map(
-    (checkbox) => checkbox.value
-  );
-
-  let filteredModelsData = modelsData.filter((model) => {
-    return model.id && selectedModelIds.includes(model.id);
-  });
-
-  // **** UPDATED: Apply sorting logic for table view ****
   if (currentView === "table") {
-    const dataTypes = {
-      name: "string",
-      provider: "string",
-      inputPrice: "number",
-      outputPrice: "number",
-      contextWindow: "number",
-      releaseDate: "date",
-    };
+    const dataTypes = { name: "string", provider: "string", inputPrice: "number", outputPrice: "number", contextWindow: "number", releaseDate: "date" };
     const sortType = dataTypes[currentSort.column];
-
     filteredModelsData.sort((a, b) => {
       let valA = parseValueForSort(a[currentSort.column], sortType);
       let valB = parseValueForSort(b[currentSort.column], sortType);
-
-      // Handle date objects for comparison
-      if (sortType === "date") {
-        valA = valA.getTime();
-        valB = valB.getTime();
-      }
-
-      if (valA < valB) {
-        return currentSort.direction === "asc" ? -1 : 1;
-      }
-      if (valA > valB) {
-        return currentSort.direction === "asc" ? 1 : -1;
-      }
+      if (sortType === "date") { valA = valA.getTime(); valB = valB.getTime(); }
+      if (valA < valB) return currentSort.direction === "asc" ? -1 : 1;
+      if (valA > valB) return currentSort.direction === "asc" ? 1 : -1;
       return 0;
     });
     updateSortIcons();
   } else {
-    // For charts, keep alphabetical sort for consistency
     filteredModelsData.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   switch (currentView) {
-    case "bar":
-      await renderBarChart(filteredModelsData);
-      break;
-    case "scatter":
-      await renderScatterChart(filteredModelsData);
-      break;
-    case "table":
-    default:
-      updateTableView(filteredModelsData);
-      break;
+    case "bar": await renderBarChart(filteredModelsData); break;
+    case "scatter": await renderScatterChart(filteredModelsData); break;
+    default: updateTableView(filteredModelsData); break;
   }
 }
 
 function updateSortIcons() {
-  const allHeaders = document.querySelectorAll("th[data-sort]");
-  allHeaders.forEach((header) => {
+  document.querySelectorAll("th[data-sort]").forEach(header => {
     header.classList.remove("asc", "desc");
     if (header.dataset.sort === currentSort.column) {
       header.classList.add(currentSort.direction);
@@ -1075,181 +786,89 @@ function updateSortIcons() {
   });
 }
 
-// **** NEW: Fetch Last Updated Timestamp from GitHub API ****
-// REMEMBER TO REPLACE THESE PLACEHOLDERS WITH YOUR ACTUAL GITHUB DETAILS!
-const GITHUB_USERNAME = "adithyadaine"; // e.g., "your-github-username"
-const GITHUB_REPO_NAME = "AI-Model-Price-Comparison"; // e.g., "your-repo-name"
-const CSV_FILE_PATH = "models.csv"; // Path to your CSV file within the repo
+const GITHUB_USERNAME = "adithyadaine";
+const GITHUB_REPO_NAME = "AI-Model-Price-Comparison";
+// UPDATED: Changed file name
+const CSV_FILE_PATH = "ai_model_list.csv";
 
 async function setLastUpdatedTimestampFromGithub() {
-  if (!dynamicTimestampSpan) {
-    console.warn("Dynamic timestamp span not found.");
-    return;
-  }
-
-  // Display a loading message
+  if (!dynamicTimestampSpan) return;
   dynamicTimestampSpan.textContent = "Fetching latest update...";
-
   const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO_NAME}/commits?path=${CSV_FILE_PATH}&page=1&per_page=1`;
-
   try {
     const response = await fetch(apiUrl);
     if (!response.ok) {
-      // Check for GitHub API rate limit specifically
-      if (response.status === 403 && response.headers.get('X-RateLimit-Remaining') === '0') {
-        throw new Error("GitHub API rate limit exceeded. Please try again later.");
-      }
-      throw new Error(`GitHub API error! status: ${response.status} - ${response.statusText}`);
+      if (response.status === 403 && response.headers.get('X-RateLimit-Remaining') === '0') throw new Error("GitHub API rate limit exceeded.");
+      throw new Error(`GitHub API error: ${response.statusText}`);
     }
-
     const commits = await response.json();
-
     if (commits && commits.length > 0) {
-      const lastCommitDateStr = commits[0].commit.author.date; // e.g., "2023-10-27T10:00:00Z"
-      const lastCommitDate = new Date(lastCommitDateStr);
-
-      const options = {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-        second: "numeric",
-        hour12: true,
-      };
-      const formattedTimestamp = new Intl.DateTimeFormat("en-US", options)
-        .format(lastCommitDate)
-        .replace(" at", ",");
-      
-      dynamicTimestampSpan.textContent = formattedTimestamp;
-      console.log("Last updated timestamp from GitHub:", formattedTimestamp);
+      const lastCommitDate = new Date(commits[0].commit.author.date);
+      const options = { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric", hour12: true };
+      dynamicTimestampSpan.textContent = new Intl.DateTimeFormat("en-US", options).format(lastCommitDate).replace(" at", ",");
     } else {
-      dynamicTimestampSpan.textContent = "Could not fetch update date (no commits found for CSV).";
-      console.warn("GitHub API returned no commits for models.csv.");
+      dynamicTimestampSpan.textContent = "Could not fetch update date.";
     }
   } catch (error) {
-    console.error("Failed to fetch last updated date from GitHub:", error);
-    // Truncate error message for display if it's too long
-    const displayError = error.message.length > 80 ? error.message.substring(0, 77) + "..." : error.message;
-    dynamicTimestampSpan.textContent = `Error fetching update date: ${displayError}`;
+    console.error("Failed to fetch last updated date:", error);
+    dynamicTimestampSpan.textContent = `Error: ${error.message}`;
   }
 }
 
-// --- Initialization ---
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("DOM fully loaded and parsed.");
-  if (
-    !modelSelectionList ||
-    !comparisonTableBody ||
-    !priceChartCanvas ||
-    !dynamicTimestampSpan
-  ) {
+  if (!modelSelectionList || !comparisonTableBody || !priceChartCanvas || !dynamicTimestampSpan) {
     console.error("Initialization failed: Essential DOM elements are missing.");
-    if (document.body)
-      document.body.innerHTML =
-        "<h1>Error: Application structure incomplete.</h1>";
+    document.body.innerHTML = "<h1>Error: Application structure incomplete.</h1>";
     return;
   }
 
-  // **** MAIN FIX: Data Loading & Initialization ****
   modelsData = await loadModelsData();
 
   if (modelsData && modelsData.length > 0) {
     populateModelSelection();
-    // **** CHANGED: Call the new function to fetch timestamp from GitHub ****
     await setLastUpdatedTimestampFromGithub();
 
-    // Attach event listeners for all buttons and interaction elements
-    if (tableViewBtn)
-      tableViewBtn.addEventListener("click", () => switchView("table"));
-    if (barChartViewBtn)
-      barChartViewBtn.addEventListener("click", () => switchView("bar"));
-    if (scatterChartViewBtn)
-      scatterChartViewBtn.addEventListener("click", () =>
-        switchView("scatter")
-      );
-    if (refreshPageBtn)
-      refreshPageBtn.addEventListener("click", () => location.reload());
-
+    if (modelSearchInput) modelSearchInput.addEventListener("input", e => filterModelsList(e.target.value));
+    if (tableViewBtn) tableViewBtn.addEventListener("click", () => switchView("table"));
+    if (barChartViewBtn) barChartViewBtn.addEventListener("click", () => switchView("bar"));
+    if (scatterChartViewBtn) scatterChartViewBtn.addEventListener("click", () => switchView("scatter"));
+    if (refreshPageBtn) refreshPageBtn.addEventListener("click", () => location.reload());
     if (hamburgerBtn) hamburgerBtn.addEventListener("click", openPanel);
     if (closePanelBtn) closePanelBtn.addEventListener("click", closePanel);
     if (overlay) overlay.addEventListener("click", closePanel);
-
-    if (selectAllBtn) {
-      selectAllBtn.addEventListener("click", () => {
-        selectAllModels();
-      });
-    }
-    if (expandAllBtn) {
-      expandAllBtn.addEventListener("click", expandAllProviders);
-    }
-    if (clearPanelBtn) {
-      clearPanelBtn.addEventListener("click", () => {
-        clearAndCollapseSelections();
-      });
-    }
-    if (filterLowBtn) {
-      filterLowBtn.addEventListener("click", () =>
-        filterModelsByCategory("Low")
-      );
-    }
-    if (filterMediumBtn) {
-      filterMediumBtn.addEventListener("click", () =>
-        filterModelsByCategory("Medium")
-      );
-    }
-    if (filterHighBtn) {
-      filterHighBtn.addEventListener("click", () =>
-        filterModelsByCategory("High")
-      );
-    }
-
-    // Custom dropdown logic
-    if (chartViewBtn) {
-      chartViewBtn.addEventListener("click", function (event) {
-        event.stopPropagation();
-        chartDropdownContent.classList.toggle("show");
-      });
-    }
-    window.addEventListener("click", function (event) {
-      if (!event.target.matches("#chartViewBtn")) {
-        if (chartDropdownContent.classList.contains("show")) {
-          chartDropdownContent.classList.remove("show");
-        }
-      }
+    if (selectAllBtn) selectAllBtn.addEventListener("click", selectAllModels);
+    if (expandAllBtn) expandAllBtn.addEventListener("click", expandAllProviders);
+    if (clearPanelBtn) clearPanelBtn.addEventListener("click", () => {
+      clearAndCollapseSelections();
+      if (modelSearchInput) { modelSearchInput.value = ''; filterModelsList(''); }
     });
-
-    // Table sorting logic
-    document
-      .querySelectorAll("th[data-sort]")
-      .forEach((header) => {
-        header.addEventListener("click", () => {
-          const sortKey = header.dataset.sort;
-          if (currentSort.column === sortKey) {
-            currentSort.direction =
-              currentSort.direction === "asc" ? "desc" : "asc";
-          } else {
-            currentSort.column = sortKey;
-            currentSort.direction = "asc";
-            // Default directions for certain columns: descending for higher numbers/newer dates
-            if (["inputPrice", "outputPrice", "contextWindow", "releaseDate"].includes(sortKey)) {
-              currentSort.direction = "desc";
-            }
-          }
-          // The updateDisplay function now handles the sorting and icon update.
-          updateDisplay();
-        });
+    if (filterLowBtn) filterLowBtn.addEventListener("click", () => filterModelsByCategory("Low"));
+    if (filterMediumBtn) filterMediumBtn.addEventListener("click", () => filterModelsByCategory("Medium"));
+    if (filterHighBtn) filterHighBtn.addEventListener("click", () => filterModelsByCategory("High"));
+    if (chartViewBtn) chartViewBtn.addEventListener("click", e => { e.stopPropagation(); chartDropdownContent.classList.toggle("show"); });
+    window.addEventListener("click", e => { if (!e.target.matches("#chartViewBtn") && chartDropdownContent.classList.contains("show")) chartDropdownContent.classList.remove("show"); });
+    document.querySelectorAll("th[data-sort]").forEach(header => {
+      header.addEventListener("click", () => {
+        const sortKey = header.dataset.sort;
+        if (currentSort.column === sortKey) {
+          currentSort.direction = currentSort.direction === "asc" ? "desc" : "asc";
+        } else {
+          currentSort.column = sortKey;
+          currentSort.direction = ["inputPrice", "outputPrice", "contextWindow", "releaseDate"].includes(sortKey) ? "desc" : "asc";
+        }
+        updateDisplay();
       });
-
-    // Initial render
+    });
+    if (closeDetailModalBtn) closeDetailModalBtn.addEventListener("click", hideModelDetail);
+    if (modelDetailModal) {
+      modelDetailModal.addEventListener("click", e => { if (e.target === modelDetailModal) hideModelDetail(); });
+      document.addEventListener("keydown", e => { if (e.key === "Escape" && modelDetailModal.classList.contains("show")) hideModelDetail(); });
+    }
+    
     await switchView(currentView);
   } else {
-    console.warn("No model data loaded. Check models.csv and console.");
-    if (modelSelectionList)
-      modelSelectionList.innerHTML =
-        "<p>Failed to load model data. Check console.</p>";
-    if (dynamicTimestampSpan)
-      dynamicTimestampSpan.textContent = "Data loading failed";
+    console.warn("No model data loaded. Check ai_model_list.csv and console.");
+    if (modelSelectionList) modelSelectionList.innerHTML = "<p>Failed to load model data.</p>";
+    if (dynamicTimestampSpan) dynamicTimestampSpan.textContent = "Data loading failed";
   }
 });
