@@ -133,7 +133,7 @@ footer h3 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: translateX(-100%);
   transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
-  z-index: 1000; /* Highest z-index */
+  z-index: 1000; /* Panel above header (900) but below modal (1010) */
   overflow-y: auto;
   box-sizing: border-box;
 }
@@ -196,15 +196,16 @@ body.panel-open .selection-panel {
   transform: rotate(90deg);
 }
 
+/* CRITICAL FIX: Overlay should be hidden by default and z-index for modals */
 .overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: none;
-  z-index: 999; /* Below panel, above fixed header and content */
+  background-color: rgba(0, 0, 0, 0.6); /* Reverted to original overlay opacity */
+  display: none; /* CRITICAL: Hidden by default */
+  z-index: 999; /* Below panel (1000) and modal (1010) */
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -388,27 +389,28 @@ body.panel-open .overlay {
   background-color: #f1f3f5; /* Use same hover as parent for consistency */
 }
 
+/* CRITICAL FIX: Model List and Items - Ensure correct display and transition */
 .model-list {
-  display: none;
+  display: none; /* Hidden by default */
   padding-left: 1rem; /* Indent model items under provider */
   margin-top: 0.25rem;
-  max-height: 0;
+  max-height: 0; /* Animated height for expansion */
   overflow: hidden;
   transition: max-height 0.3s ease-out, padding-top 0.3s ease-out,
     margin-top 0.3s ease-out;
 }
 .model-group.expanded .model-list {
-  display: block;
-  max-height: 1000px; /* Ensure this is large enough for content */
+  display: block; /* CRITICAL: Display block when expanded */
+  max-height: 1000px; /* Large enough for content, to enable transition */
   padding-top: 0.5rem;
   margin-top: 0;
   transition: max-height 0.4s ease-in, padding-top 0.4s ease-in,
     margin-top 0.4s ease-in;
 }
 
-/* Model Item (Checkbox, Logo, Name) in Selection Panel */
+/* CRITICAL FIX: Model Item (Checkbox, Logo, Name) in Selection Panel - Ensure flex display */
 .model-item {
-  display: flex;
+  display: flex; /* CRITICAL: Ensure models are displayed as flex */
   align-items: center;
   margin-bottom: 0.25rem;
   padding: 0.5rem 0.75rem; /* Padding around each model item */
@@ -428,7 +430,7 @@ body.panel-open .overlay {
 }
 
 .model-item label {
-  display: flex;
+  display: flex; /* Ensure label content aligns */
   align-items: center;
   cursor: pointer;
   font-size: 0.9rem;
@@ -638,6 +640,7 @@ body.panel-open .overlay {
   /* Also add a nice border-radius and shadow to the container for better look if it scrolls */
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
+  border: 1px solid var(--border-color);
 }
 table {
   width: 100%;
@@ -717,6 +720,7 @@ tbody tr:hover {
   margin-bottom: 0.5rem;
   background-color: var(--white-color);
   border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
 }
 .chart-canvas-container {
   position: relative;
@@ -744,7 +748,7 @@ tbody tr:hover {
   text-align: right;
 }
 
-/* NEW: Model Detail Modal Styles */
+/* CRITICAL FIX: Model Detail Modal Styles - Ensure z-index and display */
 .model-detail-modal {
   position: fixed;
   top: 0;
@@ -752,11 +756,11 @@ tbody tr:hover {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-  display: flex; /* Use flex for centering */
-  align-items: center; /* Center vertically */
-  justify-content: center; /* Center horizontally */
-  z-index: 1010; /* Above everything else, including selection panel */
-  visibility: hidden; /* Hide by default */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050; /* CRITICAL FIX: Ensure modal is on top of EVERYTHING, including selection panel (1000) */
+  visibility: hidden; /* Hidden by default */
   opacity: 0;
   transition: opacity 0.3s ease, visibility 0.3s ease;
 }
@@ -767,17 +771,18 @@ tbody tr:hover {
 }
 
 .modal-content {
-  background-color: var(--content-bg);
-  padding: 2rem;
+  background-color: var(--content-bg); /* White background */
+  padding: 2rem; /* Reverted padding */
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow-lg);
-  max-width: 500px; /* Max width for readability */
-  width: 90%; /* Responsive width */
+  max-width: 500px; /* Reverted max width */
+  width: 90%;
   position: relative;
-  max-height: 80vh; /* Max height to allow scrolling if content is long */
-  overflow-y: auto; /* Enable scrolling for modal body */
-  transform: translateY(20px); /* Small animation effect */
+  max-height: 80vh;
+  overflow-y: auto;
+  transform: translateY(20px);
   transition: transform 0.3s ease-out;
+  /* Removed z-index from modal-content; the parent modal handles the layering */
 }
 
 .model-detail-modal.show .modal-content {
@@ -790,42 +795,47 @@ tbody tr:hover {
   right: 1rem;
   background: none;
   border: none;
-  font-size: 1.8rem;
-  color: var(--secondary-color);
+  font-size: 1.8rem; /* Reverted size */
+  color: var(--secondary-color); /* Reverted color */
   cursor: pointer;
   line-height: 1;
   padding: 0.5rem;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 .close-modal-btn:hover {
-  color: var(--danger-color);
+  color: var(--primary-color); /* Reverted hover color */
+  transform: rotate(90deg); /* Reverted transform */
 }
 
 .modal-title {
   margin-top: 0;
   margin-bottom: 1rem;
   font-size: 1.75rem;
-  color: var(--primary-color);
+  color: var(--primary-color); /* CRITICAL FIX: Ensure modal title is readable */
   text-align: center;
 }
 
 .modal-body {
   line-height: 1.8;
-  color: var(--text-color);
+  color: var(--text-color); /* CRITICAL FIX: Ensure modal body text is readable */
 }
 
 .modal-body p {
   margin-bottom: 0.5rem;
 }
 
+.modal-body p strong {
+    color: var(--text-color); /* Reverted strong text color */
+}
+
 .modal-model-logo {
   display: block;
   margin: 0 auto 1.5rem;
-  width: 48px; /* Larger logo in modal */
+  width: 48px;
   height: 48px;
   object-fit: contain;
 }
-/* ------------------------------------ */
+
 
 /* --- Responsiveness --- */
 @media (max-width: 768px) {

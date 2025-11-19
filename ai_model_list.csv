@@ -74,6 +74,9 @@ Google,Gemini 1.5 Flash-8B,1000000,$0.04 ,$0.15 ,10/1/24,Proprietary
 Google,Gemini 1.5 Flash (Sep '24),1000000,$0.00 ,$0.00 ,9/1/24,Proprietary
 Google,Gemini 1.0 Pro,33000,$0.00 ,$0.00 ,12/1/23,Proprietary
 Google,Gemini 1.0 Ultra,33000,$0.00 ,$0.00 ,12/1/23,Proprietary
+Google,Gemini 3 Pro Preview,1000000,$2.00 ,$12.00 ,11/18/25,"Proprietary, Preview"
+Google,Gemma 3 4B Instruct,128000,$0.04 ,$0.08 ,11/18/25,"Open Weight, Stable"
+Google,Gemma 3 1B Instruct,32000,$0.00 ,$0.00 ,11/18/25,"Open Weight, Stable"
 Meta,Llama 4 Maverick,1000000,$0.27 ,$0.85 ,4/1/25,Open weights
 Meta,Llama 4 Scout,10000000,$0.14 ,$0.54 ,4/1/25,Open weights
 Meta,Llama 3.1 Instruct 405B,128000,$3.75 ,$6.75 ,7/1/24,Open weights
