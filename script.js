@@ -307,19 +307,23 @@ async function loadModelsData() {
 }
 
 // --- UI and Logic Functions ---
+// --- UI and Logic Functions ---
+// Bootstrap Offcanvas instance
+let selectionPanelInstance = null;
+
 function openPanel() {
-  if (selectionPanel && hamburgerBtn) {
-    document.body.classList.add("panel-open");
-    selectionPanel.setAttribute("aria-hidden", "false");
-    hamburgerBtn.setAttribute("aria-expanded", "true");
+  const el = document.getElementById("selectionPanel");
+  if (el) {
+    if (!selectionPanelInstance) selectionPanelInstance = new bootstrap.Offcanvas(el);
+    selectionPanelInstance.show();
   }
 }
 
 function closePanel() {
-  if (selectionPanel && hamburgerBtn) {
-    document.body.classList.remove("panel-open");
-    selectionPanel.setAttribute("aria-hidden", "true");
-    hamburgerBtn.setAttribute("aria-expanded", "false");
+  const el = document.getElementById("selectionPanel");
+  if (el) {
+    const instance = bootstrap.Offcanvas.getInstance(el);
+    if (instance) instance.hide();
   }
 }
 
@@ -340,7 +344,7 @@ function populateModelSelection() {
     return;
   }
   if (!modelsData || modelsData.length === 0) {
-    modelSelectionList.innerHTML = "<p>No model data available.</p>";
+    modelSelectionList.innerHTML = "<p class='text-center text-muted'>No model data available.</p>";
     console.warn("populateModelSelection: modelsData is empty.");
     return;
   }
@@ -351,116 +355,156 @@ function populateModelSelection() {
     if (b === "Other") return -1;
     return a.localeCompare(b);
   });
-  for (const provider of sortedProviders) {
-    const groupDiv = document.createElement("div");
-    groupDiv.className = "model-group";
-    const providerTitle = document.createElement("h3");
-    providerTitle.className = "provider-title";
+
+  sortedProviders.forEach((provider, index) => {
+    const providerId = provider.replace(/\s+/g, "-").replace(/[^a-zA-Z0-9-]/g, "");
+    const collapseId = `collapse-${providerId}-${index}`;
+    const headingId = `heading-${providerId}-${index}`;
+
+    const accordionItem = document.createElement("div");
+    accordionItem.className = "accordion-item";
+
+    const header = document.createElement("h2");
+    header.className = "accordion-header";
+    header.id = headingId;
+
+    const button = document.createElement("button");
+    button.className = "accordion-button collapsed";
+    button.type = "button";
+    button.setAttribute("data-bs-toggle", "collapse");
+    button.setAttribute("data-bs-target", `#${collapseId}`);
+    button.setAttribute("aria-expanded", "false");
+    button.setAttribute("aria-controls", collapseId);
+
+    // Provider Logo
     const providerLogoFilename = getLogoFilename(provider);
     const logoImg = document.createElement("img");
     logoImg.src = `img/logos/${providerLogoFilename}`;
     logoImg.alt = `${provider} logo`;
-    logoImg.className = "provider-logo-title";
+    logoImg.className = "me-2";
+    logoImg.style.width = "20px";
+    logoImg.style.height = "20px";
+    logoImg.style.objectFit = "contain";
     logoImg.loading = "lazy";
     logoImg.onerror = function () { this.style.display = "none"; };
-    const providerNameSpan = document.createElement("span");
-    providerNameSpan.textContent = provider;
-    providerTitle.appendChild(logoImg);
-    providerTitle.appendChild(providerNameSpan);
-    const clearProviderBtn = document.createElement("button");
-    clearProviderBtn.className = "clear-provider-btn";
-    clearProviderBtn.innerHTML = "&times;";
-    clearProviderBtn.setAttribute("aria-label", `Clear ${provider} selections`);
-    clearProviderBtn.title = `Clear ${provider} selections`;
-    providerTitle.appendChild(clearProviderBtn);
-    providerTitle.setAttribute("aria-expanded", "false");
-    const modelListDiv = document.createElement("div");
-    modelListDiv.className = "model-list";
-    modelListDiv.id = `provider-list-${provider.replace(/\s+/g, "-")}`;
-    providerTitle.setAttribute("aria-controls", modelListDiv.id);
-    clearProviderBtn.addEventListener("click", (event) => {
-      event.stopPropagation();
-      modelListDiv.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
-      updateDisplay();
-    });
-    providerTitle.addEventListener("click", () => {
-      const isExpanded = groupDiv.classList.contains("expanded");
-      groupDiv.classList.toggle("expanded", !isExpanded);
-      providerTitle.setAttribute("aria-expanded", !isExpanded);
-    });
+
+    button.appendChild(logoImg);
+    button.appendChild(document.createTextNode(provider));
+
+    header.appendChild(button);
+    accordionItem.appendChild(header);
+
+    const collapseDiv = document.createElement("div");
+    collapseDiv.id = collapseId;
+    collapseDiv.className = "accordion-collapse collapse";
+    collapseDiv.setAttribute("aria-labelledby", headingId);
+    // Remove data-bs-parent to allow multiple sections to be open at once
+    // collapseDiv.setAttribute("data-bs-parent", "#model-selection-list"); 
+
+    const body = document.createElement("div");
+    body.className = "accordion-body p-0";
+
+    const listGroup = document.createElement("div");
+    listGroup.className = "list-group list-group-flush";
+
     const sortedModels = groupedModels[provider].sort((a, b) => a.name.localeCompare(b.name));
     sortedModels.forEach((model) => {
       if (!model.id) return;
-      const div = document.createElement("div");
-      div.className = "model-item";
+      
+      const label = document.createElement("label");
+      label.className = "list-group-item list-group-item-action d-flex align-items-center gap-2 model-item";
+      label.style.cursor = "pointer";
+
       const checkbox = document.createElement("input");
+      checkbox.className = "form-check-input flex-shrink-0";
       checkbox.type = "checkbox";
       checkbox.id = `model-checkbox-${model.id}`;
       checkbox.value = model.id;
       checkbox.addEventListener("change", () => updateDisplay());
-      const label = document.createElement("label");
-      label.htmlFor = `model-checkbox-${model.id}`;
+
+      label.appendChild(checkbox);
+
       if (model.logo) {
         const modelItemLogoImg = document.createElement("img");
         modelItemLogoImg.src = `img/logos/${model.logo}`;
         modelItemLogoImg.alt = `${model.provider || "Provider"} logo`;
-        modelItemLogoImg.className = "model-logo";
+        modelItemLogoImg.style.width = "16px";
+        modelItemLogoImg.style.height = "16px";
+        modelItemLogoImg.style.objectFit = "contain";
         modelItemLogoImg.loading = "lazy";
         label.appendChild(modelItemLogoImg);
       }
+
       const nameSpan = document.createElement("span");
-      nameSpan.className = "model-name-text";
+      nameSpan.className = "model-name-text flex-grow-1";
       nameSpan.textContent = model.name || "Unnamed Model";
       label.appendChild(nameSpan);
+
       const category = getPriceCategory(model);
       if (category.name !== "N/A") {
         const categoryTag = document.createElement("span");
-        categoryTag.className = `price-tag ${category.className}`;
+        let badgeClass = "bg-secondary";
+        if (category.className === "low") badgeClass = "bg-success";
+        if (category.className === "medium") badgeClass = "bg-warning text-dark";
+        if (category.className === "high") badgeClass = "bg-danger";
+        
+        categoryTag.className = `badge ${badgeClass} rounded-pill`;
         categoryTag.textContent = category.name;
         label.appendChild(categoryTag);
       }
-      div.appendChild(checkbox);
-      div.appendChild(label);
-      modelListDiv.appendChild(div);
+
+      listGroup.appendChild(label);
     });
-    groupDiv.appendChild(providerTitle);
-    groupDiv.appendChild(modelListDiv);
-    modelSelectionList.appendChild(groupDiv);
-  }
+
+    body.appendChild(listGroup);
+    collapseDiv.appendChild(body);
+    accordionItem.appendChild(collapseDiv);
+    modelSelectionList.appendChild(accordionItem);
+  });
 }
 
 function filterModelsList(searchTerm) {
   const normalizedSearchTerm = searchTerm.toLowerCase().trim();
-  const allProviderGroups = modelSelectionList.querySelectorAll(".model-group");
-  allProviderGroups.forEach(groupDiv => {
-    const providerTitle = groupDiv.querySelector(".provider-title");
-    const providerName = providerTitle ? providerTitle.textContent.toLowerCase() : "";
-    const modelListDiv = groupDiv.querySelector(".model-list");
-    const modelItems = modelListDiv ? modelListDiv.querySelectorAll(".model-item") : [];
+  const allAccordionItems = modelSelectionList.querySelectorAll(".accordion-item");
+  
+  allAccordionItems.forEach(item => {
+    const button = item.querySelector(".accordion-button");
+    const providerName = button ? button.textContent.toLowerCase() : "";
+    const listGroup = item.querySelector(".list-group");
+    const modelItems = listGroup ? listGroup.querySelectorAll(".model-item") : [];
+    
     let groupHasVisibleModels = false;
     let providerMatches = providerName.includes(normalizedSearchTerm);
+    
     modelItems.forEach(modelItem => {
       const modelNameText = modelItem.querySelector(".model-name-text");
       const modelName = modelNameText ? modelNameText.textContent.toLowerCase() : "";
       const modelMatches = modelName.includes(normalizedSearchTerm);
+      
       if (providerMatches || modelMatches || normalizedSearchTerm === "") {
-        modelItem.style.display = "flex";
+        modelItem.classList.remove("d-none");
+        modelItem.classList.add("d-flex");
         if (modelMatches) groupHasVisibleModels = true;
       } else {
-        modelItem.style.display = "none";
+        modelItem.classList.add("d-none");
+        modelItem.classList.remove("d-flex");
       }
     });
+
     if (groupHasVisibleModels || providerMatches || normalizedSearchTerm === "") {
-      groupDiv.style.display = "block";
+      item.classList.remove("d-none");
+      const collapseDiv = item.querySelector(".accordion-collapse");
       if ((groupHasVisibleModels || providerMatches) && normalizedSearchTerm !== "") {
-        groupDiv.classList.add("expanded");
-        if (providerTitle) providerTitle.setAttribute("aria-expanded", "true");
+        if (collapseDiv) new bootstrap.Collapse(collapseDiv, { toggle: false }).show();
+        button.classList.remove("collapsed");
+        button.setAttribute("aria-expanded", "true");
       } else if (normalizedSearchTerm === "") {
-        groupDiv.classList.remove("expanded");
-        if (providerTitle) providerTitle.setAttribute("aria-expanded", "false");
+         if (collapseDiv) new bootstrap.Collapse(collapseDiv, { toggle: false }).hide();
+         button.classList.add("collapsed");
+         button.setAttribute("aria-expanded", "false");
       }
     } else {
-      groupDiv.style.display = "none";
+      item.classList.add("d-none");
     }
   });
 }
@@ -471,23 +515,15 @@ function selectAllModels() {
 }
 
 function expandAllProviders() {
-  modelSelectionList.querySelectorAll(".model-group").forEach(groupDiv => {
-    if (!groupDiv.classList.contains("expanded")) {
-      groupDiv.classList.add("expanded");
-      const providerTitle = groupDiv.querySelector(".provider-title");
-      if (providerTitle) providerTitle.setAttribute("aria-expanded", "true");
-    }
+  modelSelectionList.querySelectorAll(".accordion-collapse").forEach(collapseDiv => {
+    new bootstrap.Collapse(collapseDiv, { toggle: false }).show();
   });
 }
 
 function clearAndCollapseSelections() {
   modelSelectionList.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
-  modelSelectionList.querySelectorAll(".model-group").forEach(groupDiv => {
-    if (groupDiv.classList.contains("expanded")) {
-      groupDiv.classList.remove("expanded");
-      const providerTitle = groupDiv.querySelector(".provider-title");
-      if (providerTitle) providerTitle.setAttribute("aria-expanded", "false");
-    }
+  modelSelectionList.querySelectorAll(".accordion-collapse").forEach(collapseDiv => {
+    new bootstrap.Collapse(collapseDiv, { toggle: false }).hide();
   });
   updateDisplay();
 }
@@ -498,6 +534,9 @@ function filterModelsByCategory(categoryName) {
   allCheckboxes.forEach(checkbox => checkbox.checked = matchingModelIds.includes(checkbox.value));
   updateDisplay();
 }
+
+// Bootstrap Modal instance
+let modelDetailModalInstance = null;
 
 function showModelDetail(modelId) {
   const model = modelsData.find(m => m.id === modelId);
@@ -513,13 +552,18 @@ function showModelDetail(modelId) {
   modalContextWindow.textContent = model.contextWindow || "N/A";
   modalReleaseDate.textContent = model.releaseDate || "N/A";
   modalStatus.textContent = model.status || "N/A";
-  modelDetailModal.classList.add("show");
-  document.body.classList.add("modal-open");
+  
+  const el = document.getElementById("modelDetailModal");
+  if (el) {
+    if (!modelDetailModalInstance) modelDetailModalInstance = new bootstrap.Modal(el);
+    modelDetailModalInstance.show();
+  }
 }
 
 function hideModelDetail() {
-  modelDetailModal.classList.remove("show");
-  document.body.classList.remove("modal-open");
+  if (modelDetailModalInstance) {
+    modelDetailModalInstance.hide();
+  }
 }
 
 function updateTableView(selectedModelsData) {
@@ -632,8 +676,8 @@ async function renderBarChart(selectedModelsData) {
   const inputPrices = selectedModelsData.map((model) => model.inputPrice ?? null);
   const outputPrices = selectedModelsData.map((model) => model.outputPrice ?? null);
   const data = { labels, datasets: [
-    { label: "Input Price ($/1M)", data: inputPrices, backgroundColor: "rgba(54, 162, 235, 0.6)", borderColor: "rgba(54, 162, 235, 1)", borderWidth: 1 },
-    { label: "Output Price ($/1M)", data: outputPrices, backgroundColor: "rgba(255, 99, 132, 0.6)", borderColor: "rgba(255, 99, 132, 1)", borderWidth: 1 },
+    { label: "Input Price ($/1M)", data: inputPrices, backgroundColor: "rgba(54, 162, 235, 0.6)", borderColor: "rgba(54, 162, 235, 1)", borderWidth: 1, minBarLength: 5 },
+    { label: "Output Price ($/1M)", data: outputPrices, backgroundColor: "rgba(255, 99, 132, 0.6)", borderColor: "rgba(255, 99, 132, 1)", borderWidth: 1, minBarLength: 5 },
   ]};
 
   const logoSize = 16;
@@ -647,6 +691,10 @@ async function renderBarChart(selectedModelsData) {
       responsive: true,
       maintainAspectRatio: false,
       indexAxis: "x",
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
       layout: { padding: { bottom: xAxisItemHeight } },
       plugins: {
         title: { display: true, text: "Model Pricing Comparison ($/1M)", padding: { top: 10, bottom: 20 }, font: { size: 14 } },
@@ -734,10 +782,27 @@ async function switchView(view) {
   if (tableViewBtn) tableViewBtn.classList.toggle("active", !isChartView);
   if (chartViewBtn) {
     chartViewBtn.classList.toggle("active", isChartView);
-    if (isChartView) chartDropdownContent.classList.remove("show");
+    // Bootstrap dropdown handles its own state, but we might want to close it if open?
+    // Actually, clicking an item usually closes it.
   }
-  if (tableView) tableView.classList.toggle("active", !isChartView);
-  if (barChartView) barChartView.classList.toggle("active", isChartView);
+  if (tableView) {
+    if (!isChartView) {
+      tableView.classList.remove("d-none");
+      tableView.classList.add("active");
+    } else {
+      tableView.classList.add("d-none");
+      tableView.classList.remove("active");
+    }
+  }
+  if (barChartView) {
+    if (isChartView) {
+      barChartView.classList.remove("d-none");
+      barChartView.classList.add("active");
+    } else {
+      barChartView.classList.add("d-none");
+      barChartView.classList.remove("active");
+    }
+  }
   if (viewTitle) {
     switch (view) {
       case "bar": viewTitle.textContent = "Bar Chart"; break;
@@ -845,8 +910,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (filterLowBtn) filterLowBtn.addEventListener("click", () => filterModelsByCategory("Low"));
     if (filterMediumBtn) filterMediumBtn.addEventListener("click", () => filterModelsByCategory("Medium"));
     if (filterHighBtn) filterHighBtn.addEventListener("click", () => filterModelsByCategory("High"));
-    if (chartViewBtn) chartViewBtn.addEventListener("click", e => { e.stopPropagation(); chartDropdownContent.classList.toggle("show"); });
-    window.addEventListener("click", e => { if (!e.target.matches("#chartViewBtn") && chartDropdownContent.classList.contains("show")) chartDropdownContent.classList.remove("show"); });
+
     document.querySelectorAll("th[data-sort]").forEach(header => {
       header.addEventListener("click", () => {
         const sortKey = header.dataset.sort;
