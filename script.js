@@ -676,8 +676,8 @@ async function renderBarChart(selectedModelsData) {
   const inputPrices = selectedModelsData.map((model) => model.inputPrice ?? null);
   const outputPrices = selectedModelsData.map((model) => model.outputPrice ?? null);
   const data = { labels, datasets: [
-    { label: "Input Price ($/1M)", data: inputPrices, backgroundColor: "rgba(54, 162, 235, 0.6)", borderColor: "rgba(54, 162, 235, 1)", borderWidth: 1 },
-    { label: "Output Price ($/1M)", data: outputPrices, backgroundColor: "rgba(255, 99, 132, 0.6)", borderColor: "rgba(255, 99, 132, 1)", borderWidth: 1 },
+    { label: "Input Price ($/1M)", data: inputPrices, backgroundColor: "rgba(54, 162, 235, 0.6)", borderColor: "rgba(54, 162, 235, 1)", borderWidth: 1, minBarLength: 5 },
+    { label: "Output Price ($/1M)", data: outputPrices, backgroundColor: "rgba(255, 99, 132, 0.6)", borderColor: "rgba(255, 99, 132, 1)", borderWidth: 1, minBarLength: 5 },
   ]};
 
   const logoSize = 16;
@@ -691,6 +691,10 @@ async function renderBarChart(selectedModelsData) {
       responsive: true,
       maintainAspectRatio: false,
       indexAxis: "x",
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
       layout: { padding: { bottom: xAxisItemHeight } },
       plugins: {
         title: { display: true, text: "Model Pricing Comparison ($/1M)", padding: { top: 10, bottom: 20 }, font: { size: 14 } },
@@ -906,8 +910,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (filterLowBtn) filterLowBtn.addEventListener("click", () => filterModelsByCategory("Low"));
     if (filterMediumBtn) filterMediumBtn.addEventListener("click", () => filterModelsByCategory("Medium"));
     if (filterHighBtn) filterHighBtn.addEventListener("click", () => filterModelsByCategory("High"));
-    if (chartViewBtn) chartViewBtn.addEventListener("click", e => { e.stopPropagation(); chartDropdownContent.classList.toggle("show"); });
-    window.addEventListener("click", e => { if (!e.target.matches("#chartViewBtn") && chartDropdownContent.classList.contains("show")) chartDropdownContent.classList.remove("show"); });
+
     document.querySelectorAll("th[data-sort]").forEach(header => {
       header.addEventListener("click", () => {
         const sortKey = header.dataset.sort;
