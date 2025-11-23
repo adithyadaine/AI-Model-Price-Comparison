@@ -16,9 +16,10 @@ const tableView = document.getElementById("table-view");
 const barChartView = document.getElementById("bar-chart-view");
 const tableViewBtn = document.getElementById("tableViewBtn");
 const chartViewBtn = document.getElementById("chartViewBtn");
-const chartDropdownContent = document.getElementById("chart-dropdown-content");
+
 const barChartViewBtn = document.getElementById("barChartViewBtn");
 const scatterChartViewBtn = document.getElementById("scatterChartViewBtn");
+const timelineChartViewBtn = document.getElementById("timelineChartViewBtn");
 const refreshPageBtn = document.getElementById("refreshPageBtn");
 const priceChartCanvas = document.getElementById("priceChart");
 const barChartMessage = document.getElementById("bar-chart-message");
@@ -777,8 +778,78 @@ async function renderScatterChart(selectedModelsData) {
   if (ctx) priceChartInstance = new Chart(ctx, config);
 }
 
+async function renderTimelineChart(selectedModelsData) {
+  if (!priceChartCanvas || !barChartCanvasContainer || !barChartMessage) return;
+  if (priceChartInstance) priceChartInstance.destroy();
+  barChartMessage.textContent = "";
+  priceChartCanvas.style.display = "block";
+  barChartCanvasContainer.style.minWidth = "0px";
+
+  const validModels = selectedModelsData.filter(m => m.releaseDate && parseValueForSort(m.releaseDate, "date").getTime() > 0);
+
+  if (validModels.length === 0) {
+    barChartMessage.textContent = "Select models with release dates to display timeline.";
+    priceChartCanvas.style.display = "none";
+    return;
+  }
+
+  // Group by provider to create Y-axis categories
+  const providers = [...new Set(validModels.map(m => m.provider))].sort();
+  
+  const timelineData = validModels.map(model => ({
+    x: parseValueForSort(model.releaseDate, "date"),
+    y: model.provider,
+    model
+  }));
+
+  const config = {
+    type: "scatter",
+    data: {
+      datasets: [{
+        label: "Models",
+        data: timelineData,
+        backgroundColor: "rgba(75, 192, 192, 0.6)",
+        pointRadius: 6,
+        pointHoverRadius: 9
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: { display: true, text: "Model Release Timeline", font: { size: 14 } },
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const model = context.raw.model;
+              return `${model.name} (${model.releaseDate})`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: "time",
+          time: { unit: "month" },
+          title: { display: true, text: "Release Date" }
+        },
+        y: {
+          type: "category",
+          labels: providers,
+          title: { display: true, text: "Provider" },
+          offset: true // Add spacing at top/bottom
+        }
+      }
+    }
+  };
+
+  const ctx = priceChartCanvas.getContext("2d");
+  if (ctx) priceChartInstance = new Chart(ctx, config);
+}
+
 async function switchView(view) {
-  const isChartView = view === "bar" || view === "scatter";
+  const isChartView = view === "bar" || view === "scatter" || view === "timeline";
   if (tableViewBtn) tableViewBtn.classList.toggle("active", !isChartView);
   if (chartViewBtn) {
     chartViewBtn.classList.toggle("active", isChartView);
@@ -807,6 +878,7 @@ async function switchView(view) {
     switch (view) {
       case "bar": viewTitle.textContent = "Bar Chart"; break;
       case "scatter": viewTitle.textContent = "Scatter Plot"; break;
+      case "timeline": viewTitle.textContent = "Timeline"; break;
       default: viewTitle.textContent = "Table"; break;
     }
   }
@@ -838,6 +910,7 @@ async function updateDisplay() {
   switch (currentView) {
     case "bar": await renderBarChart(filteredModelsData); break;
     case "scatter": await renderScatterChart(filteredModelsData); break;
+    case "timeline": await renderTimelineChart(filteredModelsData); break;
     default: updateTableView(filteredModelsData); break;
   }
 }
@@ -897,6 +970,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (tableViewBtn) tableViewBtn.addEventListener("click", () => switchView("table"));
     if (barChartViewBtn) barChartViewBtn.addEventListener("click", () => switchView("bar"));
     if (scatterChartViewBtn) scatterChartViewBtn.addEventListener("click", () => switchView("scatter"));
+    if (timelineChartViewBtn) timelineChartViewBtn.addEventListener("click", () => switchView("timeline"));
     if (refreshPageBtn) refreshPageBtn.addEventListener("click", () => location.reload());
     if (hamburgerBtn) hamburgerBtn.addEventListener("click", openPanel);
     if (closePanelBtn) closePanelBtn.addEventListener("click", closePanel);

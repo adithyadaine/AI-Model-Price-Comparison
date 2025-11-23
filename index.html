@@ -83,15 +83,16 @@
       <main class="card shadow-sm">
         <div class="card-body">
           <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-            <div class="btn-group" role="group">
-              <button id="tableViewBtn" class="btn btn-outline-primary active">Table</button>
+            <div class="d-inline-flex position-relative" role="group" style="z-index: 1021;">
+              <button id="tableViewBtn" class="btn btn-outline-primary active rounded-end-0">Table</button>
               <div class="btn-group" role="group">
-                <button id="chartViewBtn" type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <button id="chartViewBtn" type="button" class="btn btn-outline-primary dropdown-toggle rounded-start-0" data-bs-toggle="dropdown" aria-expanded="false">
                   Chart Type
                 </button>
-                <ul class="dropdown-menu" id="chart-dropdown-content">
+                <ul class="dropdown-menu">
                   <li><button id="barChartViewBtn" class="dropdown-item">Bar Chart</button></li>
                   <li><button id="scatterChartViewBtn" class="dropdown-item">Scatter Plot</button></li>
+                  <li><button id="timelineChartViewBtn" class="dropdown-item">Timeline Chart</button></li>
                 </ul>
               </div>
             </div>
