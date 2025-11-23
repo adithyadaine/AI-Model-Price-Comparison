@@ -579,7 +579,7 @@ function updateTableView(selectedModelsData) {
     row.dataset.modelId = model.id;
     const formatPrice = p => (p !== null && p !== undefined && !isNaN(p)) ? `$${p.toFixed(2)}` : "N/A";
     const modelNameCell = document.createElement("td");
-    modelNameCell.className = "model-name-cell";
+    modelNameCell.className = "model-name-cell d-flex align-items-center";
     modelNameCell.style.cursor = "pointer";
     modelNameCell.title = `View details for ${model.name}`;
     if (model.logo) {
@@ -598,7 +598,12 @@ function updateTableView(selectedModelsData) {
     const category = getPriceCategory(model);
     if (category.name !== "N/A") {
       const categoryTag = document.createElement("span");
-      categoryTag.className = `price-tag ${category.className}`;
+      let badgeClass = "bg-secondary";
+      if (category.className === "low") badgeClass = "bg-success";
+      if (category.className === "medium") badgeClass = "bg-warning text-dark";
+      if (category.className === "high") badgeClass = "bg-danger";
+      
+      categoryTag.className = `badge ${badgeClass} rounded-pill ms-auto`;
       categoryTag.textContent = category.name;
       modelNameCell.appendChild(categoryTag);
     }
