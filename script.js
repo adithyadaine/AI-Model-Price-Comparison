@@ -50,10 +50,58 @@ const modalOutputPrice = document.getElementById("modalOutputPrice");
 const modalContextWindow = document.getElementById("modalContextWindow");
 const modalReleaseDate = document.getElementById("modalReleaseDate");
 const modalStatus = document.getElementById("modalStatus");
+// NEW: Theme Toggle Elements
+const themeToggleBtn = document.getElementById("themeToggle");
+const themeIcon = document.getElementById("themeIcon");
 // --------------------
 
 // --- Global Image Cache ---
 const imageCache = {};
+
+// --- Theme Management ---
+function getStoredTheme() {
+  return localStorage.getItem("theme") || "light";
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute("data-bs-theme", theme);
+  localStorage.setItem("theme", theme);
+  updateThemeIcon(theme);
+  updateDisplay(); // Re-render to update chart colors
+}
+
+function updateThemeIcon(theme) {
+  if (theme === "dark") {
+    themeIcon.classList.remove("bi-moon-stars-fill");
+    themeIcon.classList.add("bi-sun-fill");
+  } else {
+    themeIcon.classList.remove("bi-sun-fill");
+    themeIcon.classList.add("bi-moon-stars-fill"); // Moon icon for light mode (switch to dark)
+  }
+}
+
+function toggleTheme() {
+  const currentTheme = getStoredTheme();
+  const newTheme = currentTheme === "light" ? "dark" : "light";
+  setTheme(newTheme);
+}
+
+function getChartColors() {
+  const theme = getStoredTheme();
+  const isDark = theme === "dark";
+  return {
+    textColor: isDark ? "#e0e0e0" : "#666",
+    gridColor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+    tooltipBg: isDark ? "rgba(255, 255, 255, 0.9)" : "rgba(0, 0, 0, 0.8)",
+    tooltipText: isDark ? "#000" : "#fff"
+  };
+}
+
+
+
+// Initialize Theme
+const savedTheme = getStoredTheme();
+setTheme(savedTheme);
 
 // --- Helper Functions ---
 function getPriceCategory(model) {
@@ -515,6 +563,14 @@ function selectAllModels() {
   updateDisplay();
 }
 
+// Initial Render
+updateDisplay();
+
+// Theme Toggle Listener
+if (themeToggleBtn) {
+  themeToggleBtn.addEventListener("click", toggleTheme);
+}
+
 function expandAllProviders() {
   modelSelectionList.querySelectorAll(".accordion-collapse").forEach(collapseDiv => {
     new bootstrap.Collapse(collapseDiv, { toggle: false }).show();
@@ -689,6 +745,8 @@ async function renderBarChart(selectedModelsData) {
   const logoSize = 16;
   const textPadding = 4;
   const xAxisItemHeight = logoSize + textPadding + 12 + 5;
+  
+  const colors = getChartColors();
 
   const config = {
     type: "bar",
@@ -703,8 +761,11 @@ async function renderBarChart(selectedModelsData) {
       },
       layout: { padding: { bottom: xAxisItemHeight } },
       plugins: {
-        title: { display: true, text: "Model Pricing Comparison ($/1M)", padding: { top: 10, bottom: 20 }, font: { size: 14 } },
+        title: { display: true, text: "Model Pricing Comparison ($/1M)", padding: { top: 10, bottom: 20 }, font: { size: 14 }, color: colors.textColor },
         tooltip: {
+          backgroundColor: colors.tooltipBg,
+          titleColor: colors.tooltipText,
+          bodyColor: colors.tooltipText,
           callbacks: {
             label: function (context) {
               let label = context.dataset.label || "";
@@ -719,12 +780,12 @@ async function renderBarChart(selectedModelsData) {
             },
           },
         },
-        legend: { position: "top" },
-        customXAxisRenderer: { selectedModels: selectedModelsData, logoSize, textPadding, font: "10px Arial, sans-serif", textColor: "#444" },
+        legend: { position: "top", labels: { color: colors.textColor } },
+        customXAxisRenderer: { selectedModels: selectedModelsData, logoSize, textPadding, font: "10px Arial, sans-serif", textColor: colors.textColor },
       },
       scales: {
-        y: { beginAtZero: true, title: { display: true, text: "Price ($/1M)" }, ticks: { callback: (value) => "$" + value.toFixed(2) }, min: 0 },
-        x: { barPercentage: 0.5, categoryPercentage: 0.7, title: { display: true, text: "Model" }, ticks: { callback: () => "" } },
+        y: { beginAtZero: true, title: { display: true, text: "Price ($/1M)", color: colors.textColor }, ticks: { callback: (value) => "$" + value.toFixed(2), color: colors.textColor }, grid: { color: colors.gridColor }, min: 0 },
+        x: { barPercentage: 0.5, categoryPercentage: 0.7, title: { display: true, text: "Model", color: colors.textColor }, ticks: { callback: () => "", color: colors.textColor }, grid: { color: colors.gridColor } },
       },
     },
   };
@@ -751,6 +812,8 @@ async function renderScatterChart(selectedModelsData) {
 
   const scatterData = validModels.map(model => ({ x: parseFormattedNumber(model.contextWindow), y: model.inputPrice, model }));
 
+  const colors = getChartColors();
+
   const config = {
     type: "scatter",
     data: {
@@ -760,11 +823,14 @@ async function renderScatterChart(selectedModelsData) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        title: { display: true, text: "Price vs. Context Window", font: { size: 14 } },
+        title: { display: true, text: "Price vs. Context Window", font: { size: 14 }, color: colors.textColor },
         legend: { display: false },
         tooltip: {
           mode: "nearest",
           intersect: true,
+          backgroundColor: colors.tooltipBg,
+          titleColor: colors.tooltipText,
+          bodyColor: colors.tooltipText,
           callbacks: {
             label: function (context) {
               const model = context.raw.model;
@@ -774,8 +840,8 @@ async function renderScatterChart(selectedModelsData) {
         },
       },
       scales: {
-        x: { type: "logarithmic", title: { display: true, text: "Context Window (Tokens) - Logarithmic Scale" }, ticks: { callback: v => v >= 1e6 ? `${v/1e6}M` : (v >= 1e3 ? `${v/1e3}k` : v) } },
-        y: { type: "linear", beginAtZero: true, title: { display: true, text: "Input Price ($/1M)" }, ticks: { callback: v => `$${v.toFixed(2)}` }, min: 0 },
+        x: { type: "logarithmic", title: { display: true, text: "Context Window (Tokens) - Logarithmic Scale", color: colors.textColor }, ticks: { callback: v => v >= 1e6 ? `${v/1e6}M` : (v >= 1e3 ? `${v/1e3}k` : v), color: colors.textColor }, grid: { color: colors.gridColor } },
+        y: { type: "linear", beginAtZero: true, title: { display: true, text: "Input Price ($/1M)", color: colors.textColor }, ticks: { callback: v => `$${v.toFixed(2)}`, color: colors.textColor }, min: 0, grid: { color: colors.gridColor } },
       },
     },
   };
