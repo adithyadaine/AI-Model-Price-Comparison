@@ -37,6 +37,8 @@ Anthropic,Claude 3 Haiku,200000,$0.25 ,$1.25 ,3/13/24,Proprietary
 Anthropic,Claude 2.1,200000,$8.00 ,$24.00 ,11/21/23,Proprietary
 Anthropic,Claude 2.0,100000,$8.00 ,$24.00 ,7/11/23,Proprietary
 Anthropic,Claude Instant 1.2,100000,$0.80 ,$2.40 ,8/9/23,Proprietary
+Anthropic,Claude Opus 4.5 (Non-reasoning),200000,$5.00 ,$25.00 ,11/24/25,Proprietary
+Anthropic,Claude Opus 4.5 (Reasoning),200000,$5.00 ,$25.00 ,11/24/25,Proprietary
 Cohere,Command A,256000,$2.50 ,$10.00 ,3/1/25,Open weights
 Cohere,Command-R+ (Aug '24),128000,$2.50 ,$10.00 ,8/1/24,Open weights
 Cohere,Command-R+ (Apr '24),128000,$3.00 ,$15.00 ,4/1/24,Open weights
