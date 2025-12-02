@@ -2,12 +2,17 @@
 <html lang="en" data-bs-theme="light">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Model Pricing Comparator</title>
-    <!-- Bootstrap 5 CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Ledger - AI Model Pricing & Specs</title>
+  
+  <!-- Favicon -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
     <link
       rel="icon"
@@ -19,160 +24,344 @@
   </head>
   <body>
     
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm py-3">
-      <div class="container-fluid">
-        <button
-          id="hamburgerBtn"
-          class="btn btn-outline-light me-3"
-          type="button"
-          data-bs-toggle="offcanvas"
-          data-bs-target="#selectionPanel"
-          aria-controls="selectionPanel"
-          aria-label="Open model selection menu"
-        >
-          <i class="bi bi-list"></i>
-        </button>
-        <a class="navbar-brand d-flex align-items-center" href="#">
-          <img
-            src="img/favicon/innovative-brain-icon.png"
-            alt="Logo"
-            width="30"
-            height="30"
-            class="d-inline-block align-text-top me-2"
-            id="brain"
-          />
-          AI Model Pricing Comparator
-        </a>
-        <button class="btn btn-outline-light" id="themeToggle" title="Toggle Dark Mode">
-          <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
-        </button>
-      </div>
-    </nav>
-
-    <!-- Offcanvas Selection Panel -->
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="selectionPanel" aria-labelledby="selectionPanelLabel">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="selectionPanelLabel">Select Models</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" id="closePanelBtn"></button>
-      </div>
-      <div class="offcanvas-body">
-        <div class="d-grid gap-2 mb-3">
-          <button id="selectAllBtn" class="btn btn-primary btn-sm">Select All Models</button>
-          <button id="expandAllBtn" class="btn btn-outline-secondary btn-sm">Expand All Providers</button>
-          <button id="clearPanelBtn" class="btn btn-outline-danger btn-sm">Clear & Collapse</button>
+    <div class="d-flex h-100">
+      <!-- Sidebar -->
+      <aside class="sidebar d-flex flex-column flex-shrink-0 p-3 border-end" style="width: 240px; height: 100vh; position: fixed; overflow-y: auto;">
+        <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none sidebar-brand-link">
+        <img src="img/favicon/innovative-brain-icon.png" alt="Logo" width="32" height="32" class="me-2">
+        <span class="fs-5 fw-bold tracking-tight">LLM Ledger</span>
+      </a>
+      <hr>  <div class="mt-4">
+          <button class="btn btn-primary w-100 rounded-pill mb-3 fw-medium" data-bs-toggle="offcanvas" data-bs-target="#selectionPanel">
+            <i class="bi bi-plus-lg me-2"></i> Select Models
+          </button>
         </div>
-
-        <!-- Price Filter Buttons -->
-        <div class="btn-group w-100 mb-3" role="group" aria-label="Price filters">
-          <button id="filterLowBtn" type="button" class="btn btn-success btn-sm">Low</button>
-          <button id="filterMediumBtn" type="button" class="btn btn-warning btn-sm text-dark">Medium</button>
-          <button id="filterHighBtn" type="button" class="btn btn-danger btn-sm">High</button>
+        <ul class="nav nav-pills flex-column mb-auto">
+          <li class="nav-item">
+            <a href="#" class="nav-link active d-flex align-items-center" aria-current="page">
+              <i class="bi bi-trophy me-3"></i>
+              Leaderboard
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link d-flex align-items-center" id="nav-providers">
+              <i class="bi bi-building me-3"></i>
+              Providers
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#aboutModal">
+              <i class="bi bi-info-circle me-3"></i>
+              About
+            </a>
+          </li>
+        </ul>
+        <div class="mt-auto pt-4 border-top">
+           <button class="btn btn-link link-secondary text-decoration-none d-flex align-items-center px-2" id="themeToggle">
+            <i class="bi bi-moon-stars me-2" id="themeIcon"></i>
+            <span>Theme</span>
+          </button>
         </div>
+      </aside>
 
-        <!-- Search Input -->
-        <div class="mb-3">
-          <input type="search" id="modelSearchInput" class="form-control" placeholder="Search models..." aria-label="Search models">
+      <!-- Offcanvas Selection Panel (Hidden by default, triggered by button) -->
+      <div class="offcanvas offcanvas-start" tabindex="-1" id="selectionPanel" aria-labelledby="selectionPanelLabel" style="z-index: 1050;">
+        <div class="offcanvas-header border-bottom">
+          <h5 class="offcanvas-title fw-bold" id="selectionPanelLabel">Select Models</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" id="closePanelBtn"></button>
         </div>
-
-        <div id="model-selection-list" class="accordion accordion-flush">
-          <p class="text-center text-muted">Loading models...</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="container-fluid py-4">
-      <main class="card shadow-sm">
-        <div class="card-body">
-          <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-            <div class="d-inline-flex position-relative" role="group" style="z-index: 1021;">
-              <button id="tableViewBtn" class="btn btn-outline-primary active rounded-end-0">Table</button>
-              <div class="btn-group" role="group">
-                <button id="chartViewBtn" type="button" class="btn btn-outline-primary dropdown-toggle rounded-start-0" data-bs-toggle="dropdown" aria-expanded="false">
-                  Chart Type
-                </button>
-                <ul class="dropdown-menu">
-                  <li><button id="barChartViewBtn" class="dropdown-item">Bar Chart</button></li>
-                  <li><button id="scatterChartViewBtn" class="dropdown-item">Scatter Plot</button></li>
-                  <li><button id="timelineChartViewBtn" class="dropdown-item">Timeline Chart</button></li>
-                </ul>
-              </div>
-            </div>
-            <button id="refreshPageBtn" class="btn btn-outline-danger">Clear</button>
+        <div class="offcanvas-body">
+          <div class="d-grid gap-2 mb-3">
+            <button id="selectAllBtn" class="btn btn-light btn-sm rounded-pill border">Select All</button>
+            <button id="expandAllBtn" class="btn btn-light btn-sm rounded-pill border">Expand All</button>
+            <button id="clearPanelBtn" class="btn btn-light btn-sm rounded-pill border text-danger">Clear</button>
           </div>
 
-          <h2 class="card-title mb-4 pb-2 border-bottom">Comparison <span id="view-title" class="text-primary">Table</span></h2>
+          <!-- Price Filter Buttons -->
+          <div class="btn-group w-100 mb-3" role="group">
+            <button id="filterLowBtn" type="button" class="btn btn-outline-secondary btn-sm">Low</button>
+            <button id="filterMediumBtn" type="button" class="btn btn-outline-secondary btn-sm">Med</button>
+            <button id="filterHighBtn" type="button" class="btn btn-outline-secondary btn-sm">High</button>
+          </div>
 
-          <!-- Table View -->
-          <div id="table-view" class="view-container active">
-            <div class="table-responsive" style="max-height: 70vh;">
-              <table class="table table-striped table-hover table-bordered align-middle">
-                <thead class="table-light sticky-top">
-                  <tr>
-                    <th scope="col" data-sort="name" role="button">Model Name <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                    <th scope="col" data-sort="provider" role="button">Provider <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                    <th scope="col" data-sort="inputPrice" role="button">Input ($/1M) <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                    <th scope="col" data-sort="outputPrice" role="button">Output ($/1M) <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                    <th scope="col" data-sort="contextWindow" role="button">Context Window <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                    <th scope="col" data-sort="releaseDate" role="button">Release Date <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                  </tr>
-                </thead>
-                <tbody id="comparison-table-body">
-                  <tr>
-                    <td colspan="6" class="text-center">Select models to compare.</td>
-                  </tr>
-                </tbody>
-              </table>
+          <!-- Search Input -->
+          <div class="mb-3">
+            <input type="search" id="modelSearchInput" class="form-control rounded-pill border-0" placeholder="Search models...">
+          </div>
+
+          <div id="model-selection-list" class="accordion accordion-flush">
+            <p class="text-center text-muted small mt-4">Loading models...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <main class="flex-grow-1 d-flex flex-column" style="margin-left: 240px; min-height: 100vh; width: calc(100% - 240px); overflow-x: hidden;">
+        <!-- Top Header -->
+        <header class="py-2 px-4 border-bottom sticky-top" style="z-index: 1000;">
+          <div class="d-flex justify-content-between align-items-center">
+            <nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Leaderboard</li>
+    </ol>
+  </nav>
+
+  <div class="flex-grow-1 mx-4" style="max-width: 400px;">
+    <div class="input-group position-relative">
+      <span class="input-group-text bg-light border-end-0 text-muted">
+        <i class="bi bi-search"></i>
+      </span>
+      <input type="text" id="mainSearchInput" class="form-control bg-light border-start-0" placeholder="Search models, providers..." aria-label="Search" autocomplete="off">
+      <div id="searchSuggestions" class="list-group position-absolute w-100 shadow-lg d-none rounded-3 overflow-hidden bg-body" style="z-index: 2000; top: 100%; margin-top: 4px;"></div>
+    </div>
+  </div>
+
+  <div class="btn-group bg-light rounded-pill p-1 border" role="group" aria-label="View toggle">
+               <button id="refreshPageBtn" class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size: 0.75rem;">Reset View</button>
             </div>
+          </div>
+        </header>
+
+        <div class="container-fluid p-3 p-lg-4" style="max-width: 1600px;">
+          
+          <div class="mb-4">
+            <h1 class="h4 fw-bold mb-1">Pricing Leaderboard</h1>
+            <p class="text-muted small mb-0" style="max-width: 800px;">
+              Compare input and output costs across top AI models. Select models from the sidebar to customize your view.
+            </p>
+          </div>
+
+          <!-- View Controls -->
+          <div class="d-flex justify-content-between align-items-center mb-4">
+             <div class="btn-group" role="group" aria-label="View controls">
+                <button type="button" class="btn btn-outline-secondary active" id="tableViewBtn"><i class="bi bi-table me-1"></i>Table</button>
+                <button type="button" class="btn btn-outline-secondary" id="barChartViewBtn"><i class="bi bi-bar-chart me-1"></i>Bar</button>
+                <button type="button" class="btn btn-outline-secondary" id="scatterChartViewBtn"><i class="bi bi-graph-up me-1"></i>Scatter</button>
+                <button type="button" class="btn btn-outline-secondary" id="timelineChartViewBtn"><i class="bi bi-calendar3 me-1"></i>Timeline</button>
+             </div>
+             <div class="text-muted small">
+               Last updated: <span id="dynamicTimestamp"></span>
+             </div>
           </div>
 
           <!-- Chart View -->
           <div id="bar-chart-view" class="view-container d-none">
-            <div class="chart-scroll-wrapper border rounded p-2 mb-3" style="overflow-x: auto;">
-              <div class="chart-canvas-container" style="height: 500px; position: relative;">
-                <canvas id="priceChart"></canvas>
+            <div class="card border shadow-sm rounded-3 p-4">
+              <div id="barChartMessage" class="text-center text-muted mb-3"></div>
+              <div class="chart-scroll-container">
+                <div id="barChartCanvasContainer" class="chart-canvas-container">
+                  <canvas id="priceChartCanvas"></canvas>
+                </div>
               </div>
             </div>
-            <p class="text-center text-muted" id="bar-chart-message"></p>
           </div>
 
-          <p class="text-end text-muted small mt-3">
-            Last updated: <span id="dynamicTimestamp"></span>
-          </p>
+          <!-- Table Card -->
+          <div id="table-view" class="view-container active">
+            <div class="card border shadow-sm rounded-3 overflow-hidden">
+              <div class="card-header border-bottom py-2 px-3 d-flex justify-content-between align-items-center">
+                 <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-table text-muted small"></i>
+                    <h5 class="mb-0 fw-semibold" style="font-size: 0.9rem;">Model Pricing</h5>
+                 </div>
+                 <span class="badge border rounded-pill fw-normal live-data-badge" style="font-size: 0.7rem;">Live Data</span>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                  <thead class="border-bottom table-header-bg">
+                    <tr>
+                      <th scope="col" class="ps-3 text-muted fw-medium text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.05em; width: 60px;">Rank</th>
+                      <th scope="col" data-sort="name" role="button" class="text-muted fw-medium text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.05em;">Model <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                      <th scope="col" class="text-muted fw-medium text-uppercase text-center" style="font-size: 0.7rem; letter-spacing: 0.05em;">Tier</th>
+                      <th scope="col" data-sort="provider" role="button" class="text-muted fw-medium text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.05em;">Provider <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                      <th scope="col" data-sort="inputPrice" role="button" class="text-muted fw-medium text-uppercase text-end" style="font-size: 0.7rem; letter-spacing: 0.05em;">Input ($/1M) <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                      <th scope="col" data-sort="outputPrice" role="button" class="text-muted fw-medium text-uppercase text-end" style="font-size: 0.7rem; letter-spacing: 0.05em;">Output ($/1M) <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                      <th scope="col" data-sort="contextWindow" role="button" class="text-muted fw-medium text-uppercase text-end" style="font-size: 0.7rem; letter-spacing: 0.05em;">Context <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                      <th scope="col" data-sort="releaseDate" role="button" class="text-muted fw-medium text-uppercase text-end pe-3" style="font-size: 0.7rem; letter-spacing: 0.05em;">Release <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                    </tr>
+                  </thead>
+                  <tbody id="comparison-table-body">
+                    <tr>
+                      <td colspan="7" class="text-center py-4 text-muted">Select models to compare.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-footer border-top py-2 px-3 text-center">
+                 <button class="btn btn-link text-decoration-none text-muted fw-medium" style="font-size: 0.75rem;" data-bs-toggle="offcanvas" data-bs-target="#selectionPanel">View all models</button>
+              </div>
+            </div>
+          </div>
+
+
+
+          <!-- Providers View -->
+          <div id="providers-view" class="view-container d-none">
+            <div class="row g-4" id="providersListContainer">
+              <!-- Providers will be populated here -->
+            </div>
+          </div>
+
         </div>
+        <footer class="py-4 border-top mt-auto px-4 px-lg-5">
+            <div class="row align-items-center justify-content-between g-4">
+          <div class="col-md-6 d-flex align-items-center">
+            <a href="/" class="d-flex align-items-center text-decoration-none text-muted me-3">
+               <img src="img/favicon/innovative-brain-icon.png" alt="Logo" width="24" height="24" class="me-2 opacity-75 footer-logo">
+               <span class="fw-bold font-monospace">LLM Ledger</span>
+            </a>
+            <span class="text-muted small border-start ps-3">© 2025</span>
+          </div>
+          <div class="col-md-6 d-flex justify-content-md-end gap-4 align-items-center text-muted">
+            <a href="#" class="text-decoration-none text-muted hover-text-main transition-colors" data-bs-toggle="modal" data-bs-target="#aboutModal">About</a>
+            <a href="#" class="text-decoration-none text-muted hover-text-main transition-colors" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy</a>
+          </div>
+        </div>
+        </footer>
       </main>
     </div>
-
-    <footer class="bg-dark text-light text-center py-4 mt-auto fixed-bottom">
-      <div class="container">
-        <h6 class="m-0 fw-normal">Maintained with ❤️ by Adithya D M</h6>
-      </div>
-    </footer>
 
     <!-- Model Detail Modal -->
     <div class="modal fade" id="modelDetailModal" tabindex="-1" aria-labelledby="modalModelName" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalModelName">Model Name</h5>
+        <div class="modal-content border-0 shadow-lg rounded-4">
+          <div class="modal-header border-bottom-0 pb-0">
+            <h5 class="modal-title fw-bold" id="modalModelName">Model Name</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeDetailModalBtn"></button>
           </div>
-          <div class="modal-body">
-            <div class="text-center mb-3">
-                <img id="modalModelLogo" src="" alt="Model Logo" class="img-fluid" style="max-height: 60px; display: none;">
+          <div class="modal-body pt-2">
+            <div class="text-center mb-4 mt-2">
+                <img id="modalModelLogo" src="" alt="Model Logo" class="img-fluid rounded-3 shadow-sm p-2 bg-white border" style="max-height: 80px; display: none;">
             </div>
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item"><strong>Provider:</strong> <span id="modalModelProvider"></span></li>
-              <li class="list-group-item"><strong>Input Price ($/1M):</strong> <span id="modalInputPrice"></span></li>
-              <li class="list-group-item"><strong>Output Price ($/1M):</strong> <span id="modalOutputPrice"></span></li>
-              <li class="list-group-item"><strong>Context Window (tokens):</strong> <span id="modalContextWindow"></span></li>
-              <li class="list-group-item"><strong>Release Date:</strong> <span id="modalReleaseDate"></span></li>
-              <li class="list-group-item"><strong>Status:</strong> <span id="modalStatus"></span></li>
-            </ul>
+            <div class="list-group list-group-flush rounded-3 border">
+              <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-3">
+                  <span class="text-muted">Provider</span>
+                  <span id="modalModelProvider" class="fw-medium"></span>
+              </div>
+              <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-3">
+                  <span class="text-muted">Input Price</span>
+                  <span id="modalInputPrice" class="fw-medium font-monospace"></span>
+              </div>
+              <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-3">
+                  <span class="text-muted">Output Price</span>
+                  <span id="modalOutputPrice" class="fw-medium font-monospace"></span>
+              </div>
+              <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-3">
+                  <span class="text-muted">Context Window</span>
+                  <span id="modalContextWindow" class="fw-medium"></span>
+              </div>
+              <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-3">
+                  <span class="text-muted">Release Date</span>
+                  <span id="modalReleaseDate" class="fw-medium"></span>
+              </div>
+              <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-3">
+                  <span class="text-muted">Status</span>
+                  <span id="modalStatus" class="fw-medium"></span>
+              </div>
+            </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+          <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold d-flex align-items-center" id="aboutModalLabel">
+          <img src="img/favicon/innovative-brain-icon.png" alt="Logo" width="24" height="24" class="me-2">
+          About LLM Ledger
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+          <div class="modal-body pt-3 px-4 pb-4">
+            <p class="lead text-muted mb-4">Compare AI model pricing, performance, and capabilities in one place.</p>
+            
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-light border h-100">
+                  <h6 class="fw-bold mb-2"><i class="bi bi-currency-dollar me-2 text-primary"></i>Transparent Pricing</h6>
+                  <p class="small text-muted mb-0">View up-to-date input and output costs per 1 million tokens for all major LLMs. No hidden fees or complex calculations.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-light border h-100">
+                  <h6 class="fw-bold mb-2"><i class="bi bi-hdd-stack me-2 text-primary"></i>Context Windows</h6>
+                  <p class="small text-muted mb-0">Compare context window sizes to find the right model for your document processing and long-context tasks.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-light border h-100">
+                  <h6 class="fw-bold mb-2"><i class="bi bi-graph-up me-2 text-primary"></i>Visual Analytics</h6>
+                  <p class="small text-muted mb-0">Use interactive charts to visualize price trends and compare models side-by-side.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-light border h-100">
+                  <h6 class="fw-bold mb-2"><i class="bi bi-shield-check me-2 text-primary"></i>Data Source</h6>
+                  <p class="small text-muted mb-0">Data is sourced from provider documentation, <a href="https://artificialanalysis.ai/" target="_blank" class="text-decoration-none">Artificial Analysis</a>, and <a href="https://openrouter.ai/models" target="_blank" class="text-decoration-none">OpenRouter</a> to ensure accuracy.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-top text-center">
+               <p class="small text-muted mb-0">
+                 Designed for developers, researchers, and businesses to make informed decisions about AI infrastructure.
+               </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold d-flex align-items-center" id="privacyModalLabel">
+              <i class="bi bi-shield-lock me-2 text-primary"></i>
+              Privacy & Data
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body pt-3 px-4 pb-4">
+            <p class="lead text-muted mb-4">Your privacy is paramount. LLM Ledger is designed to be a secure, client-side tool.</p>
+            
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-light border h-100">
+                  <h6 class="fw-bold mb-2"><i class="bi bi-person-x me-2 text-primary"></i>No Data Collection</h6>
+                  <p class="small text-muted mb-0">Since no login is required, data collection is out of the question. We do not track search queries or usage metrics.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-light border h-100">
+                  <h6 class="fw-bold mb-2"><i class="bi bi-cpu me-2 text-primary"></i>Local Processing</h6>
+                  <p class="small text-muted mb-0">All data filtering, sorting, and comparisons are performed entirely within your browser. No data is sent to external servers.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-light border h-100">
+                  <h6 class="fw-bold mb-2"><i class="bi bi-box-arrow-up-right me-2 text-primary"></i>External Links</h6>
+                  <p class="small text-muted mb-0">Links to model providers (e.g., OpenAI, Anthropic) take you to third-party sites. Please review their respective privacy policies.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-light border h-100">
+                  <h6 class="fw-bold mb-2"><i class="bi bi-code-square me-2 text-primary"></i>Transparency</h6>
+                  <p class="small text-muted mb-0">This application is built with transparency in mind, ensuring you can verify how your data is handled.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-top text-center">
+               <p class="small text-muted mb-0">
+                 Trust and security are core to the LLM Ledger experience.
+               </p>
+            </div>
           </div>
         </div>
       </div>
@@ -180,6 +369,6 @@
 
     <!-- Bootstrap 5 JS Bundle (includes Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    <script src="script.js"></script>
+    <script src="script.js?v=1"></script>
   </body>
 </html>

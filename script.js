@@ -7,6 +7,7 @@ let currentSort = {
   column: "releaseDate",
   direction: "desc",
 };
+let globalSearchTerm = "";
 
 // --- DOM Elements ---
 const modelSelectionList = document.getElementById("model-selection-list");
@@ -14,18 +15,15 @@ const comparisonTableBody = document.getElementById("comparison-table-body");
 const viewTitle = document.getElementById("view-title");
 const tableView = document.getElementById("table-view");
 const barChartView = document.getElementById("bar-chart-view");
+const priceChartCanvas = document.getElementById("priceChartCanvas");
+const barChartCanvasContainer = document.getElementById("barChartCanvasContainer");
+const barChartMessage = document.getElementById("barChartMessage");
 const tableViewBtn = document.getElementById("tableViewBtn");
-const chartViewBtn = document.getElementById("chartViewBtn");
-
 const barChartViewBtn = document.getElementById("barChartViewBtn");
 const scatterChartViewBtn = document.getElementById("scatterChartViewBtn");
 const timelineChartViewBtn = document.getElementById("timelineChartViewBtn");
+const chartViewBtn = document.getElementById("chartViewBtn");
 const refreshPageBtn = document.getElementById("refreshPageBtn");
-const priceChartCanvas = document.getElementById("priceChart");
-const barChartMessage = document.getElementById("bar-chart-message");
-const barChartCanvasContainer = document.querySelector(
-  ".chart-canvas-container"
-);
 const hamburgerBtn = document.getElementById("hamburgerBtn");
 const selectionPanel = document.getElementById("selectionPanel");
 const closePanelBtn = document.getElementById("closePanelBtn");
@@ -39,6 +37,9 @@ const filterMediumBtn = document.getElementById("filterMediumBtn");
 const filterHighBtn = document.getElementById("filterHighBtn");
 // NEW: Search input element
 const modelSearchInput = document.getElementById("modelSearchInput");
+const mainSearchInput = document.getElementById("mainSearchInput");
+const searchSuggestions = document.getElementById("searchSuggestions");
+const providersListContainer = document.getElementById("providersListContainer");
 // NEW: Model Detail Modal Elements
 const modelDetailModal = document.getElementById("modelDetailModal");
 const closeDetailModalBtn = document.getElementById("closeDetailModalBtn");
@@ -340,6 +341,13 @@ function parseCSV(csvText) {
 
 async function loadModelsData() {
   console.log("Loading ai_model_list.csv...");
+  if (window.location.protocol === 'file:') {
+    const errorMsg = "Security Error: Cannot load data from a local file (file://). Please run this app on a local server (e.g., 'python3 -m http.server').";
+    console.error(errorMsg);
+    if (modelSelectionList) modelSelectionList.innerHTML = `<div class="alert alert-danger m-3">${errorMsg}</div>`;
+    if (comparisonTableBody) comparisonTableBody.innerHTML = `<tr><td colspan="6" class="text-danger text-center">${errorMsg}</td></tr>`;
+    return [];
+  }
   try {
     // UPDATED: Changed file name
     const response = await fetch("ai_model_list.csv");
@@ -384,6 +392,95 @@ function groupModelsByProvider(models) {
     acc[provider].push(model);
     return acc;
   }, {});
+}
+
+const providerUrls = {
+  "OpenAI": "https://openai.com",
+  "Anthropic": "https://www.anthropic.com",
+  "Google": "https://deepmind.google",
+  "Meta": "https://ai.meta.com",
+  "Mistral": "https://mistral.ai",
+  "Cohere": "https://cohere.com",
+  "DeepSeek": "https://www.deepseek.com",
+  "AI21 Labs": "https://www.ai21.com",
+  "Alibaba": "https://www.alibabacloud.com/en/solutions/generative-ai",
+  "Amazon Bedrock": "https://aws.amazon.com/bedrock",
+  "MiniMax": "https://www.minimaxi.com",
+  "Moonshot AI": "https://www.moonshot.cn",
+  "NVIDIA": "https://www.nvidia.com/en-us/ai-data-science",
+  "Perplexity AI": "https://www.perplexity.ai",
+  "xAI": "https://x.ai",
+  "Zhipu AI": "https://www.zhipuai.cn/en"
+};
+
+function renderProviders() {
+  if (!providersListContainer || !modelsData) return;
+  
+  const providers = [...new Set(modelsData.map(m => m.provider))].sort();
+  providersListContainer.innerHTML = "";
+
+  providers.forEach(provider => {
+    const col = document.createElement("div");
+    col.className = "col-6 col-md-4 col-lg-3 col-xl-2"; // Denser grid
+    
+    const card = document.createElement("div");
+    card.className = "card h-100 border-0 shadow-sm hover-shadow transition-all";
+    
+    const cardBody = document.createElement("div");
+    cardBody.className = "card-body d-flex flex-column align-items-center text-center p-3"; // Reduced padding
+
+    // Logo
+    const logoFilename = getLogoFilename(provider);
+    const logo = document.createElement("img");
+    logo.src = `img/logos/${logoFilename}`;
+    logo.alt = provider;
+    logo.className = "mb-2 rounded-3"; // Reduced margin
+    logo.style.width = "40px"; // Smaller logo
+    logo.style.height = "40px";
+    logo.style.objectFit = "contain";
+    logo.onerror = function() { this.style.display = "none"; };
+
+    // Title
+    const title = document.createElement("div"); // Changed from h5 to div
+    title.className = "fw-bold mb-3 text-truncate w-100"; // Reduced margin
+    title.style.fontSize = "0.9rem";
+    title.textContent = provider;
+
+    // Links Container
+    const linksDiv = document.createElement("div");
+    linksDiv.className = "d-flex gap-1 mt-auto w-100 justify-content-center flex-wrap"; // Tighter gap
+
+    // Official Link
+    const officialUrl = providerUrls[provider];
+    if (officialUrl) {
+      const link1 = document.createElement("a");
+      link1.href = officialUrl;
+      link1.target = "_blank";
+      link1.className = "btn btn-sm btn-outline-primary flex-grow-1 py-0 px-1"; // Compact button
+      link1.style.fontSize = "0.75rem";
+      link1.innerHTML = '<i class="bi bi-globe me-1"></i>Web';
+      linksDiv.appendChild(link1);
+    }
+
+    // Artificial Analysis Link
+    const aaSlug = provider.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    const aaUrl = `https://artificialanalysis.ai/providers/${aaSlug}`;
+    
+    const link2 = document.createElement("a");
+    link2.href = aaUrl;
+    link2.target = "_blank";
+    link2.className = "btn btn-sm btn-outline-secondary flex-grow-1 py-0 px-1"; // Compact button
+    link2.style.fontSize = "0.75rem";
+    link2.innerHTML = '<i class="bi bi-bar-chart-fill me-1"></i>Data';
+    linksDiv.appendChild(link2);
+
+    cardBody.appendChild(logo);
+    cardBody.appendChild(title);
+    cardBody.appendChild(linksDiv);
+    card.appendChild(cardBody);
+    col.appendChild(card);
+    providersListContainer.appendChild(col);
+  });
 }
 
 function populateModelSelection() {
@@ -569,18 +666,116 @@ updateDisplay();
 // Theme Toggle Listener
 if (themeToggleBtn) {
   themeToggleBtn.addEventListener("click", toggleTheme);
+  themeToggleBtn.addEventListener("click", toggleTheme);
+}
+
+// Main Search Listener
+if (mainSearchInput) {
+  mainSearchInput.addEventListener("input", (e) => {
+    const term = e.target.value.trim();
+    console.log("Search input:", term); // Debug log
+    globalSearchTerm = term;
+    updateDisplay();
+    showSuggestions(term);
+  });
+
+  mainSearchInput.addEventListener("focus", () => {
+    if (globalSearchTerm) showSuggestions(globalSearchTerm);
+  });
+}
+
+// Hide suggestions when clicking outside
+document.addEventListener("click", (e) => {
+  if (searchSuggestions && !searchSuggestions.contains(e.target) && e.target !== mainSearchInput) {
+    searchSuggestions.classList.add("d-none");
+  }
+});
+
+function showSuggestions(term) {
+  if (!searchSuggestions) {
+    console.error("searchSuggestions element not found");
+    return;
+  }
+  if (!modelsData) {
+    console.warn("modelsData is not loaded yet");
+    return;
+  }
+  
+  if (!term) {
+    searchSuggestions.classList.add("d-none");
+    return;
+  }
+
+  const normalizedTerm = term.toLowerCase();
+  const matches = modelsData.filter(model => 
+    model.name.toLowerCase().includes(normalizedTerm) || 
+    model.provider.toLowerCase().includes(normalizedTerm)
+  ).slice(0, 8); // Limit to 8 suggestions
+
+  console.log("Search matches:", matches.length); // Debug log
+
+  if (matches.length === 0) {
+    searchSuggestions.classList.add("d-none");
+    return;
+  }
+
+  searchSuggestions.innerHTML = "";
+  matches.forEach(model => {
+    const item = document.createElement("div");
+    item.className = "list-group-item list-group-item-action d-flex align-items-center gap-3 p-2 suggestion-item border-0";
+    
+    // Logo
+    const logoFilename = getLogoFilename(model.provider);
+    const logo = document.createElement("img");
+    logo.src = `img/logos/${logoFilename}`;
+    logo.alt = model.provider;
+    logo.style.width = "24px";
+    logo.style.height = "24px";
+    logo.style.objectFit = "contain";
+    logo.onerror = function() { this.style.display = "none"; };
+
+    // Text
+    const textDiv = document.createElement("div");
+    textDiv.innerHTML = `
+      <div class="fw-medium text-truncate" style="max-width: 250px;">${model.name}</div>
+      <div class="small text-muted">${model.provider}</div>
+    `;
+
+    item.appendChild(logo);
+    item.appendChild(textDiv);
+
+    item.addEventListener("click", () => {
+      mainSearchInput.value = model.name;
+      globalSearchTerm = model.name;
+      updateDisplay();
+      searchSuggestions.classList.add("d-none");
+    });
+
+    searchSuggestions.appendChild(item);
+  });
+
+  searchSuggestions.classList.remove("d-none");
+}
+
+function selectAllModels() {
+  const checkboxes = modelSelectionList.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach(c => c.checked = true);
+  updateDisplay();
 }
 
 function expandAllProviders() {
-  modelSelectionList.querySelectorAll(".accordion-collapse").forEach(collapseDiv => {
-    new bootstrap.Collapse(collapseDiv, { toggle: false }).show();
+  const collapses = modelSelectionList.querySelectorAll(".accordion-collapse");
+  collapses.forEach(collapseDiv => {
+    const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseDiv, { toggle: false });
+    bsCollapse.show();
   });
 }
 
 function clearAndCollapseSelections() {
   modelSelectionList.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
   modelSelectionList.querySelectorAll(".accordion-collapse").forEach(collapseDiv => {
-    new bootstrap.Collapse(collapseDiv, { toggle: false }).hide();
+    const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseDiv, { toggle: false });
+    bsCollapse.hide();
   });
   updateDisplay();
 }
@@ -627,13 +822,21 @@ function updateTableView(selectedModelsData) {
   if (!comparisonTableBody) return;
   comparisonTableBody.innerHTML = "";
   if (!selectedModelsData || selectedModelsData.length === 0) {
-    comparisonTableBody.innerHTML = `<tr><td colspan="6">Select models to compare.</td></tr>`;
+    comparisonTableBody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-muted">Select models to compare.</td></tr>`;
     return;
   }
-  selectedModelsData.forEach((model) => {
+  selectedModelsData.forEach((model, index) => {
     const row = document.createElement("tr");
     row.dataset.modelId = model.id;
-    const formatPrice = p => (p !== null && p !== undefined && !isNaN(p)) ? `$${p.toFixed(2)}` : "N/A";
+    const formatPrice = p => (p !== null && p !== undefined && !isNaN(p)) ? `$${p.toFixed(2)}` : "—";
+    
+    // Rank Cell
+    const rankCell = document.createElement("td");
+    rankCell.className = "ps-4 text-muted fw-medium";
+    rankCell.textContent = index + 1;
+    row.appendChild(rankCell);
+
+    // Model Name Cell
     const modelNameCell = document.createElement("td");
     modelNameCell.className = "model-name-cell d-flex align-items-center";
     modelNameCell.style.cursor = "pointer";
@@ -651,20 +854,30 @@ function updateTableView(selectedModelsData) {
     modelNameSpan.className = "model-name-text";
     modelNameSpan.textContent = model.name || "N/A";
     modelNameCell.appendChild(modelNameSpan);
+    
+    row.appendChild(modelNameCell);
+
+    // Tier Cell
+    const tierCell = document.createElement("td");
+    tierCell.className = "text-center";
     const category = getPriceCategory(model);
     if (category.name !== "N/A") {
-      const categoryTag = document.createElement("span");
-      let badgeClass = "bg-secondary";
-      if (category.className === "low") badgeClass = "bg-success";
-      if (category.className === "medium") badgeClass = "bg-warning text-dark";
-      if (category.className === "high") badgeClass = "bg-danger";
-      
-      categoryTag.className = `badge ${badgeClass} rounded-pill ms-auto`;
-      categoryTag.textContent = category.name;
-      modelNameCell.appendChild(categoryTag);
+      const badge = document.createElement("span");
+      badge.className = `badge ${category.className}`;
+      badge.textContent = category.name;
+      tierCell.appendChild(badge);
+    } else {
+        tierCell.innerHTML = '<span class="text-muted small">—</span>';
     }
-    row.appendChild(modelNameCell);
-    row.innerHTML += `<td>${model.provider || "N/A"}</td><td>${formatPrice(model.inputPrice)}</td><td>${formatPrice(model.outputPrice)}</td><td>${model.contextWindow || "N/A"}</td><td>${model.releaseDate || "N/A"}</td>`;
+    row.appendChild(tierCell);
+
+    row.innerHTML += `
+      <td>${model.provider || "—"}</td>
+      <td class="text-end font-monospace">${formatPrice(model.inputPrice)}</td>
+      <td class="text-end font-monospace">${formatPrice(model.outputPrice)}</td>
+      <td class="text-end">${model.contextWindow || "—"}</td>
+      <td class="text-end pe-4">${model.releaseDate || "—"}</td>
+    `;
     comparisonTableBody.appendChild(row);
   });
   comparisonTableBody.querySelectorAll("tr").forEach(row => {
@@ -800,9 +1013,13 @@ async function renderScatterChart(selectedModelsData) {
   if (priceChartInstance) priceChartInstance.destroy();
   barChartMessage.textContent = "";
   priceChartCanvas.style.display = "block";
-  barChartCanvasContainer.style.minWidth = "0px";
-
   const validModels = selectedModelsData.filter(m => m.inputPrice !== null && m.contextWindow && parseFormattedNumber(m.contextWindow));
+
+  // Dynamic width with moderate spacing (buffer)
+  const minWidthPerPoint = 12; 
+  const chartPadding = 100;
+  const calculatedMinWidth = validModels.length * minWidthPerPoint + chartPadding;
+  barChartCanvasContainer.style.minWidth = `${calculatedMinWidth}px`;
 
   if (validModels.length === 0) {
     barChartMessage.textContent = "Select models with price and context window data to display scatter plot.";
@@ -919,41 +1136,72 @@ async function renderTimelineChart(selectedModelsData) {
   if (ctx) priceChartInstance = new Chart(ctx, config);
 }
 
+// Navigation Logic
+const navLinks = document.querySelectorAll('.nav-link');
+const viewTabs = document.getElementById('viewTabs');
+const pageHeader = document.querySelector('.mb-4'); // Selects the header div
+
+const views = {
+  'Leaderboard': document.getElementById('table-view'),
+  'Providers': document.getElementById('providers-view')
+};
+
+// Handle Navigation Clicks
+navLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    
+    // Get the text content to identify the view
+    const text = link.textContent.trim();
+    
+    // Remove active class from all links
+    navLinks.forEach(l => l.classList.remove('active'));
+    
+    // Add active class to clicked link
+    link.classList.add('active');
+    
+    // Hide all views
+    Object.values(views).forEach(view => {
+      if(view) view.classList.add('d-none');
+    });
+    
+    // Show selected view
+    if (views[text]) {
+      views[text].classList.remove('d-none');
+    }
+
+    // Toggle Header visibility
+    if (text === 'Providers') {
+      if (pageHeader) pageHeader.classList.add('d-none');
+    } else {
+      if (pageHeader) pageHeader.classList.remove('d-none');
+    }
+  });
+});
+
 async function switchView(view) {
-  const isChartView = view === "bar" || view === "scatter" || view === "timeline";
-  if (tableViewBtn) tableViewBtn.classList.toggle("active", !isChartView);
-  if (chartViewBtn) {
-    chartViewBtn.classList.toggle("active", isChartView);
-    // Bootstrap dropdown handles its own state, but we might want to close it if open?
-    // Actually, clicking an item usually closes it.
-  }
-  if (tableView) {
-    if (!isChartView) {
-      tableView.classList.remove("d-none");
-      tableView.classList.add("active");
-    } else {
-      tableView.classList.add("d-none");
-      tableView.classList.remove("active");
-    }
-  }
-  if (barChartView) {
-    if (isChartView) {
-      barChartView.classList.remove("d-none");
-      barChartView.classList.add("active");
-    } else {
-      barChartView.classList.add("d-none");
-      barChartView.classList.remove("active");
-    }
-  }
-  if (viewTitle) {
-    switch (view) {
-      case "bar": viewTitle.textContent = "Bar Chart"; break;
-      case "scatter": viewTitle.textContent = "Scatter Plot"; break;
-      case "timeline": viewTitle.textContent = "Timeline"; break;
-      default: viewTitle.textContent = "Table"; break;
-    }
-  }
   currentView = view;
+  
+  // Update active button state
+  [tableViewBtn, barChartViewBtn, scatterChartViewBtn, timelineChartViewBtn].forEach(btn => {
+    if (btn) btn.classList.remove("active");
+  });
+
+  if (view === "table" && tableViewBtn) tableViewBtn.classList.add("active");
+  if (view === "bar" && barChartViewBtn) barChartViewBtn.classList.add("active");
+  if (view === "scatter" && scatterChartViewBtn) scatterChartViewBtn.classList.add("active");
+  if (view === "timeline" && timelineChartViewBtn) timelineChartViewBtn.classList.add("active");
+
+  // Toggle visibility
+  if (tableView) tableView.classList.add("d-none");
+  if (barChartView) barChartView.classList.add("d-none");
+
+  if (view === "table") {
+    if (tableView) tableView.classList.remove("d-none");
+  } else {
+    if (barChartView) barChartView.classList.remove("d-none");
+  }
+
   await updateDisplay();
 }
 
@@ -961,6 +1209,15 @@ async function updateDisplay() {
   if (!modelsData || modelsData.length === 0) return;
   const selectedModelIds = Array.from(modelSelectionList.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
   let filteredModelsData = modelsData.filter(model => model.id && selectedModelIds.includes(model.id));
+
+  // Filter by global search term
+  if (globalSearchTerm) {
+    const term = globalSearchTerm.toLowerCase();
+    filteredModelsData = filteredModelsData.filter(model => 
+      model.name.toLowerCase().includes(term) || 
+      model.provider.toLowerCase().includes(term)
+    );
+  }
 
   if (currentView === "table") {
     const dataTypes = { name: "string", provider: "string", inputPrice: "number", outputPrice: "number", contextWindow: "number", releaseDate: "date" };
@@ -1025,16 +1282,45 @@ async function setLastUpdatedTimestampFromGithub() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  if (!modelSelectionList || !comparisonTableBody || !priceChartCanvas || !dynamicTimestampSpan) {
+  if (!modelSelectionList || !comparisonTableBody || !dynamicTimestampSpan) {
     console.error("Initialization failed: Essential DOM elements are missing.");
     document.body.innerHTML = "<h1>Error: Application structure incomplete.</h1>";
     return;
+  }
+
+  if (selectAllBtn) {
+    selectAllBtn.addEventListener("click", selectAllModels);
+  }
+  if (expandAllBtn) {
+    expandAllBtn.addEventListener("click", expandAllProviders);
+  }
+
+  if (clearPanelBtn) {
+    clearPanelBtn.onclick = () => {
+      clearAndCollapseSelections();
+      if (modelSearchInput) { modelSearchInput.value = ''; filterModelsList(''); }
+    };
+  }
+
+  const lowBtn = document.getElementById("filterLowBtn");
+  const medBtn = document.getElementById("filterMediumBtn");
+  const highBtn = document.getElementById("filterHighBtn");
+
+  if (lowBtn) {
+    lowBtn.onclick = () => filterModelsByCategory("Low");
+  }
+  if (medBtn) {
+    medBtn.onclick = () => filterModelsByCategory("Medium");
+  }
+  if (highBtn) {
+    highBtn.onclick = () => filterModelsByCategory("High");
   }
 
   modelsData = await loadModelsData();
 
   if (modelsData && modelsData.length > 0) {
     populateModelSelection();
+    renderProviders();
     await setLastUpdatedTimestampFromGithub();
 
     if (modelSearchInput) modelSearchInput.addEventListener("input", e => filterModelsList(e.target.value));
@@ -1046,15 +1332,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (hamburgerBtn) hamburgerBtn.addEventListener("click", openPanel);
     if (closePanelBtn) closePanelBtn.addEventListener("click", closePanel);
     if (overlay) overlay.addEventListener("click", closePanel);
-    if (selectAllBtn) selectAllBtn.addEventListener("click", selectAllModels);
-    if (expandAllBtn) expandAllBtn.addEventListener("click", expandAllProviders);
-    if (clearPanelBtn) clearPanelBtn.addEventListener("click", () => {
-      clearAndCollapseSelections();
-      if (modelSearchInput) { modelSearchInput.value = ''; filterModelsList(''); }
-    });
-    if (filterLowBtn) filterLowBtn.addEventListener("click", () => filterModelsByCategory("Low"));
-    if (filterMediumBtn) filterMediumBtn.addEventListener("click", () => filterModelsByCategory("Medium"));
-    if (filterHighBtn) filterHighBtn.addEventListener("click", () => filterModelsByCategory("High"));
 
     document.querySelectorAll("th[data-sort]").forEach(header => {
       header.addEventListener("click", () => {
