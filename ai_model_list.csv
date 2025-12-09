@@ -182,3 +182,5 @@ Zhipu AI,GLM-4.5-Air,128000,"$0.20 ","$1.10 ",7/1/25,Open weights
 Zhipu AI,GLM-4.6 (Non-reasoning),200000,"$0.60 ","$2.15 ",9/1/25,Open weights
 Zhipu AI,GLM-4.5V (Reasoning),64000,"$0.55 ","$1.75 ",8/1/25,Open weights
 Zhipu AI,GLM-4.5V (Non-reasoning),64000,"$0.60 ","$1.80 ",8/1/25,Open weights
+Zhipu AI,GLM-4.6V,128000,$0.30,$0.90,12/9/25,Open weights
+Zhipu AI,GLM-4.6V-Flash,128000,$0.00,$0.00,12/9/25,Open weights
