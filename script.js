@@ -1140,15 +1140,22 @@ async function renderTimelineChart(selectedModelsData) {
 const navLinks = document.querySelectorAll('.nav-link');
 const viewTabs = document.getElementById('viewTabs');
 const pageHeader = document.querySelector('.mb-4'); // Selects the header div
+const viewControls = document.getElementById('viewControls'); // View controls (Table/Bar/Scatter/Timeline)
+const breadcrumbActive = document.getElementById('breadcrumbActive'); // Breadcrumb active item
 
 const views = {
-  'Leaderboard': document.getElementById('table-view'),
+  'Overview': document.getElementById('table-view'),
   'Providers': document.getElementById('providers-view')
 };
 
 // Handle Navigation Clicks
 navLinks.forEach(link => {
   link.addEventListener('click', (e) => {
+    // Skip modal links (About) - they use Bootstrap modal, not view switching
+    if (link.hasAttribute('data-bs-toggle')) {
+      return; // Let Bootstrap handle the modal
+    }
+    
     e.preventDefault();
     
     // Get the text content to identify the view
@@ -1170,11 +1177,18 @@ navLinks.forEach(link => {
       views[text].classList.remove('d-none');
     }
 
-    // Toggle Header visibility
+    // Update breadcrumb
+    if (breadcrumbActive) {
+      breadcrumbActive.textContent = text;
+    }
+
+    // Toggle Header and View Controls visibility
     if (text === 'Providers') {
       if (pageHeader) pageHeader.classList.add('d-none');
+      if (viewControls) viewControls.classList.add('d-none');
     } else {
       if (pageHeader) pageHeader.classList.remove('d-none');
+      if (viewControls) viewControls.classList.remove('d-none');
     }
   });
 });
