@@ -13,7 +13,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
     <link
       rel="icon"
       type="image/png"
@@ -21,13 +22,15 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <!-- Custom Scripts -->
+    <script type="module" src="js/main.js"></script>
   </head>
   <body>
     
     <div class="d-flex h-100">
       <!-- Sidebar -->
       <aside class="sidebar d-flex flex-column flex-shrink-0 p-3 border-end" style="width: 240px; height: 100vh; position: fixed; overflow-y: auto;">
-        <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none sidebar-brand-link">
+        <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none sidebar-brand-link" id="sidebarBrandLink">
         <img src="img/favicon/innovative-brain-icon.png" alt="Logo" width="32" height="32" class="me-2">
         <span class="fs-5 fw-bold tracking-tight">LLM Ledger</span>
       </a>
@@ -35,12 +38,24 @@
           <button class="btn btn-primary w-100 rounded-pill mb-3 fw-medium" data-bs-toggle="offcanvas" data-bs-target="#selectionPanel">
             <i class="bi bi-plus-lg me-2"></i> Select Models
           </button>
+          
+          <div class="input-group mb-2">
+             <span class="input-group-text bg-light border-end-0 text-muted ps-3"><i class="bi bi-search" style="font-size: 0.8rem;"></i></span>
+             <input type="text" id="modelSearchInput" class="form-control bg-light border-start-0 ps-0" placeholder="Search..." style="font-size: 0.85rem; height: 38px;">
+          </div>
+          <div id="searchSuggestions" class="list-group position-absolute w-100 shadow-lg bg-body rounded-bottom start-0" style="z-index: 1050; display: none;"></div>
         </div>
         <ul class="nav nav-pills flex-column mb-auto">
           <li class="nav-item">
-            <a href="#" class="nav-link active d-flex align-items-center" aria-current="page">
+            <a href="#" class="nav-link active d-flex align-items-center" id="nav-home">
+              <i class="bi bi-house-door me-3"></i>
+              Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link d-flex align-items-center" id="nav-compare">
               <i class="bi bi-trophy me-3"></i>
-              Overview
+              Compare
             </a>
           </li>
           <li>
@@ -50,13 +65,24 @@
             </a>
           </li>
           <li>
-            <a href="#" class="nav-link d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#aboutModal">
-              <i class="bi bi-info-circle me-3"></i>
-              About
+            <a href="#" class="nav-link d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#apiStatusModal">
+              <i class="bi bi-activity me-3"></i>
+              Status
             </a>
           </li>
+          <li>
+            <a href="#" class="nav-link d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#apiKeyModal">
+              <i class="bi bi-key me-3"></i>
+              API Key
+            </a>
+          </li>
+
         </ul>
-        <div class="mt-auto pt-4 border-top">
+        <div>
+           <button class="btn btn-link link-secondary text-decoration-none d-flex align-items-center px-2 mb-2" id="refreshDataBtn">
+             <i class="bi bi-arrow-clockwise me-2"></i>
+             <span>Refresh Data</span>
+           </button>
            <button class="btn btn-link link-secondary text-decoration-none d-flex align-items-center px-2" id="themeToggle">
             <i class="bi bi-moon-stars me-2" id="themeIcon"></i>
             <span>Theme</span>
@@ -73,21 +99,21 @@
         <div class="offcanvas-body">
           <div class="d-grid gap-2 mb-3">
             <button id="selectAllBtn" class="btn btn-light btn-sm rounded-pill border">Select All</button>
-            <button id="expandAllBtn" class="btn btn-light btn-sm rounded-pill border">Expand All</button>
-            <button id="clearPanelBtn" class="btn btn-light btn-sm rounded-pill border text-danger">Clear</button>
+            <div class="d-flex gap-2">
+                <button id="expandAllBtn" class="btn btn-light btn-sm rounded-pill border w-50">Expand All</button>
+                <button id="collapseAllBtn" class="btn btn-light btn-sm rounded-pill border w-50">Collapse</button>
+            </div>
+            <button id="clearPanelBtn" class="btn btn-light btn-sm rounded-pill border text-danger">Clear Selection</button>
           </div>
 
           <!-- Price Filter Buttons -->
-          <div class="btn-group w-100 mb-3" role="group">
-            <button id="filterLowBtn" type="button" class="btn btn-outline-secondary btn-sm">Low</button>
-            <button id="filterMediumBtn" type="button" class="btn btn-outline-secondary btn-sm">Med</button>
-            <button id="filterHighBtn" type="button" class="btn btn-outline-secondary btn-sm">High</button>
+          <div class="d-flex gap-2 mb-3">
+            <button id="filterLowBtn" type="button" class="btn btn-tier low btn-sm rounded-pill flex-grow-1">Low</button>
+            <button id="filterMediumBtn" type="button" class="btn btn-tier medium btn-sm rounded-pill flex-grow-1">Med</button>
+            <button id="filterHighBtn" type="button" class="btn btn-tier high btn-sm rounded-pill flex-grow-1">High</button>
           </div>
 
-          <!-- Search Input -->
-          <div class="mb-3">
-            <input type="search" id="modelSearchInput" class="form-control rounded-pill border-0" placeholder="Search models...">
-          </div>
+
 
           <div id="model-selection-list" class="accordion accordion-flush">
             <p class="text-center text-muted small mt-4">Loading models...</p>
@@ -96,38 +122,108 @@
       </div>
 
       <!-- Main Content -->
-      <main class="flex-grow-1 d-flex flex-column" style="margin-left: 240px; min-height: 100vh; width: calc(100% - 240px); overflow-x: hidden;">
+      <main class="flex-grow-1 d-flex flex-column" style="margin-left: 240px; min-height: 100vh; width: calc(100% - 240px);">
         <!-- Top Header -->
         <header class="py-2 px-4 border-bottom sticky-top" style="z-index: 1000;">
           <div class="d-flex justify-content-between align-items-center">
-            <nav aria-label="breadcrumb">
-    <ol class="breadcrumb mb-0">
-      <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Home</a></li>
-      <li class="breadcrumb-item active" aria-current="page" id="breadcrumbActive">Overview</li>
-    </ol>
-  </nav>
-
-  <div class="flex-grow-1 mx-4" style="max-width: 400px;">
-    <div class="input-group position-relative">
-      <span class="input-group-text bg-light border-end-0 text-muted">
-        <i class="bi bi-search"></i>
-      </span>
-      <input type="text" id="mainSearchInput" class="form-control bg-light border-start-0" placeholder="Search models, providers..." aria-label="Search" autocomplete="off">
-      <div id="searchSuggestions" class="list-group position-absolute w-100 shadow-lg d-none rounded-3 overflow-hidden bg-body" style="z-index: 2000; top: 100%; margin-top: 4px;"></div>
-    </div>
-  </div>
-
-  <div class="btn-group bg-light rounded-pill p-1 border" role="group" aria-label="View toggle">
-               <button id="refreshPageBtn" class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size: 0.75rem;">Reset View</button>
+            <nav aria-label="breadcrumb" class="d-flex w-100">
+              <span class="fs-5 fw-bold text-dark" id="currentPageTitle">Home</span>
+            </nav>
+ 
+            <div class="flex-grow-1"></div>
+ 
+            <div class="btn-group bg-light rounded-pill p-1 border" role="group" aria-label="View toggle">
+               <button id="refreshPageBtn" class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size: 0.75rem;">Reset</button>
             </div>
           </div>
         </header>
 
         <div class="container-fluid p-3 p-lg-4" style="max-width: 1600px;">
           
+          <div id="home-view" class="py-5 d-flex flex-column justify-content-center" style="min-height: 70vh;">
+            <div class="row align-items-center justify-content-center mb-5 w-100">
+              <div class="col-lg-6 mb-5 mb-lg-0 text-center">
+                 <h1 class="display-4 fw-bold mb-3 ls-tight">A Better Way To <br>Compare <span class="text-primary">Models</span></h1>
+                 <p class="lead text-muted mb-4 mx-auto" style="max-width: 500px;">No hype, just data. A clean, open-source overview of pricing, capabilities, and availability.</p>
+                 <button class="btn btn-primary btn-lg rounded-pill px-5 fw-medium shadow-sm transition-all" id="homeExploreBtn">
+                   Explore Models <i class="bi bi-arrow-right ms-2"></i>
+                 </button>
+              </div>
+              <div class="col-lg-6">
+                 <div class="position-relative ps-lg-5">
+                   <!-- Card 1 -->
+                   <div class="card border-0 shadow-sm mb-3 position-relative" style="z-index: 2; transform: translateX(-20px);">
+                     <div class="card-body p-3">
+                       <div class="d-flex justify-content-between align-items-center mb-2">
+                          <span class="fw-bold"><i class="bi bi-stars text-warning me-2"></i>GPT-4o</span>
+                          <span class="badge bg-light text-dark text-uppercase" style="font-size: 0.6rem; letter-spacing: 0.05em;">OpenAI</span>
+                       </div>
+                       <div class="d-flex justify-content-between small text-muted">
+                         <span id="hero-card-1-price">Input: ...</span>
+                         <span class="text-success fw-medium">Active</span>
+                       </div>
+                     </div>
+                   </div>
+                   <!-- Card 2 -->
+                   <div class="card border-0 shadow mb-3 position-relative" style="z-index: 3;">
+                     <div class="card-body p-4">
+                       <div class="d-flex justify-content-between align-items-center mb-3">
+                          <span class="fw-bold fs-5"><i class="bi bi-lightning-charge-fill text-primary me-2"></i>Claude 3.5 Sonnet</span>
+                          <span class="badge bg-primary-subtle text-primary text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.05em;">Anthropic</span>
+                       </div>
+                       <div class="d-flex justify-content-between text-muted mb-2">
+                         <span id="hero-card-2-context">Context: ...</span>
+                         <span id="hero-card-2-price" class="fw-bold text-dark">...</span>
+                       </div>
+                       <div class="progress" style="height: 6px;">
+                         <div class="progress-bar bg-primary" style="width: 85%"></div>
+                       </div>
+                     </div>
+                   </div>
+                    <!-- Card 3 -->
+                   <div class="card border-0 shadow-sm position-relative" style="z-index: 1; transform: translateX(20px) translateY(-10px) scale(0.95); opacity: 0.8;">
+                     <div class="card-body p-3">
+                       <div class="d-flex justify-content-between align-items-center mb-2">
+                          <span class="fw-bold"><i class="bi bi-gem text-info me-2"></i>Gemini 2.5 Pro</span>
+                          <span class="badge bg-light text-dark text-uppercase" style="font-size: 0.6rem; letter-spacing: 0.05em;">Google</span>
+                       </div>
+                       <div class="d-flex justify-content-between small text-muted">
+                          <span id="hero-card-3-context">Context: ...</span>
+                          <span id="hero-card-3-price">...</span>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+              </div>
+            </div>
+          
+            <div class="row g-4 mt-5 pt-5 border-top">
+               <div class="col-md-3 col-6 text-center border-end">
+                 <h2 class="fw-bold mb-0" id="stats-model-count">...</h2>
+                 <p class="text-muted small">Active Models</p>
+               </div>
+               <div class="col-md-3 col-6 text-center border-end-md">
+                 <h2 class="fw-bold mb-0" id="stats-provider-count">...</h2>
+                 <p class="text-muted small">Providers</p>
+               </div>
+               <div class="col-md-3 col-6 text-center border-end">
+                 <h2 class="fw-bold mb-0 d-flex align-items-center justify-content-center gap-2">
+                    <span id="homeApiStatusDot" class="status-dot bg-secondary"></span>
+                    Live
+                 </h2>
+                 <p class="text-muted small">Pricing Data</p>
+               </div>
+               <div class="col-md-3 col-6 text-center">
+                 <h2 class="fw-bold mb-0" id="stats-token-capacity">...</h2>
+                 <p class="text-muted small">Token Capacity</p>
+               </div>
+            </div>
+          </div>
+          
+          <div id="compare-view-wrap" class="d-none">
           <div class="mb-4">
             <h1 class="h4 fw-bold mb-1">Pricing Overview</h1>
-            <p class="text-muted small mb-0" style="max-width: 800px;">
+            <p class="text-muted small mb-0">
               Compare input and output costs across top AI models. Select models from the sidebar to customize your view.
             </p>
           </div>
@@ -140,9 +236,7 @@
                 <button type="button" class="btn btn-outline-secondary" id="scatterChartViewBtn"><i class="bi bi-graph-up me-1"></i>Scatter</button>
                 <button type="button" class="btn btn-outline-secondary" id="timelineChartViewBtn"><i class="bi bi-calendar3 me-1"></i>Timeline</button>
              </div>
-             <div class="text-muted small">
-               Last updated: <span id="dynamicTimestamp"></span>
-             </div>
+
           </div>
 
           <!-- Chart View -->
@@ -165,7 +259,10 @@
                     <i class="bi bi-table text-muted small"></i>
                     <h5 class="mb-0 fw-semibold" style="font-size: 0.9rem;">Model Pricing</h5>
                  </div>
-                 <span class="badge border rounded-pill fw-normal live-data-badge" style="font-size: 0.7rem;">Live Data</span>
+                 <span id="apiStatusBadge" class="badge border rounded-pill fw-normal live-data-badge d-flex align-items-center gap-2" style="font-size: 0.7rem;">
+                    <span id="apiStatusDot" class="status-dot bg-secondary"></span>
+                    Live Data
+                 </span>
               </div>
               <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
@@ -178,6 +275,7 @@
                       <th scope="col" data-sort="inputPrice" role="button" class="text-muted fw-medium text-uppercase text-end" style="font-size: 0.7rem; letter-spacing: 0.05em;">Input ($/1M) <i class="bi bi-arrow-down-up small ms-1"></i></th>
                       <th scope="col" data-sort="outputPrice" role="button" class="text-muted fw-medium text-uppercase text-end" style="font-size: 0.7rem; letter-spacing: 0.05em;">Output ($/1M) <i class="bi bi-arrow-down-up small ms-1"></i></th>
                       <th scope="col" data-sort="contextWindow" role="button" class="text-muted fw-medium text-uppercase text-end" style="font-size: 0.7rem; letter-spacing: 0.05em;">Context <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                      <th scope="col" class="text-muted fw-medium text-uppercase text-end" style="font-size: 0.7rem; letter-spacing: 0.05em;">License</th>
                       <th scope="col" data-sort="releaseDate" role="button" class="text-muted fw-medium text-uppercase text-end pe-3" style="font-size: 0.7rem; letter-spacing: 0.05em;">Release <i class="bi bi-arrow-down-up small ms-1"></i></th>
                     </tr>
                   </thead>
@@ -193,14 +291,29 @@
               </div>
             </div>
           </div>
-
-
+          
+          </div> <!-- Close compare-view-wrap -->
 
           <!-- Providers View -->
           <div id="providers-view" class="view-container d-none">
-            <div class="row g-4" id="providersListContainer">
-              <!-- Providers will be populated here -->
-            </div>
+            <!-- Providers Grid -->
+       <div id="providersListContainer" class="row g-4">
+          <!-- Provider Cards Injected via JS -->
+       </div>
+
+       <!-- Single Provider Detail View (Initially Hidden) -->
+       <div id="providerDetailContainer" class="d-none animate__animated animate__fadeIn">
+           <div id="providerDetailHeader" class="d-flex align-items-center mb-4 py-2">
+               <button class="btn btn-outline-secondary rounded-pill px-3 me-3" id="backToProvidersBtn">
+                   <i class="bi bi-arrow-left me-1"></i> Back
+               </button>
+               <h2 class="mb-0 fw-bold" id="selectedProviderTitle">Provider Name</h2>
+           </div>
+           
+           <div class="d-flex flex-column gap-4" id="providerModelsList">
+               <!-- High-Detail Analysis Cards Injected Here -->
+           </div>
+       </div>
           </div>
 
         </div>
@@ -214,6 +327,12 @@
             <span class="text-muted small border-start ps-3">© 2025</span>
           </div>
           <div class="col-md-6 d-flex justify-content-md-end gap-4 align-items-center text-muted">
+            <div class="text-muted small d-flex align-items-center me-3" id="lastUpdatedTrigger" style="cursor: pointer;" title="Click to view recent models">
+               <span class="me-2 opacity-75">Updated:</span>
+               <span id="dynamicTimestamp" class="fw-medium"></span>
+               <i class="bi bi-info-circle ms-2"></i>
+            </div>
+            <div class="vr mx-2 opacity-25"></div>
             <a href="#" class="text-decoration-none text-muted hover-text-main transition-colors" data-bs-toggle="modal" data-bs-target="#aboutModal">About</a>
             <a href="#" class="text-decoration-none text-muted hover-text-main transition-colors" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy</a>
           </div>
@@ -223,43 +342,99 @@
     </div>
 
     <!-- Model Detail Modal -->
-    <div class="modal fade" id="modelDetailModal" tabindex="-1" aria-labelledby="modalModelName" aria-hidden="true">
+    <!-- Model Detail Modal Removed -->
+
+      </div>
+    <!-- API Status Modal -->
+    <div class="modal fade" id="apiStatusModal" tabindex="-1" aria-labelledby="apiStatusModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-          <div class="modal-header border-bottom-0 pb-0">
-            <h5 class="modal-title fw-bold" id="modalModelName">Model Name</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeDetailModalBtn"></button>
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header border-bottom">
+            <h5 class="modal-title fw-bold" id="apiStatusModalLabel"><i class="bi bi-activity me-2"></i>Status</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body pt-2">
-            <div class="text-center mb-4 mt-2">
-                <img id="modalModelLogo" src="" alt="Model Logo" class="img-fluid rounded-3 shadow-sm p-2 bg-white border" style="max-height: 80px; display: none;">
-            </div>
-            <div class="list-group list-group-flush rounded-3 border">
-              <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-3">
-                  <span class="text-muted">Provider</span>
-                  <span id="modalModelProvider" class="fw-medium"></span>
-              </div>
-              <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-3">
-                  <span class="text-muted">Input Price</span>
-                  <span id="modalInputPrice" class="fw-medium font-monospace"></span>
-              </div>
-              <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-3">
-                  <span class="text-muted">Output Price</span>
-                  <span id="modalOutputPrice" class="fw-medium font-monospace"></span>
-              </div>
-              <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-3">
-                  <span class="text-muted">Context Window</span>
-                  <span id="modalContextWindow" class="fw-medium"></span>
-              </div>
-              <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-3">
-                  <span class="text-muted">Release Date</span>
-                  <span id="modalReleaseDate" class="fw-medium"></span>
-              </div>
-              <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-3">
-                  <span class="text-muted">Status</span>
-                  <span id="modalStatus" class="fw-medium"></span>
-              </div>
-            </div>
+          <div class="modal-body p-4">
+             <p class="text-muted small mb-4">Real-time status of the data sources and APIs powering LLM Ledger.</p>
+             
+             <div class="d-flex flex-column gap-3">
+                <!-- OpenRouter Status -->
+                <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 border">
+                   <div class="d-flex align-items-center gap-3">
+                       <img src="https://openrouter.ai/favicon.ico" alt="OpenRouter" width="24" height="24" class="rounded">
+                       <div>
+                           <div class="fw-bold">OpenRouter API</div>
+                           <div class="text-muted small" style="font-size: 0.75rem;">Model Inference & Pricing</div>
+                       </div>
+                   </div>
+                   <a href="https://status.openrouter.ai/" target="_blank" class="status-pill status-pill-link text-decoration-none" id="openrouter-status-pill">
+                       <span class="status-dot bg-secondary" id="openrouter-status-dot"></span>
+                       <span id="openrouter-status-text">Checking...</span>
+                   </a>
+                </div>
+
+                <!-- HuggingFace Status -->
+                <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 border">
+                   <div class="d-flex align-items-center gap-3">
+                       <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="HF" width="24" height="24">
+                       <div>
+                           <div class="fw-bold">HuggingFace API</div>
+                           <div class="text-muted small" style="font-size: 0.75rem;">Leaderboard & License Data</div>
+                       </div>
+                   </div>
+                   <a href="https://status.huggingface.co/" target="_blank" class="status-pill status-pill-link text-decoration-none" id="hf-status-pill">
+                       <span class="status-dot bg-secondary" id="hf-status-dot"></span>
+                       <span id="hf-status-text">Checking...</span>
+                   </a>
+                </div>
+
+                <!-- Artificial Analysis Status -->
+                <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 border">
+                   <div class="d-flex align-items-center gap-3">
+                       <div class="d-flex align-items-center justify-content-center bg-white rounded border" style="width: 24px; height: 24px;">
+                         <i class="bi bi-graph-up-arrow text-primary" style="font-size: 0.8rem;"></i>
+                       </div>
+                       <div>
+                           <div class="fw-bold">Artificial Analysis</div>
+                           <div class="text-muted small" style="font-size: 0.75rem;">Benchmarks & Speed Indices</div>
+                       </div>
+                   </div>
+                   <div class="status-pill bg-light border text-muted" style="cursor: default;">
+                       <span class="status-dot bg-success"></span>
+                       Active
+                   </div>
+                </div>
+             </div>
+
+          </div>
+          <div class="modal-footer border-top bg-light">
+             <span class="text-muted small me-auto" id="apiStatusLastChecked"><i class="bi bi-clock me-1"></i>Last checked: Just now</span>
+             <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Key Modal -->
+    <div class="modal fade" id="apiKeyModal" tabindex="-1" aria-labelledby="apiKeyModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header border-bottom">
+            <h5 class="modal-title fw-bold" id="apiKeyModalLabel"><i class="bi bi-key me-2"></i>API Configuration</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+             <p class="text-muted small mb-3">
+               To view real-time intelligence scores and speed metrics, you need an API key from Artificial Analysis.
+               Your key is stored locally in your browser and never sent to our servers.
+             </p>
+             <div class="mb-3">
+               <label for="apiKeyInput" class="form-label fw-bold small">Artificial Analysis API Key</label>
+               <input type="password" class="form-control" id="apiKeyInput" placeholder="aa_...">
+             </div>
+             <div class="d-flex justify-content-between align-items-center">
+                <a href="https://artificialanalysis.ai" target="_blank" class="small text-decoration-none"><i class="bi bi-box-arrow-up-right me-1"></i>Get a free key</a>
+                <button type="button" class="btn btn-dark rounded-pill px-4" id="saveApiKeyBtn">Save Key</button>
+             </div>
           </div>
         </div>
       </div>
@@ -288,6 +463,12 @@
               </div>
               <div class="col-md-6">
                 <div class="p-3 rounded-3 bg-light border h-100">
+                  <h6 class="fw-bold mb-2"><i class="bi bi-speedometer2 me-2 text-primary"></i>Intelligence & Speed</h6>
+                  <p class="small text-muted mb-0">Compare benchmark scores and inference speeds from independent testing to find the best-performing models.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-light border h-100">
                   <h6 class="fw-bold mb-2"><i class="bi bi-hdd-stack me-2 text-primary"></i>Context Windows</h6>
                   <p class="small text-muted mb-0">Compare context window sizes to find the right model for your document processing and long-context tasks.</p>
                 </div>
@@ -298,12 +479,46 @@
                   <p class="small text-muted mb-0">Use interactive charts to visualize price trends and compare models side-by-side.</p>
                 </div>
               </div>
-              <div class="col-md-6">
-                <div class="p-3 rounded-3 bg-light border h-100">
-                  <h6 class="fw-bold mb-2"><i class="bi bi-shield-check me-2 text-primary"></i>Data Source</h6>
-                  <p class="small text-muted mb-0">Data is sourced from provider documentation, <a href="https://artificialanalysis.ai/" target="_blank" class="text-decoration-none">Artificial Analysis</a>, and <a href="https://openrouter.ai/models" target="_blank" class="text-decoration-none">OpenRouter</a> to ensure accuracy.</p>
+            </div>
+
+            <div class="mt-4 pt-3 border-top">
+                <h6 class="fw-bold mb-3"><i class="bi bi-database me-2 text-primary"></i>Data Sources</h6>
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <div class="p-3 rounded-3 bg-light border h-100">
+                      <h6 class="fw-semibold mb-1">
+                        <a href="https://openrouter.ai/docs#models" target="_blank" class="text-decoration-none">OpenRouter API</a>
+                      </h6>
+                      <p class="small text-muted mb-0">Real-time pricing, context windows, and model specifications.</p>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="p-3 rounded-3 bg-light border h-100">
+                      <h6 class="fw-semibold mb-1">
+                        <a href="https://artificialanalysis.ai" target="_blank" class="text-decoration-none">Artificial Analysis</a>
+                      </h6>
+                      <p class="small text-muted mb-0">Intelligence Index scores, inference speed metrics.</p>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="p-3 rounded-3 bg-light border h-100">
+                      <h6 class="fw-semibold mb-1">
+                        <a href="https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard" target="_blank" class="text-decoration-none">HuggingFace LLM Leaderboard</a>
+                      </h6>
+                      <p class="small text-muted mb-0">MMLU, ARC, HellaSwag benchmark scores.</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-top">
+                <h6 class="fw-bold mb-3">How to Use</h6>
+                <ol class="small text-muted ps-3 mb-0">
+                    <li class="mb-2"><strong>Select Models:</strong> Use the sidebar to choose specific models or providers you want to compare.</li>
+                    <li class="mb-2"><strong>Analyze:</strong> Switch between Table, Bar Chart, Scatter Plot, and Timeline views using the top navigation.</li>
+                    <li class="mb-2"><strong>Filter:</strong> Use the price tier buttons (Low, Medium, High) to quickly narrow down options.</li>
+                    <li><strong>Details:</strong> Click on any model name to view detailed specs including release date and specific provider info.</li>
+                </ol>
             </div>
 
             <div class="mt-4 pt-3 border-top text-center">
@@ -328,31 +543,31 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body pt-3 px-4 pb-4">
-            <p class="lead text-muted mb-4">Your privacy is paramount. LLM Ledger is designed to be a secure, client-side tool.</p>
+            <p class="lead text-muted mb-4">Your privacy is neither stored nor sold. LLM Ledger operates entirely on the client-side.</p>
             
             <div class="row g-4">
               <div class="col-md-6">
                 <div class="p-3 rounded-3 bg-light border h-100">
-                  <h6 class="fw-bold mb-2"><i class="bi bi-person-x me-2 text-primary"></i>No Data Collection</h6>
-                  <p class="small text-muted mb-0">Since no login is required, data collection is out of the question. We do not track search queries or usage metrics.</p>
+                  <h6 class="fw-bold mb-2"><i class="bi bi-person-x me-2 text-primary"></i>Zero Data Collection</h6>
+                  <p class="small text-muted mb-0">We do not track your IP, search queries, or selected models. There is no user login and no server-side database storing your sessions.</p>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="p-3 rounded-3 bg-light border h-100">
-                  <h6 class="fw-bold mb-2"><i class="bi bi-cpu me-2 text-primary"></i>Local Processing</h6>
-                  <p class="small text-muted mb-0">All data filtering, sorting, and comparisons are performed entirely within your browser. No data is sent to external servers.</p>
+                  <h6 class="fw-bold mb-2"><i class="bi bi-cpu me-2 text-primary"></i>Client-Side Processing</h6>
+                  <p class="small text-muted mb-0">All interactions—sorting, filtering, and charting—happen instantly within your browser. Your preferences (like Theme) are saved only to your local device.</p>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="p-3 rounded-3 bg-light border h-100">
-                  <h6 class="fw-bold mb-2"><i class="bi bi-box-arrow-up-right me-2 text-primary"></i>External Links</h6>
-                  <p class="small text-muted mb-0">Links to model providers (e.g., OpenAI, Anthropic) take you to third-party sites. Please review their respective privacy policies.</p>
+                  <h6 class="fw-bold mb-2"><i class="bi bi-box-arrow-up-right me-2 text-primary"></i>External Content</h6>
+                  <p class="small text-muted mb-0">Model logos and data are fetched from trusted external sources (OpenRouter, Google Favicons). These requests are standard web traffic and do not transmit personal data.</p>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="p-3 rounded-3 bg-light border h-100">
-                  <h6 class="fw-bold mb-2"><i class="bi bi-code-square me-2 text-primary"></i>Transparency</h6>
-                  <p class="small text-muted mb-0">This application is built with transparency in mind, ensuring you can verify how your data is handled.</p>
+                  <h6 class="fw-bold mb-2"><i class="bi bi-code-square me-2 text-primary"></i>Open Architecture</h6>
+                  <p class="small text-muted mb-0">The application code runs visibly in your browser source. We prioritize transparency in both our data and our implementation.</p>
                 </div>
               </div>
             </div>
@@ -367,8 +582,179 @@
       </div>
     </div>
 
+    <!-- Model Detail Modal (Rich View) -->
+    <div class="modal fade" id="modelDetailModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="modal-header border-bottom-0 pb-0 px-4 pt-4">
+             <div>
+                <h4 class="fw-bold mb-1">Providers for <span id="modalModelName">Model Name</span></h4>
+                <p class="text-muted small">OpenRouter routes requests to the best providers that are able to handle your prompt size and parameters.</p>
+             </div>
+             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body px-4 pb-4 bg-light">
+             
+             <!-- Provider Card -->
+             <div class="card border shadow-sm rounded-3 mt-3">
+                <div class="card-body p-4">
+                   <!-- Header Row -->
+                   <div class="d-flex justify-content-between align-items-start mb-4 border-bottom pb-4">
+                      <div>
+                         <h5 class="fw-bold text-decoration-underline text-primary mb-2" id="modalModelProvider">Provider</h5>
+                         <div class="d-flex gap-2">
+                            <span class="badge bg-light text-secondary border fw-normal px-2"><i class="bi bi-info-circle"></i></span>
+                            <span class="badge bg-light text-secondary border fw-normal px-2">US</span>
+                            <span class="badge bg-light text-secondary border fw-normal px-2"><i class="bi bi-shield"></i></span>
+                         </div>
+                      </div>
+                      <div class="d-flex text-end gap-4">
+                         <div>
+                            <div class="small text-muted mb-1">Latency</div>
+                            <div class="fw-bold" id="modalLatency">--</div>
+                         </div>
+                         <div>
+                            <div class="small text-muted mb-1">Throughput</div>
+                            <div class="fw-bold" id="modalThroughput">--</div>
+                         </div>
+                         <div>
+                            <div class="small text-muted mb-1">Uptime</div>
+                            <div class="d-flex align-items-center justify-content-end">
+                               <span class="fw-bold me-2" id="modalUptime">--</span>
+                               <i class="bi bi-bar-chart-fill text-success"></i>
+                            </div>
+                         </div>
+                      </div>
+                   </div>
+
+                   <!-- Middle Row -->
+                   <div class="row g-4 mb-4">
+                      <!-- Left Col -->
+                      <div class="col-md-3">
+                         <div class="mb-3">
+                            <a href="#" class="text-decoration-underline text-secondary small fw-bold">Status Page <i class="bi bi-box-arrow-up-right" style="font-size: 0.7rem;"></i></a>
+                         </div>
+                         <div class="mb-3">
+                            <div class="fw-bold small text-muted mb-1">Data Policy</div>
+                            <div class="small font-monospace text-muted">Prompt Training: false</div>
+                         </div>
+                         <div>
+                            <div class="fw-bold small text-muted mb-1">Moderation</div>
+                            <div class="small text-muted">Managed by OpenRouter</div>
+                         </div>
+                      </div>
+
+                      <!-- Middle Col: Parameters -->
+                      <div class="col-md-3">
+                         <h6 class="fw-bold small text-muted mb-3">Supported Parameters</h6>
+                         <div class="d-flex flex-wrap gap-2">
+                            <span class="badge bg-light text-dark border fw-normal">Seed</span>
+                            <span class="badge bg-light text-dark border fw-normal">Max Tokens</span>
+                            <span class="badge bg-light text-dark border fw-normal">Response Format</span>
+                            <span class="badge bg-light text-dark border fw-normal">Tools</span>
+                            <span class="badge bg-light text-dark border fw-normal">Tool Choice</span>
+                         </div>
+                      </div>
+
+                      <!-- Right Col: Uptime -->
+                      <div class="col-md-6">
+                         <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold small text-muted mb-0">Recent Uptime</h6>
+                            <span class="small text-success fw-bold">100.00%</span>
+                         </div>
+                         <!-- Fake Bar Chart -->
+                         <div class="d-flex gap-1" style="height: 40px; opacity: 0.8;">
+                            <div class="flex-grow-1 bg-light rounded-1"></div>
+                            <div class="flex-grow-1 bg-light rounded-1"></div>
+                            <div class="flex-grow-1 bg-light rounded-1"></div>
+                            <div class="flex-grow-1 bg-secondary opacity-10 rounded-1"></div> <!-- Gap -->
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                            <div class="flex-grow-1 bg-success rounded-1"></div>
+                         </div>
+                         <div class="d-flex justify-content-between text-muted small mt-1" style="font-size: 0.7rem;">
+                            <span>Tue</span>
+                            <span>Wed</span>
+                            <span>Thu</span>
+                            <span>Now</span>
+                         </div>
+                      </div>
+                   </div>
+
+                   <!-- Bottom Metrics -->
+                   <div class="border-top pt-4">
+                      <div class="row g-4">
+                         <div class="col-6 col-md-2">
+                            <div class="small text-muted mb-1">Total Context</div>
+                            <div class="fw-bold fs-5" id="modalContextWindow">128K</div>
+                         </div>
+                         <div class="col-6 col-md-2">
+                            <div class="small text-muted mb-1">Max Output</div>
+                            <div class="fw-bold fs-5">16.4K</div>
+                         </div>
+                         <div class="col-6 col-md-2">
+                            <div class="small text-muted mb-1">Input Price</div>
+                            <div class="fw-bold fs-5" id="modalInputPrice">$1.75</div>
+                         </div>
+                         <div class="col-6 col-md-2">
+                            <div class="small text-muted mb-1">Output Price</div>
+                            <div class="fw-bold fs-5" id="modalOutputPrice">$14</div>
+                         </div>
+                         <div class="col-6 col-md-2">
+                            <div class="small text-muted mb-1">Cache Read</div>
+                            <div class="fw-bold fs-5">$0.175</div>
+                         </div>
+                         <div class="col-6 col-md-2">
+                            <div class="small text-muted mb-1">Input Audio</div>
+                            <div class="fw-bold fs-5">--</div>
+                         </div>
+                      </div>
+                   </div>
+                   
+                   <div class="mt-4 pt-3 border-top text-end">
+                       <a href="#" class="btn btn-outline-primary rounded-pill btn-sm" id="modalExternalLink" target="_blank">View Raw Data on OpenRouter <i class="bi bi-arrow-right"></i></a>
+                   </div>
+
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Updates Modal -->
+    <div class="modal fade" id="recentUpdatesModal" tabindex="-1" aria-labelledby="recentUpdatesModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+          <div class="modal-header border-bottom-0 pb-0">
+            <h5 class="modal-title fw-bold" id="recentUpdatesModalLabel">
+              <i class="bi bi-stars me-2 text-warning"></i>New Arrivals
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body pt-2">
+            <p class="text-muted small mb-3">The most recently released models in the catalog.</p>
+            <div id="recentModelsList" class="list-group list-group-flush rounded-3 border">
+               <!-- Content populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Bootstrap 5 JS Bundle (includes Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    <script src="script.js?v=1"></script>
   </body>
 </html>
