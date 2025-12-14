@@ -54,10 +54,11 @@ export async function fetchBenchmarkData() {
         console.log('[Benchmark] Fetching data from Artificial Analysis...');
         
         let url = 'https://artificialanalysis.ai/api/v2/data/llms/models';
-        if (isLocalhost()) {
-            console.log('[Benchmark] Running on localhost - using CORS proxy');
-            url = CORS_PROXY + encodeURIComponent(url);
-        }
+        
+        // ALWAYS use CORS proxy for client-side requests to this API
+        // The Artificial Analysis API does not support CORS for 3rd party domains
+        console.log('[Benchmark] Using CORS proxy for API request');
+        url = CORS_PROXY + encodeURIComponent(url);
 
         const response = await fetch(url, {
             headers: {
