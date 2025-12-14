@@ -32,6 +32,12 @@ Three powerful charting views to analyze the landscape:
 *   **Visualization:** Chart.js 4.x with `date-fns` adapter for time-series data.
 *   **Data Transport:** `fetch` API using CORS proxies (`corsproxy.io`) for seamless client-side data retrieval.
 
+## 🔒 Privacy & Security
+This application follows a **Local-First** architecture:
+*   **Zero Data Collection:** No server-side tracking, cookies, or analytics.
+*   **Client-Side Storage:** User preferences (Theme) and API keys are stored exclusively in your browser's `localStorage`.
+*   **Open Source:** The code runs entirely in your browser, visible and transparent.
+
 ## Setup & Usage
 
 This is a pure front-end application. No complex build steps (Webpack, Vite, etc.) are strictly required, though a local server is recommended.
@@ -39,15 +45,14 @@ This is a pure front-end application. No complex build steps (Webpack, Vite, etc
 ### 1. Installation
 Clone the repository:
 ```bash
-git clone https://github.com/yourusername/ai-model-comparison.git
-cd ai-model-comparison
+git clone https://github.com/adithyadaine/AI-Model-Price-Comparison.git
+cd AI-Model-Price-Comparison
 ```
 
-### 2. Configuration (Optional)
-To enable advanced benchmark data, add your Artificial Analysis API key:
-1.  Open `js/config.js`.
-2.  Set your key: `ARTIFICIAL_ANALYSIS_API_KEY: "your_key_here"`.
-*(Note: Basic pricing and specs work without this key).*
+### 2. Configuration (Secure API Key)
+To enable advanced benchmark data (Intelligence Index & Speed), you need an **Artificial Analysis API Key**.
+*   **Local Development:** Rename `js/config.template.js` to `js/config.js` and add your key. This file is git-ignored for security.
+*   **Public/Demo Mode:** If no config file is found (e.g. on GitHub Pages), the app switches to **"Bring Your Own Key"** mode. Users can enter their key via the "API Key" button in the sidebar, which is saved securely to their browser's `localStorage`.
 
 ### 3. Running Locally
 For the best experience (to avoid local file CORS restrictions), use a static local server.
