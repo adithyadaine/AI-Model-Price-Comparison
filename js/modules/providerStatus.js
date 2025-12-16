@@ -15,21 +15,22 @@ export const providerStatusPages = {
     'Mistral': 'https://status.mistral.ai',
     'Cohere': 'https://status.cohere.ai',
     'DeepSeek': 'https://status.deepseek.com',
-    'EssentialAI': null,
+    'EssentialAI': 'https://app.pulsetic.com/monitors/119196/overview',
     'AI21 Labs': 'https://status.ai21.com',
     'Alibaba': 'https://status.alibabacloud.com',
     'Amazon Bedrock': 'https://health.aws.amazon.com/health/status',
-    'MiniMax': null,
+    'MiniMax': 'https://app.pulsetic.com/monitors/119198/overview',
     'Moonshot AI': 'https://status.moonshot.cn', 
     'NVIDIA': 'https://status.ngc.nvidia.com', 
     'Perplexity AI': 'https://status.perplexity.ai',
     'xAI': 'https://status.x.ai',
-    'Zhipu AI': null,
+    'Zhipu AI': 'https://app.pulsetic.com/monitors/119199/overview',
     'Microsoft': 'https://status.azure.com',
     'Together AI': 'https://status.together.ai',
     'Fireworks AI': 'https://status.fireworks.ai',
     'Hugging Face': 'https://status.huggingface.co',
-    'OpenRouter': 'https://status.openrouter.ai'
+    'OpenRouter': 'https://status.openrouter.ai',
+    'Arcee AI': 'https://status.arcee.ai',
 };
 
 /**
