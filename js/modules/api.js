@@ -74,6 +74,7 @@ export const ALLOWED_PROVIDERS = [
   "Alibaba",
   "Amazon Bedrock",
   "Anthropic",
+  "Arcee AI",
   "Cohere",
   "DeepSeek",
   "EssentialAI",
@@ -150,7 +151,8 @@ function getProviderNameFromSlug(slug) {
     'ibm-granite': 'IBM',
     'openrouter': 'OpenRouter',
     'arcee-ai': 'Arcee AI',
-    'deepcogito': 'DeepCogito'
+    'deepcogito': 'DeepCogito',
+    'z-ai': 'Zhipu AI'
   };
   return mapping[slug.toLowerCase()] || slug.charAt(0).toUpperCase() + slug.slice(1);
 }
