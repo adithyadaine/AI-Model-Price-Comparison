@@ -16,6 +16,7 @@ export const providerUrls = {
   "NVIDIA": "https://www.nvidia.com/en-us/ai-data-science",
   "Perplexity AI": "https://www.perplexity.ai",
   "xAI": "https://x.ai",
+  "Xiaomi": "https://www.mi.com/global/",
   "Zhipu AI": "https://www.zhipuai.cn/en",
   "Microsoft": "https://www.microsoft.com",
   "01.AI": "https://www.01.ai",
@@ -87,6 +88,7 @@ export const ALLOWED_PROVIDERS = [
   "OpenAI",
   "Perplexity AI",
   "xAI",
+  "Xiaomi",
   "Zhipu AI"
 ];
 
@@ -152,6 +154,7 @@ function getProviderNameFromSlug(slug) {
     'openrouter': 'OpenRouter',
     'arcee-ai': 'Arcee AI',
     'deepcogito': 'DeepCogito',
+    'xiaomi': 'Xiaomi',
     'z-ai': 'Zhipu AI'
   };
   return mapping[slug.toLowerCase()] || slug.charAt(0).toUpperCase() + slug.slice(1);

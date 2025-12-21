@@ -24,6 +24,7 @@ export const providerStatusPages = {
     'NVIDIA': 'https://status.ngc.nvidia.com', 
     'Perplexity AI': 'https://status.perplexity.ai',
     'xAI': 'https://status.x.ai',
+    'Xiaomi': 'https://app.pulsetic.com/monitors/129398/overview',
     'Zhipu AI': 'https://app.pulsetic.com/monitors/119199/overview',
     'Microsoft': 'https://status.azure.com',
     'Together AI': 'https://status.together.ai',
