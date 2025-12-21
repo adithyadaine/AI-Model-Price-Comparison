@@ -4,18 +4,18 @@ A modern, responsive dashboard for comparing the pricing, capabilities, and perf
 
 ## Key Features
 
-### 🚀 Real-Time Data Intelligence
+### Real-Time Data Intelligence
 *   **Live API Integration:** Fetches up-to-the-minute model pricing, context windows, and specifications directly from **OpenRouter**.
 *   **Performance Benchmarks:** Integrates "Intelligence Index" and "Speed" metrics from **Artificial Analysis** to go beyond just price.
-*   **Status Monitoring:** Real-time health checks for critical APIs (OpenRouter, HuggingFace, Artificial Analysis) built directly into the UI.
+*   **Status Monitoring:** Real-time health checks for critical APIs (OpenRouter, HuggingFace, Artificial Analysis, Pulsetic) built directly into the UI.
 
-### 📊 Dynamic Visualizations
+### Dynamic Visualizations
 Three powerful charting views to analyze the landscape:
 *   **Pricing Bar Chart:** Compare Input vs. Output costs ($/1M tokens) side-by-side. Featuring custom X-axis with provider logos.
 *   **Efficiency Scatter Plot:** Visual "Price vs. Context" analysis to identify models that offer the most value (tokens per dollar).
 *   **Release Timeline:** A scrolling history of model releases to visualize the pace of innovation.
 
-### 💻 Modern UI/UX
+### Modern UI/UX
 *   **Dark Mode:** Fully themed dark/light mode toggle with persistent preferences.
 *   **Interactive Sidebar:**
     *   "Select Models" offcanvas panel for easy filtering.
@@ -32,7 +32,7 @@ Three powerful charting views to analyze the landscape:
 *   **Visualization:** Chart.js 4.x with `date-fns` adapter for time-series data.
 *   **Data Transport:** `fetch` API using CORS proxies (`corsproxy.io`) for seamless client-side data retrieval.
 
-## 🔒 Privacy & Security
+## Privacy & Security
 This application follows a **Local-First** architecture:
 *   **Zero Data Collection:** No server-side tracking, cookies, or analytics.
 *   **Client-Side Storage:** User preferences (Theme) and API keys are stored exclusively in your browser's `localStorage`.
@@ -68,7 +68,7 @@ This project is optimized for **GitHub Pages**.
 
 ## Attribution
 
-*   **Data Sources:** [OpenRouter](https://openrouter.ai), [Artificial Analysis](https://artificialanalysis.ai), [HuggingFace](https://huggingface.co).
+*   **Data Sources:** [OpenRouter](https://openrouter.ai), [Artificial Analysis](https://artificialanalysis.ai), [HuggingFace](https://huggingface.co), [Pulsetic](https://pulsetic.com).
 *   **Icons:** [Bootstrap Icons](https://icons.getbootstrap.com/).
 *   **Logos:** Provider logos fetched dynamically via Google Favicon API or hosted locally.
 
