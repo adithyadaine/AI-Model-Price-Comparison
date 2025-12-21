@@ -167,6 +167,22 @@ export async function updateSystemStatus() {
         }
     }
 
+    // Pulsetic
+    const pulseTextEl = document.getElementById('pulsetic-status-text');
+    const pulseDotEl = document.getElementById('pulsetic-status-dot');
+
+    if (pulseTextEl && pulseDotEl) {
+        // Pulsetic doesn't have a public status page in the same way, so we check availability of their landing page
+        const html = await fetchStatus('https://pulsetic.com/');
+        if (html) {
+             pulseTextEl.textContent = 'Operational';
+             pulseDotEl.className = 'status-dot bg-success status-pulse';
+        } else {
+             pulseTextEl.textContent = 'Unknown';
+             pulseDotEl.className = 'status-dot bg-secondary';
+        }
+    }
+
     // Update Timestamp
     const tsEl = document.getElementById('apiStatusLastChecked');
     if (tsEl) {
