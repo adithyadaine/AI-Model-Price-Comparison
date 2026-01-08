@@ -35,4 +35,14 @@ export const providerStatusPages = {
 };
 EOF
 
-echo "Successfully created js/modules/statusConfig.js"
+
+# Create .nojekyll to ensure all files are served (bypasses Jekyll)
+touch .nojekyll
+
+# IMPORTANT: Remove the ignore rule from .gitignore so the upload action sees the file
+# We use grep to filter out the line and overwrite the file
+if [ -f .gitignore ]; then
+    grep -v "js/modules/statusConfig.js" .gitignore > .gitignore.temp && mv .gitignore.temp .gitignore
+fi
+
+echo "Successfully created js/modules/statusConfig.js and prepared build artifacts"
