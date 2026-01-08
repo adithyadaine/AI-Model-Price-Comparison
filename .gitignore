@@ -31,3 +31,4 @@ logs/
 tmp/
 *.iml
 *.log.*
+js/modules/statusConfig.js

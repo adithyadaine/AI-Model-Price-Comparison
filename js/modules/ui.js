@@ -740,7 +740,7 @@ export function showRecentUpdatesModal(models) {
              const dB = parseValueForSort(b.releaseDate, "date");
              return dB - dA;
         })
-        .slice(0, 15);
+        .slice(0, 50);
 
     const listContainer = document.getElementById("recentModelsList_v2");
     listContainer.innerHTML = "";
