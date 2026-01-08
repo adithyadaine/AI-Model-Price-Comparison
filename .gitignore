@@ -1,9 +1,5 @@
 # Ignore all files in the models directory
-models.js
 js/config.js
-models.csv
-*.xlsx
-Icon
 node_modules/
 .env
 .DS_Store

@@ -28,7 +28,7 @@ import { state, setModels, setSelection } from './modules/state.js';
 import { setApiKey, fetchBenchmarkData } from './modules/benchmark.js';
 import { fetchLeaderboardData } from './modules/leaderboard.js';
 import { updateSystemStatus } from './modules/providerStatus.js';
-// import { CONFIG } from './config.js'; // REMOVED to support missing config file
+
 
 // Initialize Artificial Analysis API key dynamically
 // This allows the app to work even if config.js is not deployed (e.g. GitHub Pages)
@@ -186,7 +186,7 @@ async function loadModelsData() {
       if (latest) {
           ts.textContent = latest.releaseDate;
           ts.classList.remove("d-none");
-          // ts.classList.add("text-light"); // Removed to support theme switching
+
       } else {
           ts.textContent = new Date().toLocaleDateString(); 
           ts.classList.add("text-muted");

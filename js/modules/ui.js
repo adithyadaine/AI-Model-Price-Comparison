@@ -35,7 +35,7 @@ export function closePanel() {
 }
 
 // --- License Logic (Module Scope) ---
-// --- License Logic moved to utils.js ---
+
 
 
 export function updateHomeStats(models) {
@@ -148,7 +148,7 @@ export function createModelAnalysisCard(model) {
     const tps = getSpeedDisplay(benchmark);
     
      // Get HuggingFace Open LLM Leaderboard data (Already fetched above)
-    // const leaderboard = findLeaderboardScore(model.name, model.provider); // Removed redeclaration
+
     const lbSummary = getLeaderboardSummary(leaderboard);
     
     // Build leaderboard benchmarks section HTML (v2 leaderboard)
