@@ -80,6 +80,7 @@ export const ALLOWED_PROVIDERS = [
   "DeepSeek",
   "EssentialAI",
   "Google",
+  "Liquid AI",
   "Meta",
   "MiniMax",
   "Mistral",
