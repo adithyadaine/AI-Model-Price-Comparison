@@ -11,6 +11,7 @@ export const providerStatusPages = {
     'OpenAI': 'https://status.openai.com',
     'Anthropic': 'https://status.anthropic.com',
     'Google': 'https://status.cloud.google.com',
+    'Liquid AI': null,
     'Meta': 'https://metastatus.com/', 
     'Mistral': 'https://status.mistral.ai',
     'Cohere': 'https://status.cohere.ai',
