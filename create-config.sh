@@ -40,8 +40,9 @@ EOF
 touch .nojekyll
 
 
-# IMPORTANT: Delete .gitignore completely so the upload action includes EVERYTHING
-# This is the safest way to ensure generated files aren't ignored
-rm -f .gitignore
 
-echo "Successfully created js/modules/statusConfig.js, verified .nojekyll, and removed .gitignore for upload"
+# IMPORTANT: Explicitly un-ignore the file so the upload action includes it
+# Appending a negation pattern (!) allows git to see the file even if previously ignored
+echo "!js/modules/statusConfig.js" >> .gitignore
+
+echo "Successfully created js/modules/statusConfig.js, verified .nojekyll, and updated .gitignore for upload"
