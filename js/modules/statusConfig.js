@@ -1,10 +1,3 @@
-#!/bin/bash
-
-# Ensure directory exists
-mkdir -p js/modules
-
-# Create the config file
-cat > js/modules/statusConfig.js <<EOF
 export const providerStatusPages = {
     'OpenAI': 'https://status.openai.com',
     'Anthropic': 'https://status.anthropic.com',
@@ -34,16 +27,3 @@ export const providerStatusPages = {
     'OpenRouter': 'https://status.openrouter.ai',
     'Arcee AI': 'https://status.arcee.ai',
 };
-EOF
-
-
-# Create .nojekyll to ensure all files are served (bypasses Jekyll)
-touch .nojekyll
-
-
-
-# IMPORTANT: Explicitly un-ignore the file so the upload action includes it
-# Appending a negation pattern (!) allows git to see the file even if previously ignored
-echo "!js/modules/statusConfig.js" >> .gitignore
-
-echo "Successfully created js/modules/statusConfig.js, verified .nojekyll, and updated .gitignore for upload"

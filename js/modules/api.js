@@ -72,6 +72,7 @@ export const providerUrls = {
 
 export const ALLOWED_PROVIDERS = [
   "AI21 Labs",
+  "AllenAI",
   "Alibaba",
   "Amazon Bedrock",
   "Anthropic",
