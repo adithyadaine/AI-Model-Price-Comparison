@@ -586,9 +586,17 @@ function setupEventListeners() {
     }
 }
 
+function updateCopyrightYear() {
+    const yearElem = document.getElementById("copyrightYear");
+    if (yearElem) {
+        yearElem.textContent = `© ${new Date().getFullYear()}`;
+    }
+}
+
 // --- Init ---
 function init() {
   setTheme(getStoredTheme());
+  updateCopyrightYear();
   setupEventListeners();
   loadModelsData();
 }
